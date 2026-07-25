@@ -29,6 +29,7 @@ interface PhaseFormModalProps {
     due_date?: string;
     progress?: number;
     color?: string;
+    order?: number;
   };
   onSubmit: (data: PhaseFormData) => void;
   isSaving: boolean;
