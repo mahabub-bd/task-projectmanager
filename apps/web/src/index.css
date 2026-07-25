@@ -103,6 +103,32 @@ body {
   color: hsl(var(--foreground));
 }
 
+@keyframes taskflow-logo-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-4px) rotate(-3deg); }
+}
+
+@keyframes taskflow-logo-pop {
+  0%, 15% { transform: scale(0.78); opacity: 0; }
+  45% { transform: scale(1.1); opacity: 1; }
+  65%, 100% { transform: scale(1); opacity: 1; }
+}
+
+.taskflow-logo-mark {
+  animation: taskflow-logo-float 3.5s ease-in-out infinite;
+}
+
+.taskflow-logo-icon {
+  animation: taskflow-logo-pop 850ms cubic-bezier(.16, 1, .3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .taskflow-logo-mark,
+  .taskflow-logo-icon {
+    animation: none;
+  }
+}
+
 /* Compact mode styles */
 .compact {
   --compact-factor: 0.75;

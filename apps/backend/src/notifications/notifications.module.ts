@@ -1,29 +1,26 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
-import { Notification } from '../entities/notification.entity';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { NotificationPreference } from '../entities/notification-preference.entity';
-import { NotificationsService } from './notifications.service';
+import { Notification } from '../entities/notification.entity';
 import { NotificationsController } from './notifications.controller';
 import { NotificationsGateway } from './notifications.gateway';
-import { User } from '../entities/user.entity';
-import { Organization } from '../entities/organization.entity';
+import { NotificationsService } from './notifications.service';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       Notification,
       NotificationPreference,
-      User,
-      Organization,
     ]),
     JwtModule.registerAsync({
+      imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'),
+        secret: configService.get<string>('JWT_SECRET', 'your-secret-key'),
         signOptions: {
-          expiresIn: configService.get<string>('JWT_EXPIRATION', '1h') as any,
+          expiresIn: `${configService.get<number>('JWT_EXPIRATION', 3600)}s`,
         },
       }),
     }),

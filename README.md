@@ -8,10 +8,11 @@ A comprehensive enterprise-grade project and task management application built w
 - **Task Management**: Comprehensive task tracking with assignments, priorities, and status updates
 - **Organization Hierarchy**: Multi-tenant support with organizations and departments
 - **User Management**: Team member management with role-based permissions
-- **Real-time Updates**: Live notifications and updates via WebSocket connections
+- **Notifications**: In-app notification center with read, delete, and preference controls
 - **Authentication & Authorization**: JWT-based auth with granular permission system
 - **Audit Logging**: Complete activity tracking for compliance and security
 - **Modern UI**: Beautiful, responsive interface built with Radix UI and Tailwind CSS
+- **Polished Sign-in Experience**: Responsive login page with password visibility control, inline validation, secure-session messaging, and a demo credential autofill action
 
 ## Tech Stack
 
@@ -24,14 +25,12 @@ A comprehensive enterprise-grade project and task management application built w
 - **Redux Toolkit** - State management
 - **React Router** - Client-side routing
 - **React Hook Form** - Form handling with Zod validation
-- **Socket.io Client** - Real-time communication
 
 ### Backend
 - **NestJS** - Node.js framework
 - **TypeScript** - Type safety
 - **TypeORM** - ORM for database operations
 - **PostgreSQL** - Database
-- **Socket.io** - WebSocket server
 - **Passport** - Authentication middleware
 - **JWT** - Token-based authentication
 - **Nodemailer** - Email service
@@ -92,7 +91,6 @@ Before running this project, ensure you have installed:
    **Frontend** (`apps/web/.env`):
    ```env
    VITE_API_URL=http://localhost:3001
-   VITE_WS_URL=ws://localhost:3001
    ```
 
 4. **Set up the database**
@@ -202,12 +200,16 @@ project-and-taskmanager/
 - `pnpm preview` - Preview production build
 - `pnpm lint` - Run ESLint
 
-## Default Credentials
+## Sign in and Demo Access
 
-After starting the application, you can register a new user or use these defaults (if seeded):
+The login page validates the email and password before submitting credentials to the API. It also includes a **Fill demo credentials** action, which safely populates the form so the user can review the details and choose **Sign in**.
 
-- Email: `admin@example.com`
-- Password: `admin123`
+For a seeded local environment, use:
+
+- Email: `superadmin@system.com`
+- Password: `123456`
+
+> The demo action fills the form only; it does not sign the user in automatically. Authentication remains governed by the backend-issued JWT access and refresh tokens.
 
 ## API Documentation
 

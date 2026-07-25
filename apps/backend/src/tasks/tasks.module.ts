@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuditLogsModule } from '../audit-logs/audit-logs.module';
+import { AppNotificationsModule } from '../notifications/notifications.module';
 import { Project } from '../entities/project.entity';
 import { Tag } from '../entities/tag.entity';
 import { TaskAssignment } from '../entities/task-assignment.entity';
@@ -21,6 +22,7 @@ import { TasksService } from './tasks.service';
       Project,
     ]),
     AuditLogsModule,
+    AppNotificationsModule,
   ],
   controllers: [TasksController],
   providers: [TasksService],

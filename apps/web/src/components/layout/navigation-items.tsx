@@ -1,4 +1,4 @@
-import { Building, Building2, CheckSquare, FileText, Flag, FolderKanban, Key, LayoutDashboard, ListChecks, Settings, Shield, Users, Network, BadgeCheck, BookOpen } from 'lucide-react';
+import { Building, Building2, CheckSquare, FileText, Flag, FolderKanban, Key, LayoutDashboard, ListChecks, Settings, Shield, Users, Network, BadgeCheck, BookOpen, Bell } from 'lucide-react';
 import { NavGroup } from './types';
 
 export const navigationItems: NavGroup[] = [
@@ -6,6 +6,7 @@ export const navigationItems: NavGroup[] = [
     title: 'Main',
     items: [
       { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+      { name: 'Notifications', href: '/notifications', icon: Bell },
     ]
   },
   {

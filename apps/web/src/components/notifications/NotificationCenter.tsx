@@ -6,18 +6,28 @@ import { formatDistanceToNow } from 'date-fns';
 import { Bell, Check, CheckSquare, Clock, Trash2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useNotificationsSocket } from '@/hooks/useNotificationsSocket';
 
 export function NotificationCenter() {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const { data: notificationsData, isLoading } = useGetNotificationsQuery();
+  const { data: notificationsData, isLoading, refetch } = useGetNotificationsQuery();
+  const { unreadCount: socketUnreadCount, latestNotification } = useNotificationsSocket();
   const [markAsRead] = useMarkAsReadMutation();
   const [markAllAsRead] = useMarkAllAsReadMutation();
   const [deleteNotification] = useDeleteNotificationMutation();
 
   const notifications = notificationsData?.items || [];
-  const unreadCount = notifications.filter((n) => !n.read_at).length;
+  // Use socket count if available, otherwise calculate from notifications
+  const unreadCount = socketUnreadCount || notifications.filter((n) => !n.read_at).length;
+
+  // Refetch notifications when real-time notification arrives
+  useEffect(() => {
+    if (latestNotification) {
+      refetch();
+    }
+  }, [latestNotification, refetch]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

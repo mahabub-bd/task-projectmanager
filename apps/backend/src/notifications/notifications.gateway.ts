@@ -1,21 +1,20 @@
+import { Inject, forwardRef } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { InjectRepository } from '@nestjs/typeorm';
 import {
   ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
   SubscribeMessage,
-  WebSocketGateway as WSGateway,
+  WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { Repository } from 'typeorm';
-import { User } from '../entities/user.entity';
+import { NotificationsService } from './notifications.service';
 
-@WSGateway({
+@WebSocketGateway({
   cors: {
-    origin: ['http://localhost:4200', 'http://localhost:3000', 'http://localhost:5173'],
+    origin: '*', // In production, set to your frontend domain
     credentials: true,
   },
   namespace: '/notifications',
@@ -24,16 +23,17 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
   @WebSocketServer()
   server: Server;
 
-  private userSocketMap = new Map<number, string[]>(); // userId -> socketIds
+  private connectedUsers = new Map<number, Socket[]>(); // userId -> sockets
 
   constructor(
     private jwtService: JwtService,
-    @InjectRepository(User)
-    private usersRepository: Repository<User>,
+    @Inject(forwardRef(() => NotificationsService))
+    private notificationsService: NotificationsService,
   ) {}
 
   async handleConnection(client: Socket) {
     try {
+      // Extract token from handshake
       const token = client.handshake.auth.token || client.handshake.headers.authorization?.replace('Bearer ', '');
 
       if (!token) {
@@ -41,98 +41,99 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
         return;
       }
 
+      // Verify token and get user
       const payload = this.jwtService.verify(token);
-      const user = await this.usersRepository.findOne({
-        where: { id: payload.sub },
-      });
+      const userId = payload.sub;
 
-      if (!user) {
-        client.disconnect();
-        return;
+      // Store the connection
+      if (!this.connectedUsers.has(userId)) {
+        this.connectedUsers.set(userId, []);
       }
-
-      client.data.userId = user.id;
-      client.data.organizationId = user.organization_id;
-
-      // Add socket to user's socket list
-      const socketIds = this.userSocketMap.get(user.id) || [];
-      socketIds.push(client.id);
-      this.userSocketMap.set(user.id, socketIds);
+      this.connectedUsers.get(userId)!.push(client);
 
       // Join user's personal room
-      await client.join(`user:${user.id}`);
+      client.join(`user:${userId}`);
 
       // Send unread count
-      const unreadCount = await this.getUnreadCount(user.id);
-      client.emit('unread_count', unreadCount);
+      const unreadCount = await this.notificationsService.getUnreadCount(userId);
+      client.emit('unread-count', unreadCount);
 
-      console.log(`User ${user.email} connected to notifications`);
+      console.log(`User ${userId} connected. Total connected: ${this.getConnectedUserCount()}`);
     } catch (error) {
-      console.error('WebSocket connection error:', error);
+      console.error('Connection error:', error instanceof Error ? error.message : String(error));
       client.disconnect();
     }
   }
 
   handleDisconnect(client: Socket) {
-    const userId = client.data.userId;
-
-    if (userId) {
-      // Remove socket from user's socket list
-      const socketIds = this.userSocketMap.get(userId) || [];
-      const index = socketIds.indexOf(client.id);
-      if (index > -1) {
-        socketIds.splice(index, 1);
+    // Remove socket from connected users
+    for (const [userId, sockets] of this.connectedUsers.entries()) {
+      const index = sockets.findIndex(s => s.id === client.id);
+      if (index !== -1) {
+        sockets.splice(index, 1);
+        if (sockets.length === 0) {
+          this.connectedUsers.delete(userId);
+        }
+        console.log(`User ${userId} disconnected. Total connected: ${this.getConnectedUserCount()}`);
+        break;
       }
-
-      if (socketIds.length === 0) {
-        this.userSocketMap.delete(userId);
-      } else {
-        this.userSocketMap.set(userId, socketIds);
-      }
-
-      console.log(`User ${userId} disconnected from notifications`);
     }
   }
 
-  @SubscribeMessage('mark_read')
-  async handleMarkRead(
-    @MessageBody() data: { notificationId: number },
+  // Send notification to specific user
+  sendNotificationToUser(userId: number, notification: any) {
+    this.server.to(`user:${userId}`).emit('notification', notification);
+  }
+
+  // Send unread count to specific user
+  sendUnreadCount(userId: number, count: number) {
+    this.server.to(`user:${userId}`).emit('unread-count', count);
+  }
+
+  // Broadcast to organization
+  sendToOrganization(organizationId: number, event: string, data: any) {
+    this.server.to(`org:${organizationId}`).emit(event, data);
+  }
+
+  // Join organization room
+  @SubscribeMessage('join-organization')
+  handleJoinOrganization(
+    @MessageBody() data: { organizationId: number },
     @ConnectedSocket() client: Socket,
-  ): Promise<void> {
-    const userId = client.data.userId;
-
-    if (!userId) {
-      return;
-    }
-
-    // Broadcast to all user's sockets
-    this.server.to(`user:${userId}`).emit('notification_marked_read', {
-      notificationId: data.notificationId,
-    });
+  ) {
+    const room = `org:${data.organizationId}`;
+    client.join(room);
+    client.emit('joined-organization', { organizationId: data.organizationId });
   }
 
-  @SubscribeMessage('mark_all_read')
-  async handleMarkAllRead(@ConnectedSocket() client: Socket): Promise<void> {
-    const userId = client.data.userId;
-
-    if (!userId) {
-      return;
-    }
-
-    // Broadcast to all user's sockets
-    this.server.to(`user:${userId}`).emit('all_notifications_marked_read');
+  // Leave organization room
+  @SubscribeMessage('leave-organization')
+  handleLeaveOrganization(
+    @MessageBody() data: { organizationId: number },
+    @ConnectedSocket() client: Socket,
+  ) {
+    const room = `org:${data.organizationId}`;
+    client.leave(room);
+    client.emit('left-organization', { organizationId: data.organizationId });
   }
 
-  sendNotificationToUser(userId: number, notification: any): void {
-    this.server.to(`user:${userId}`).emit('new_notification', notification);
+  // Test connection
+  @SubscribeMessage('ping')
+  handlePing(@ConnectedSocket() client: Socket) {
+    client.emit('pong', { timestamp: new Date().toISOString() });
   }
 
-  sendUnreadCount(userId: number, count: number): void {
-    this.server.to(`user:${userId}`).emit('unread_count', count);
+  private getConnectedUserCount(): number {
+    return this.connectedUsers.size;
   }
 
-  private async getUnreadCount(userId: number): Promise<number> {
-    // This will be called from the service
-    return 0;
+  // Check if user is online
+  isUserOnline(userId: number): boolean {
+    return this.connectedUsers.has(userId) && this.connectedUsers.get(userId)!.length > 0;
+  }
+
+  // Get all connected user IDs
+  getOnlineUsers(): number[] {
+    return Array.from(this.connectedUsers.keys());
   }
 }

@@ -6,6 +6,7 @@ import { Header } from './layout/Header';
 import { Sidebar } from './layout/Sidebar';
 import { useBreadcrumbs } from './layout/breadcrumbs';
 import { useFilteredNavigation } from './layout/use-filtered-navigation';
+import NotificationToast from './notifications/NotificationToast';
 
 interface LayoutProps {
   children: ReactNode;
@@ -77,6 +78,9 @@ export default function Layout({ children }: LayoutProps) {
           onClick={() => setSidebarOpen(false)}
         />
       )}
+
+      {/* Notification Toast */}
+      <NotificationToast />
     </div>
   );
 }

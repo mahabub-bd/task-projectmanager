@@ -19,6 +19,7 @@ import { CreateTaskDto } from './dto/create-task.dto';
 import { QueryTasksDto } from './dto/query-tasks.dto';
 import { UpdateTaskStatusDto } from './dto/update-task-status.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class TasksService {
@@ -36,6 +37,7 @@ export class TasksService {
     @InjectRepository(Project)
     private projectRepository: Repository<Project>,
     private auditLogsService: AuditLogsService,
+    private notificationsService: NotificationsService,
   ) {}
 
   // Helper method to update project progress
@@ -97,6 +99,17 @@ export class TasksService {
     // Update project progress
     if (savedTask.project_id) {
       await this.updateProjectProgress(Number(savedTask.project_id));
+    }
+
+    // Send notification if task is assigned to someone
+    if (savedTask.assigned_to && savedTask.assigned_to !== userId) {
+      await this.notificationsService.notifyTaskAssigned(
+        savedTask.assigned_to,
+        savedTask.project?.organization_id || 1,
+        savedTask.title,
+        savedTask.id,
+        'System',
+      );
     }
 
     return this.findOne(Number(savedTask.id));
@@ -306,6 +319,16 @@ export class TasksService {
     // Update completed_at if task is completed
     if (newStatus === TaskStatus.COMPLETED) {
       await this.taskRepository.update(id, { completed_at: new Date() });
+
+      // Send notification for task completion
+      const organizationId = task.project?.organization_id || task.department?.organization_id || 1;
+      await this.notificationsService.notifyTaskCompleted(
+        task.assigned_to || userId,
+        organizationId,
+        task.title,
+        task.id,
+        'System',
+      );
     }
 
     return this.findOne(id);
@@ -355,6 +378,20 @@ export class TasksService {
       description: `Assigned task "${task.title}" to ${assignTaskDto.user_ids.length} user(s)`,
       organization_id: task.department?.organization_id,
     });
+
+    // Send notifications to newly assigned users
+    const organizationId = task.project?.organization_id || task.department?.organization_id || 1;
+    for (const userIdToAssign of assignTaskDto.user_ids) {
+      if (!oldAssignedUserIds.includes(userIdToAssign)) {
+        await this.notificationsService.notifyTaskAssigned(
+          userIdToAssign,
+          organizationId,
+          task.title,
+          task.id,
+          'System',
+        );
+      }
+    }
 
     return this.findOne(id);
   }

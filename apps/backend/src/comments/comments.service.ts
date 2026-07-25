@@ -6,6 +6,7 @@ import { CommentLike } from '../entities/comment-like.entity';
 import { Task } from '../entities/task.entity';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class CommentsService {
@@ -16,6 +17,7 @@ export class CommentsService {
     private taskRepository: Repository<Task>,
     @InjectRepository(CommentLike)
     private commentLikeRepository: Repository<CommentLike>,
+    private notificationsService: NotificationsService,
   ) {}
 
   async create(createCommentDto: CreateCommentDto, userId: number): Promise<TaskComment> {
@@ -39,6 +41,35 @@ export class CommentsService {
 
     // Update task comment count
     await this.taskRepository.increment({ id: createCommentDto.task_id }, 'comment_count', 1);
+
+    // Send notification to task assignee if they are not the commenter
+    if (task.assigned_to && task.assigned_to !== userId) {
+      const organizationId = task.project?.organization_id || task.department?.organization_id || 1;
+      await this.notificationsService.notifyCommentAdded(
+        task.assigned_to,
+        organizationId,
+        task.title,
+        task.id,
+        'System', // Should be actual user name
+      );
+    }
+
+    // Send notifications to mentioned users
+    if (createCommentDto.mentions && createCommentDto.mentions.length > 0) {
+      const organizationId = task.project?.organization_id || task.department?.organization_id || 1;
+      for (const mentionedUserId of createCommentDto.mentions) {
+        if (mentionedUserId !== userId) {
+          await this.notificationsService.notifyMention(
+            mentionedUserId,
+            organizationId,
+            'System',
+            'task',
+            task.title,
+            task.id,
+          );
+        }
+      }
+    }
 
     return this.findOne(savedComment.id);
   }

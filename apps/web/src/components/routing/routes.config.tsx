@@ -29,6 +29,7 @@ const PermissionsByRolePage = lazy(() => import('@/pages/PermissionsByRolePage')
 const SettingsPage = lazy(() => import('@/pages/SettingsPage'));
 const AuditLogsPage = lazy(() => import('@/pages/AuditLogsPage'));
 const ProfilePage = lazy(() => import('@/pages/ProfilePage'));
+const NotificationsPage = lazy(() => import('@/pages/NotificationsPage'));
 
 export interface AppRoute {
   path: string;
@@ -74,5 +75,6 @@ export const routes: AppRoute[] = [
 
   { path: '/settings', element: <SettingsPage /> },
   { path: '/profile', element: <ProfilePage /> },
+  { path: '/notifications', element: <NotificationsPage /> },
   { path: '/audit-logs', element: <AuditLogsPage />, permission: 'read:audit' },
 ]; 

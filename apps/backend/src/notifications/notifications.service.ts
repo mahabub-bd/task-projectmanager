@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, forwardRef, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Notification } from '../entities/notification.entity';
@@ -14,7 +14,8 @@ export class NotificationsService {
     private notificationsRepository: Repository<Notification>,
     @InjectRepository(NotificationPreference)
     private preferencesRepository: Repository<NotificationPreference>,
-    private wsGateway: NotificationsGateway,
+    @Inject(forwardRef(() => NotificationsGateway))
+    private notificationsGateway: NotificationsGateway,
   ) {}
 
   async create(
@@ -31,7 +32,11 @@ export class NotificationsService {
     const saved = await this.notificationsRepository.save(notification);
 
     // Send real-time notification via WebSocket
-    this.wsGateway.sendNotificationToUser(userId, saved);
+    this.notificationsGateway.sendNotificationToUser(userId, saved);
+
+    // Update unread count for the user
+    const unreadCount = await this.getUnreadCount(userId);
+    this.notificationsGateway.sendUnreadCount(userId, unreadCount);
 
     return saved;
   }
@@ -88,8 +93,6 @@ export class NotificationsService {
       notification.read_at = new Date();
       await this.notificationsRepository.save(notification);
 
-      // Send updated unread count
-      this.updateUnreadCount(userId);
     }
 
     return notification;
@@ -104,16 +107,12 @@ export class NotificationsService {
       .andWhere('read_at IS NULL')
       .execute();
 
-    // Send updated unread count
-    this.updateUnreadCount(userId);
   }
 
   async delete(id: number, userId: number): Promise<void> {
     const notification = await this.findOne(id, userId);
     await this.notificationsRepository.remove(notification);
 
-    // Send updated unread count
-    this.updateUnreadCount(userId);
   }
 
   async getUnreadCount(userId: number): Promise<number> {
@@ -191,12 +190,6 @@ export class NotificationsService {
     }
 
     return preferences;
-  }
-
-  private updateUnreadCount(userId: number): void {
-    this.getUnreadCount(userId).then((count) => {
-      this.wsGateway.sendUnreadCount(userId, count);
-    });
   }
 
   // Helper methods to create different types of notifications
