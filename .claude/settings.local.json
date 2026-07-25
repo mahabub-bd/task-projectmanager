@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git commit -m 'fix: add --legacy-peer-deps to npm install in Dockerfile *)"
+    ]
+  }
+}
