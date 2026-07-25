@@ -1,0 +1,38 @@
+# Dependencies
+node_modules
+
+# Build outputs
+dist
+.build
+
+# Git
+.git
+.gitignore
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+
+# IDE
+.vscode
+.idea
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage
+.nyc_output
+
+# Misc
+.cache
+temp
+tmp
+
+# Scripts (not needed in production container)
+scripts

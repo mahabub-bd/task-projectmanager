@@ -1,0 +1,54 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: ./apps/backend/Dockerfile
+    container_name: backend
+    image: taskmanagment-backend:latest
+    ports:
+      - "3000:3000"
+    environment:
+      # Using host.docker.internal to connect to local PostgreSQL on host machine
+      DB_HOST: host.docker.internal
+      DB_PORT: 5432
+      DB_USERNAME: postgres
+      DB_PASSWORD: "1234"
+      DB_DATABASE: taskmanager
+      DB_SYNCHRONIZE: "true"
+      DB_LOGGING: "false"
+      DB_SSL: "false"
+      JWT_SECRET: your-super-secret-jwt-key-change-this-in-production
+      JWT_EXPIRATION: 3600
+      JWT_REFRESH_SECRET: your-super-secret-refresh-key-change-this-in-production
+      JWT_REFRESH_EXPIRATION: 604800
+      CORS_ORIGIN: "*"
+      PORT: 3000
+      NODE_ENV: production
+      AWS_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: your-aws-access-key-id
+      AWS_SECRET_ACCESS_KEY: your-aws-secret-access-key
+      AWS_S3_BUCKET: your-bucket-name
+      AWS_S3_ENDPOINT: https://s3.amazonaws.com
+    restart: unless-stopped
+    networks:
+      - taskmanagment-network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: ./apps/web/Dockerfile
+      args:
+        - VITE_API_URL=http://localhost:3000/api
+    container_name: frontend
+    image: taskmanagment-frontend:latest
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - taskmanagment-network
+
+networks:
+  taskmanagment-network:
+    driver: bridge
