@@ -11,10 +11,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { useGetDepartmentsListQuery, useGetUsersByDepartmentQuery } from '@/store/api';
+import { useGetDepartmentsListQuery, useGetUsersByDepartmentQuery, useGetUsersListQuery } from '@/store/api';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
-import { Users, X } from 'lucide-react';
+import { Building2, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -52,6 +52,34 @@ const projectColors = [
   '#ef4444', '#f97316', '#f59e0b', '#84cc16', '#10b981', '#06b6d4', '#3b82f6', '#8b5cf6', '#d946ef', '#f43f5e'
 ];
 
+function getUserInitials(name: string): string {
+  const words = name.trim().split(/\s+/);
+  if (words.length >= 2) {
+    return (words[0][0] + words[words.length - 1][0]).toUpperCase();
+  }
+  return name.slice(0, 2).toUpperCase();
+}
+
+function getUserAvatarColor(name: string): string {
+  const colors = [
+    'bg-blue-500',
+    'bg-green-500',
+    'bg-purple-500',
+    'bg-orange-500',
+    'bg-pink-500',
+    'bg-teal-500',
+    'bg-indigo-500',
+    'bg-red-500',
+    'bg-cyan-500',
+    'bg-emerald-500',
+  ];
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return colors[Math.abs(hash) % colors.length];
+}
+
 export default function ProjectFormModal({
   open,
   onClose,
@@ -73,8 +101,10 @@ export default function ProjectFormModal({
     selectedDepartment || '',
     { skip: !selectedDepartment }
   );
+  const { data: allUsers } = useGetUsersListQuery(editingProject?.organization_id ? String(editingProject.organization_id) : undefined);
 
   const departments = departmentsResponse || [];
+  const users = allUsers || [];
 
   const {
     register,
@@ -160,8 +190,12 @@ export default function ProjectFormModal({
 
   const getMemberDisplayName = (member: any) => {
     if (member.user_id) {
-      const user = departmentUsers?.find((u: any) => u.id === member.user_id);
-      return user?.name || `User ${member.user_id}`;
+      // First try to find in all users (for editing project)
+      const user = users?.find((u: any) => u.id === member.user_id);
+      if (user) return user.name;
+      // Then try to find in department users (for adding new members)
+      const deptUser = departmentUsers?.find((u: any) => u.id === member.user_id);
+      return deptUser?.name || `User ${member.user_id}`;
     }
     const dept = departments.find((d: any) => d.id === member.department_id);
     return dept?.name || `Department ${member.department_id}`;
@@ -315,43 +349,45 @@ export default function ProjectFormModal({
           </div>
         </div>
 
-        <div>
-          <Label htmlFor="budget">Budget</Label>
-          <Input
-            id="budget"
-            type="number"
-            {...register('budget')}
-            placeholder="Project budget"
-            className={errors.budget ? 'border-destructive' : ''}
-          />
-          {errors.budget && (
-            <p className="mt-1 text-sm text-destructive">{errors.budget.message}</p>
-          )}
-        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <Label htmlFor="budget">Budget</Label>
+            <Input
+              id="budget"
+              type="number"
+              {...register('budget')}
+              placeholder="Project budget"
+              className={errors.budget ? 'border-destructive' : ''}
+            />
+            {errors.budget && (
+              <p className="mt-1 text-sm text-destructive">{errors.budget.message}</p>
+            )}
+          </div>
 
-        <div>
-          <Label htmlFor="manager_id">Project Manager</Label>
-          <Select
-            value={watch('manager_id') || 'none'}
-            onValueChange={(value) =>
-              setValue('manager_id', value === 'none' ? '' : value)
-            }
-          >
-            <SelectTrigger className="mt-2">
-              <SelectValue placeholder="Select a project manager" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="none">No manager assigned</SelectItem>
-              {managerOptions.map((manager: any) => (
-                <SelectItem key={manager.id} value={String(manager.id)}>
-                  {manager.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {errors.manager_id && (
-            <p className="mt-1 text-sm text-destructive">{errors.manager_id.message}</p>
-          )}
+          <div>
+            <Label htmlFor="manager_id">Project Manager</Label>
+            <Select
+              value={watch('manager_id') || 'none'}
+              onValueChange={(value) =>
+                setValue('manager_id', value === 'none' ? '' : value)
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select a project manager" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">No manager assigned</SelectItem>
+                {managerOptions.map((manager: any) => (
+                  <SelectItem key={manager.id} value={String(manager.id)}>
+                    {manager.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.manager_id && (
+              <p className="mt-1 text-sm text-destructive">{errors.manager_id.message}</p>
+            )}
+          </div>
         </div>
 
         {/* Team Members Section */}
@@ -363,7 +399,6 @@ export default function ProjectFormModal({
                 value={selectedDepartment || ''}
                 onValueChange={(value) => {
                   setSelectedDepartment(value);
-                  setSelectedUsers([]);
                 }}
               >
                 <SelectTrigger className="flex-1">
@@ -404,29 +439,42 @@ export default function ProjectFormModal({
           {membersList.length > 0 && (
             <div className="space-y-2">
               <Label>Team Members ({membersList.length})</Label>
-              <div className="space-y-2 max-h-40 overflow-y-auto">
-                {membersList.map((member, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between p-2 bg-muted rounded-lg"
-                  >
-                    <div className="flex items-center gap-2">
-                      <Users className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">{getMemberDisplayName(member)}</span>
-                      <span className="text-xs text-muted-foreground">
-                        ({member.role})
-                      </span>
-                    </div>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleRemoveMember(index)}
+              <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto">
+                {membersList.map((member, index) => {
+                  const userName = member.user_id ? users?.find((u: any) => u.id === member.user_id)?.name : null;
+                  const avatarColor = userName ? getUserAvatarColor(userName) : 'bg-muted';
+                  const initials = userName ? getUserInitials(userName) : null;
+
+                  return (
+                    <div
+                      key={index}
+                      className="flex items-center gap-2 p-2 bg-muted rounded-lg group"
                     >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
+                      {userName ? (
+                        <div className={`h-8 w-8 rounded-full flex items-center justify-center text-white text-xs font-semibold shrink-0 ${avatarColor}`}>
+                          {initials}
+                        </div>
+                      ) : (
+                        <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                          <Building2 className="h-4 w-4 text-muted-foreground" />
+                        </div>
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium truncate">{getMemberDisplayName(member)}</p>
+                        <p className="text-xs text-muted-foreground capitalize">{member.role}</p>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+                        onClick={() => handleRemoveMember(index)}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}

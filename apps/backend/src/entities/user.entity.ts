@@ -38,6 +38,9 @@ export class User extends BaseEntity {
   @Column({ length: 255, unique: true })
   email: string;
 
+  @Column({ name: 'employee_id', length: 50, nullable: true, unique: true })
+  employee_id: string | null;
+
   @Column({ name: 'password_hash' })
   password_hash: string;
 

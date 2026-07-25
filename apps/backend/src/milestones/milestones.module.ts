@@ -4,11 +4,12 @@ import { MilestonesService } from './milestones.service';
 import { MilestonesController } from './milestones.controller';
 import { Milestone } from '../entities/milestone.entity';
 import { MilestoneStatusHistory } from '../entities/milestone-status-history.entity';
+import { Phase } from '../entities/phase.entity';
 import { AuditLogsModule } from '../audit-logs/audit-logs.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Milestone, MilestoneStatusHistory]),
+    TypeOrmModule.forFeature([Milestone, MilestoneStatusHistory, Phase]),
     AuditLogsModule,
   ],
   controllers: [MilestonesController],

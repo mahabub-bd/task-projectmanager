@@ -1,6 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, CheckCircle, RefreshCw } from 'lucide-react';
+import { ArrowRight, CheckCircle, RefreshCw, UserPlus } from 'lucide-react';
 import { format } from 'date-fns';
 
 const safeFormatDate = (dateValue: string | Date | null | undefined, formatStr: string = 'MMM d, yyyy • h:mm a') => {
@@ -44,31 +44,43 @@ export default function ProjectActivityTimeline({ statusHistory, onRefresh }: Pr
       </div>
       {statusHistory && statusHistory.length > 0 ? (
         <div className="space-y-2">
-          {statusHistory.slice(0, 5).map((history: any) => (
-            <div key={history.id} className="flex items-start gap-2 text-xs pb-2 last:pb-0 border-b last:border-0">
-              <div className="mt-0.5">
-                <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center">
-                  <CheckCircle className="h-3 w-3 text-primary" />
+          {statusHistory.slice(0, 5).map((history: any) => {
+            const isMemberAddition = history.from_status === null && history.reason?.includes('Added');
+
+            return (
+              <div key={history.id} className="flex items-start gap-2 text-xs pb-2 last:pb-0 border-b last:border-0">
+                <div className="mt-0.5">
+                  <div className={`h-6 w-6 rounded-full flex items-center justify-center ${isMemberAddition ? 'bg-green-100' : 'bg-primary/10'}`}>
+                    {isMemberAddition ? (
+                      <UserPlus className="h-3 w-3 text-green-600" />
+                    ) : (
+                      <CheckCircle className="h-3 w-3 text-primary" />
+                    )}
+                  </div>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
+                    <span className="font-medium truncate">{history.changed_by_user?.name}</span>
+                    <span className="text-muted-foreground">•</span>
+                    <span className="text-muted-foreground">{safeFormatDate(history.changed_at)}</span>
+                  </div>
+                  {isMemberAddition ? (
+                    <p className="text-muted-foreground">{history.reason}</p>
+                  ) : (
+                    <div className="flex items-center gap-1.5">
+                      <Badge variant="outline" className={`text-xs ${getStatusColor(history.from_status)} border`}>
+                        {history.from_status?.replace('_', ' ') || 'None'}
+                      </Badge>
+                      <ArrowRight className="h-3 w-3 text-muted-foreground" />
+                      <Badge variant="outline" className={`text-xs ${getStatusColor(history.to_status)} border`}>
+                        {history.to_status?.replace('_', ' ')}
+                      </Badge>
+                    </div>
+                  )}
                 </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5 mb-0.5 flex-wrap">
-                  <span className="font-medium truncate">{history.changed_by_user?.name}</span>
-                  <span className="text-muted-foreground">•</span>
-                  <span className="text-muted-foreground">{safeFormatDate(history.changed_at)}</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <Badge variant="outline" className={`text-xs ${getStatusColor(history.from_status)} border`}>
-                    {history.from_status?.replace('_', ' ') || 'None'}
-                  </Badge>
-                  <ArrowRight className="h-3 w-3 text-muted-foreground" />
-                  <Badge variant="outline" className={`text-xs ${getStatusColor(history.to_status)} border`}>
-                    {history.to_status?.replace('_', ' ')}
-                  </Badge>
-                </div>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       ) : (
         <p className="text-xs text-muted-foreground text-center py-2">No activity yet</p>

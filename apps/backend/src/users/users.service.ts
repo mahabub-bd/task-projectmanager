@@ -34,6 +34,16 @@ export class UsersService {
       throw new ConflictException('Email already registered');
     }
 
+    // Check if employee_id already exists
+    if (createUserDto.employee_id) {
+      const existingEmployeeId = await this.userRepository.findOne({
+        where: { employee_id: createUserDto.employee_id },
+      });
+      if (existingEmployeeId) {
+        throw new ConflictException('Employee ID already exists');
+      }
+    }
+
     // Hash the password
     const password_hash = await bcrypt.hash(createUserDto.password, 10);
 
@@ -41,9 +51,11 @@ export class UsersService {
     const userData = {
       name: createUserDto.name,
       email: createUserDto.email,
+      employee_id: createUserDto.employee_id,
       password_hash,
       organization_id: currentUser?.organization_id || 1,
       department_id: createUserDto.department_id,
+      designation_id: createUserDto.designation_id,
       status: createUserDto.status,
     };
     const user = this.userRepository.create(userData);
@@ -58,7 +70,9 @@ export class UsersService {
       new_values: {
         name: savedUser.name,
         email: savedUser.email,
+        employee_id: savedUser.employee_id,
         department_id: savedUser.department_id,
+        designation_id: savedUser.designation_id,
         status: savedUser.status,
       },
       description: `Created user "${savedUser.name}" (${savedUser.email})`,
@@ -83,6 +97,7 @@ export class UsersService {
       .leftJoinAndSelect('user.organization', 'organization')
       .leftJoinAndSelect('user.department', 'department')
       .leftJoinAndSelect('department.division', 'division')
+      .leftJoinAndSelect('user.designation', 'designation')
       .leftJoinAndSelect('user.user_roles', 'user_roles')
       .leftJoinAndSelect('user_roles.role', 'role');
 
@@ -106,7 +121,8 @@ export class UsersService {
     }
 
     const [data, total] = await queryBuilder
-      .orderBy('user.created_at', 'DESC')
+      .orderBy('user.employee_id', 'ASC')
+      .addOrderBy('user.name', 'ASC')
       .skip((page - 1) * limit)
       .take(limit)
       .getManyAndCount();
@@ -117,7 +133,7 @@ export class UsersService {
   async findOne(id: number): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { id },
-      relations: ['organization', 'department', 'user_roles', 'user_roles.role'],
+      relations: ['organization', 'department', 'department.division', 'designation', 'user_roles', 'user_roles.role'],
     });
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
@@ -128,6 +144,26 @@ export class UsersService {
   async update(id: number, updateUserDto: UpdateUserDto, currentUser?: any): Promise<User> {
     // Get old user data for audit log
     const oldUser = await this.findOne(id);
+
+    // Check if employee_id already exists (only if changing to a different value)
+    if (updateUserDto.employee_id !== undefined && updateUserDto.employee_id !== oldUser.employee_id) {
+      const existingEmployeeId = await this.userRepository.findOne({
+        where: { employee_id: updateUserDto.employee_id },
+      });
+      if (existingEmployeeId) {
+        throw new ConflictException('Employee ID already exists');
+      }
+    }
+
+    // Check if email already exists (only if changing to a different value)
+    if (updateUserDto.email !== oldUser.email) {
+      const existingEmail = await this.userRepository.findOne({
+        where: { email: updateUserDto.email },
+      });
+      if (existingEmail) {
+        throw new ConflictException('Email already registered');
+      }
+    }
 
     // Hash password if provided
     const updateData: any = { ...updateUserDto };
@@ -355,7 +391,8 @@ export class UsersService {
     }
 
     const [data, total] = await queryBuilder
-      .orderBy('user.name', 'ASC')
+      .orderBy('user.employee_id', 'ASC')
+      .addOrderBy('user.name', 'ASC')
       .skip((page - 1) * limit)
       .take(limit)
       .getManyAndCount();

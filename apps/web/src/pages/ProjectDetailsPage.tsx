@@ -1,8 +1,10 @@
+import ActionBar from '@/components/ui/ActionBar';
 import { FolderKanban } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate, useParams } from 'react-router-dom';
-import ProjectActionBar from '../components/projects/ProjectActionBar';
+import PhaseFormModal, { PhaseFormData } from '../components/phases/PhaseFormModal';
+import PhaseList from '../components/phases/PhaseList';
 import ProjectActivityTimeline from '../components/projects/ProjectActivityTimeline';
 import ProjectDetailsGrid from '../components/projects/ProjectDetailsGrid';
 import ProjectFormModal, { ProjectFormData } from '../components/projects/ProjectFormModal';
@@ -10,15 +12,18 @@ import ProjectMilestonesList from '../components/projects/ProjectMilestonesList'
 import ProjectOverview from '../components/projects/ProjectOverview';
 import ProjectTasksList from '../components/projects/ProjectTasksList';
 import ProjectTeam from '../components/projects/ProjectTeam';
+import ProjectTeamMemberModal from '../components/projects/ProjectTeamMemberModal';
 import ProjectTimeline from '../components/projects/ProjectTimeline';
 import { Button } from '../components/ui/button';
 import { FullPageLoader } from '../components/ui/loading-spinner';
-import { useDeleteProjectMutation, useGetProjectMembersQuery, useGetProjectQuery, useGetUsersListQuery, useUpdateProjectMutation } from '../store/api';
+import { useCreatePhaseMutation, useDeleteProjectMutation, useGetPhasesByProjectQuery, useGetProjectMembersQuery, useGetProjectQuery, useGetUsersListQuery, useUpdateProjectMutation } from '../store/api';
 
 export default function ProjectDetailsPage() {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showAddMemberModal, setShowAddMemberModal] = useState(false);
+  const [showPhaseModal, setShowPhaseModal] = useState(false);
   const [editingProject, setEditingProject] = useState<any>(null);
 
   const { data: project, isLoading, isError, refetch } = useGetProjectQuery(projectId || '', {
@@ -28,14 +33,19 @@ export default function ProjectDetailsPage() {
 
   const [updateProject, { isLoading: isUpdating }] = useUpdateProjectMutation();
   const [deleteProject] = useDeleteProjectMutation();
+  const [createPhase] = useCreatePhaseMutation();
 
   const { data: usersList } = useGetUsersListQuery(project?.organization_id ? String(project.organization_id) : undefined);
   const { data: projectMembers } = useGetProjectMembersQuery(projectId || '', {
     skip: !projectId,
   });
+  const { data: phases, refetch: refetchPhases } = useGetPhasesByProjectQuery(projectId || '', {
+    skip: !projectId,
+  });
 
   const projectTasks = Array.isArray(project?.tasks) ? project.tasks : [];
   const projectMilestones = Array.isArray(project?.milestones) ? project.milestones : [];
+  const projectPhases = Array.isArray(phases) ? phases : [];
 
   useEffect(() => {
     if (project) {
@@ -99,6 +109,17 @@ export default function ProjectDetailsPage() {
     }
   };
 
+  const handleCreatePhase = async (data: PhaseFormData) => {
+    try {
+      await createPhase(data).unwrap();
+      toast.success('Phase created successfully');
+      setShowPhaseModal(false);
+      refetchPhases();
+    } catch (error: any) {
+      toast.error(error?.data?.message || 'Failed to create phase');
+    }
+  };
+
   if (isLoading) {
     return <FullPageLoader text="Loading project details..." />;
   }
@@ -116,11 +137,15 @@ export default function ProjectDetailsPage() {
     );
   }
 
+  // Get current member IDs for the modal
+  const currentMemberIds = projectMembers?.map((m: any) => m.user_id).filter(Boolean) || [];
+
   return (
     <>
       <div className="mx-auto space-y-6">
-        <ProjectActionBar
+        <ActionBar
           onEdit={() => setShowEditModal(true)}
+          onAddMember={() => setShowAddMemberModal(true)}
           onDelete={handleDelete}
           onBack={() => navigate('/projects')}
         />
@@ -132,6 +157,12 @@ export default function ProjectDetailsPage() {
           priority={project.priority}
           progress={project.progress || 0}
           color={project.color}
+        />
+
+        <PhaseList
+          phases={projectPhases}
+          onAddPhase={() => setShowPhaseModal(true)}
+          projectId={projectId}
         />
 
         <div className="grid gap-6 lg:grid-cols-2">
@@ -162,6 +193,23 @@ export default function ProjectDetailsPage() {
         onSubmit={handleSubmit}
         isSaving={isUpdating}
         managerOptions={usersList || []}
+      />
+
+      <ProjectTeamMemberModal
+        open={showAddMemberModal}
+        onClose={() => setShowAddMemberModal(false)}
+        projectId={projectId || null}
+        projectName={project.name || 'Project'}
+        currentMemberIds={currentMemberIds}
+      />
+
+      <PhaseFormModal
+        open={showPhaseModal}
+        onClose={() => setShowPhaseModal(false)}
+        onSubmit={handleCreatePhase}
+        isSaving={false}
+        projectId={projectId || ''}
+        organizationId={String(project?.organization_id || '')}
       />
     </>
   );

@@ -1,7 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Mail, MapPin, Phone, Building2, Briefcase, User } from 'lucide-react';
+import { Mail, MapPin, Phone, Building2, Briefcase, Network, Shield, IdCard } from 'lucide-react';
 
 interface AddressBookTableViewProps {
   users: any[];
@@ -45,10 +45,12 @@ export default function AddressBookTableView({
       <TableHeader>
         <TableRow>
           <TableHead>Name</TableHead>
+          <TableHead>Employee ID</TableHead>
           <TableHead>Contact Information</TableHead>
+          <TableHead>Division</TableHead>
           <TableHead>Department</TableHead>
           <TableHead>Designation</TableHead>
-          <TableHead>Division</TableHead>
+          <TableHead>Role</TableHead>
           <TableHead>Status</TableHead>
           <TableHead className="text-right">Actions</TableHead>
         </TableRow>
@@ -75,6 +77,17 @@ export default function AddressBookTableView({
             </TableCell>
 
             <TableCell>
+              {user.employee_id ? (
+                <div className="flex items-center gap-2 text-sm">
+                  <IdCard className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+                  <span className="font-mono">{user.employee_id}</span>
+                </div>
+              ) : (
+                <span className="text-sm text-muted-foreground">-</span>
+              )}
+            </TableCell>
+
+            <TableCell>
               <div className="space-y-1">
                 {user.phone_number && (
                   <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
@@ -97,8 +110,19 @@ export default function AddressBookTableView({
             </TableCell>
 
             <TableCell>
+              {user.department?.division ? (
+                <Badge variant="outline" className="gap-1.5 bg-blue-50 border-blue-200 text-blue-700">
+                  <Network className="h-3.5 w-3.5" />
+                  {user.department.division.name}
+                </Badge>
+              ) : (
+                <span className="text-sm text-muted-foreground">-</span>
+              )}
+            </TableCell>
+
+            <TableCell>
               {user.department ? (
-                <Badge variant="outline" className="gap-1.5">
+                <Badge variant="outline" className="gap-1.5 bg-green-50 border-green-200 text-green-700">
                   <Building2 className="h-3.5 w-3.5" />
                   {user.department.name}
                 </Badge>
@@ -109,7 +133,7 @@ export default function AddressBookTableView({
 
             <TableCell>
               {user.designation ? (
-                <Badge variant="secondary" className="gap-1.5">
+                <Badge variant="outline" className="gap-1.5 bg-purple-50 border-purple-200 text-purple-700">
                   <Briefcase className="h-3.5 w-3.5" />
                   {user.designation.name}
                 </Badge>
@@ -119,11 +143,15 @@ export default function AddressBookTableView({
             </TableCell>
 
             <TableCell>
-              {user.department?.division ? (
-                <Badge variant="outline" className="gap-1.5">
-                  <User className="h-3.5 w-3.5" />
-                  {user.department.division.name}
-                </Badge>
+              {user.user_roles && user.user_roles.length > 0 ? (
+                <div className="flex flex-wrap gap-1">
+                  {user.user_roles.map((userRole: any) => (
+                    <Badge key={userRole.role.id} variant="outline" className="gap-1 bg-amber-50 border-amber-200 text-amber-700">
+                      <Shield className="h-3 w-3" />
+                      {userRole.role.name}
+                    </Badge>
+                  ))}
+                </div>
               ) : (
                 <span className="text-sm text-muted-foreground">-</span>
               )}

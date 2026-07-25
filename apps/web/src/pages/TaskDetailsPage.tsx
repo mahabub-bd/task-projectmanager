@@ -2,7 +2,7 @@ import { FileText } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate, useParams } from 'react-router-dom';
-import TaskActionBar from '../components/tasks/TaskActionBar';
+import ActionBar from '@/components/ui/ActionBar';
 import TaskActivityTimeline from '../components/tasks/TaskActivityTimeline';
 import TaskAssignModal from '../components/tasks/TaskAssignModal';
 import TaskComments from '../components/tasks/TaskComments';
@@ -267,7 +267,7 @@ export default function TaskDetailsPage() {
   return (
     <>
       <div className="mx-auto space-y-6">
-        <TaskActionBar
+        <ActionBar
           onAssign={() => setShowAssignModal(true)}
           onEdit={() => setShowEditModal(true)}
           onDelete={handleDeleteTask}

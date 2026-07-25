@@ -12,39 +12,35 @@ const safeFormatDate = (dateValue: string | Date | null | undefined, formatStr: 
   }
 };
 
-interface MilestoneDetailsGridProps {
-  milestone: any;
+interface PhaseDetailsGridProps {
+  phase: any;
   onStatusChange: (status: string) => void;
   onProgressChange: (progress: number) => void;
   onProjectClick?: (projectId: string | number) => void;
 }
 
-export default function MilestoneDetailsGrid({
-  milestone,
+export default function PhaseDetailsGrid({
+  phase,
   onStatusChange,
   onProgressChange,
   onProjectClick,
-}: MilestoneDetailsGridProps) {
-  const isOverdue = milestone?.due_date &&
-    new Date(milestone.due_date) < new Date() &&
-    milestone?.status !== 'completed' &&
-    milestone?.status !== 'cancelled';
+}: PhaseDetailsGridProps) {
+  const isOverdue = phase?.due_date &&
+    new Date(phase.due_date) < new Date() &&
+    phase?.status !== 'completed' &&
+    phase?.status !== 'cancelled';
+
+  const milestonesCount = phase?.milestones?.length || 0;
+  const completedMilestones = phase?.milestones?.filter((m: any) => m.status === 'completed')?.length || 0;
 
   return (
-    <section className="overflow-hidden rounded-xl border bg-card shadow-sm">
-      <div className="flex items-center justify-between border-b px-4 py-3 sm:px-5">
-        <div>
-          <h2 className="text-base font-semibold">Milestone Details</h2>
-          <p className="text-xs text-muted-foreground">Progress, schedule, and project context</p>
-        </div>
-        {isOverdue && <span className="rounded-full bg-destructive px-2 py-0.5 text-xs font-medium text-destructive-foreground">Overdue</span>}
-      </div>
-      <div className="grid gap-px bg-border sm:grid-cols-6">
+    <div className="rounded-lg border bg-card">
+      <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0">
         {/* Status */}
-        <div className="bg-card p-4">
+        <div className="p-3">
           <label className="text-xs font-medium text-muted-foreground block mb-1">Status</label>
           <select
-            value={milestone.status}
+            value={phase.status}
             onChange={(e) => onStatusChange(e.target.value)}
             className="w-full px-2 py-1 rounded border bg-background text-sm"
           >
@@ -57,10 +53,10 @@ export default function MilestoneDetailsGrid({
         </div>
 
         {/* Progress */}
-        <div className="bg-card p-4">
+        <div className="p-3">
           <label className="text-xs font-medium text-muted-foreground block mb-1">Progress</label>
           <select
-            value={String(milestone.progress || 0)}
+            value={String(phase.progress || 0)}
             onChange={(e) => onProgressChange(Number(e.target.value))}
             className="w-full px-2 py-1 rounded border bg-background text-sm"
           >
@@ -73,46 +69,47 @@ export default function MilestoneDetailsGrid({
         </div>
 
         {/* Start Date */}
-        <div className="bg-card p-4">
+        <div className="p-3">
           <label className="text-xs font-medium text-muted-foreground block mb-1">Start Date</label>
           <p className="text-sm font-medium inline-flex items-center gap-1">
             <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
-            {safeFormatDate(milestone.start_date)}
+            {safeFormatDate(phase.start_date)}
           </p>
         </div>
 
         {/* Due Date */}
-        <div className={`p-4 ${isOverdue ? 'bg-red-50/70 dark:bg-red-950/20' : 'bg-card'}`}>
+        <div className="p-3">
           <label className="text-xs font-medium text-muted-foreground block mb-1">Due Date</label>
-          <p className={`text-sm font-medium inline-flex items-center gap-1 ${isOverdue ? 'text-red-600' : ''
-            }`}>
+          <p className={`text-sm font-medium inline-flex items-center gap-1 ${
+            isOverdue ? 'text-red-600' : ''
+          }`}>
             <Clock className="h-3.5 w-3.5 text-muted-foreground" />
-            {safeFormatDate(milestone.due_date)}
+            {safeFormatDate(phase.due_date)}
           </p>
         </div>
 
         {/* End Date */}
-        <div className="bg-card p-4">
+        <div className="p-3">
           <label className="text-xs font-medium text-muted-foreground block mb-1">End Date</label>
           <p className="text-sm font-medium inline-flex items-center gap-1">
             <Target className="h-3.5 w-3.5 text-muted-foreground" />
-            {safeFormatDate(milestone.end_date)}
+            {safeFormatDate(phase.end_date)}
           </p>
         </div>
 
         {/* Project */}
-        <div className="bg-card p-4">
+        <div className="p-3">
           <label className="text-xs font-medium text-muted-foreground block mb-1">Project</label>
-          {milestone.project ? (
+          {phase.project ? (
             onProjectClick ? (
               <button
-                onClick={() => onProjectClick(milestone.project.id)}
+                onClick={() => onProjectClick(phase.project.id)}
                 className="text-sm font-medium text-primary hover:underline text-left"
               >
-                {milestone.project.name}
+                {phase.project.name}
               </button>
             ) : (
-              <p className="text-sm font-medium">{milestone.project.name}</p>
+              <p className="text-sm font-medium">{phase.project.name}</p>
             )
           ) : (
             <p className="text-sm text-muted-foreground">Not assigned</p>
@@ -120,34 +117,43 @@ export default function MilestoneDetailsGrid({
         </div>
 
         {/* Color */}
-        <div className="bg-card p-4">
+        <div className="p-3">
           <label className="text-xs font-medium text-muted-foreground block mb-1">Color</label>
           <div className="flex items-center gap-2">
-            {milestone.color && (
+            {phase.color && (
               <div
                 className="h-4 w-4 rounded-full shadow-sm"
-                style={{ backgroundColor: milestone.color }}
+                style={{ backgroundColor: phase.color }}
               />
             )}
             <span className="text-sm font-medium">
-              {milestone.color || 'Default'}
+              {phase.color || 'Default'}
             </span>
           </div>
         </div>
 
+        {/* Milestones */}
+        <div className="p-3">
+          <label className="text-xs font-medium text-muted-foreground block mb-1">Milestones</label>
+          <p className="text-sm font-medium inline-flex items-center gap-1">
+            <Target className="h-3.5 w-3.5 text-muted-foreground" />
+            {completedMilestones} / {milestonesCount}
+          </p>
+        </div>
+
         {/* Running Days */}
-        <div className="bg-card p-4">
+        <div className="p-3">
           <label className="text-xs font-medium text-muted-foreground block mb-1">Running</label>
           <p className="text-sm font-medium inline-flex items-center gap-1">
             <Clock className="h-3.5 w-3.5 text-muted-foreground" />
             {(() => {
-              if (!milestone.created_at) return 'Just started';
-              const runningDays = Math.floor((new Date().getTime() - new Date(milestone.created_at).getTime()) / (1000 * 60 * 60 * 24));
+              if (!phase.created_at) return 'Just started';
+              const runningDays = Math.floor((new Date().getTime() - new Date(phase.created_at).getTime()) / (1000 * 60 * 60 * 24));
               return `${runningDays} day${runningDays === 1 ? '' : 's'}`;
             })()}
           </p>
         </div>
       </div>
-    </section>
+    </div>
   );
 }

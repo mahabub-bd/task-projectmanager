@@ -4,6 +4,7 @@ import { Department } from './department.entity';
 import { Designation } from './designation.entity';
 import { Division } from './division.entity';
 import { Milestone } from './milestone.entity';
+import { Phase } from './phase.entity';
 import { Project } from './project.entity';
 import { Role } from './role.entity';
 import { User } from './user.entity';
@@ -60,4 +61,7 @@ export class Organization extends BaseEntity {
 
   @OneToMany(() => Milestone, (milestone) => milestone.organization)
   milestones: Milestone[];
+
+  @OneToMany(() => Phase, (phase) => phase.organization)
+  phases: Phase[];
 }

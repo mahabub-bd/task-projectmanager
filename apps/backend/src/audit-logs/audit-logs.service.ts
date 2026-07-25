@@ -110,4 +110,64 @@ export class AuditLogsService {
       take: limit,
     });
   }
+
+  async exportToCsv(query: QueryAuditLogsDto): Promise<string> {
+    // Get all logs without pagination for export
+    const result = await this.findAll({
+      ...query,
+      page: 1,
+      limit: 100000, // Export all records
+    });
+
+    // Create CSV header
+    const headers = [
+      'ID',
+      'User',
+      'Action',
+      'Entity Type',
+      'Entity ID',
+      'Description',
+      'Old Values',
+      'New Values',
+      'IP Address',
+      'Created At'
+    ];
+
+    // Helper function to escape CSV values
+    const escapeCsv = (value: any): string => {
+      if (value === null || value === undefined) return '';
+      const strValue = String(value);
+      if (strValue.includes(',') || strValue.includes('"') || strValue.includes('\n')) {
+        return `"${strValue.replace(/"/g, '""')}"`;
+      }
+      return strValue;
+    };
+
+    // Helper function to convert object to string
+    const objectToString = (obj: any): string => {
+      if (!obj) return '';
+      try {
+        return JSON.stringify(obj);
+      } catch {
+        return String(obj);
+      }
+    };
+
+    // Create CSV rows
+    const rows = result.data.map((log) => [
+      escapeCsv(log.id),
+      escapeCsv(log.user?.name || 'System'),
+      escapeCsv(log.action),
+      escapeCsv(log.entity_type),
+      escapeCsv(log.entity_id),
+      escapeCsv(log.description || ''),
+      escapeCsv(objectToString(log.old_values)),
+      escapeCsv(objectToString(log.new_values)),
+      escapeCsv(log.ip_address || ''),
+      escapeCsv(log.created_at?.toISOString() || ''),
+    ].join(','));
+
+    // Combine header and rows
+    return [headers.join(','), ...rows].join('\n');
+  }
 }

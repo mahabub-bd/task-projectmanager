@@ -8,12 +8,12 @@ import { Flag } from 'lucide-react';
 import { FullPageLoader } from '../components/ui/loading-spinner';
 import { Button } from '../components/ui/button';
 import MilestoneActivityTimeline from '../components/milestones/MilestoneActivityTimeline';
-import MilestoneActionBar from '../components/milestones/MilestoneActionBar';
+import ActionBar from '@/components/ui/ActionBar';
 import MilestoneDetailsGrid from '../components/milestones/MilestoneDetailsGrid';
 import MilestoneFormModal, { MilestoneFormData } from '../components/milestones/MilestoneFormModal';
 import MilestoneOverview from '../components/milestones/MilestoneOverview';
 import MilestoneTimeline from '../components/milestones/MilestoneTimeline';
-import { useDeleteMilestoneMutation, useGetMilestoneQuery, useGetProjectsListQuery, useGetTasksQuery, useUpdateMilestoneMutation } from '../store/api';
+import { useDeleteMilestoneMutation, useGetMilestoneQuery, useGetPhasesByProjectQuery, useGetProjectsListQuery, useGetTasksQuery, useUpdateMilestoneMutation } from '../store/api';
 import { RootState } from '../store/store';
 
 export default function MilestoneDetailsPage() {
@@ -34,6 +34,14 @@ export default function MilestoneDetailsPage() {
   // Fetch projects for the modal
   const { data: projects } = useGetProjectsListQuery(
     organizationId ? String(organizationId) : '',
+  );
+
+  // Fetch phases for the project if milestone has a project
+  const { data: phases } = useGetPhasesByProjectQuery(
+    milestone?.project_id ? String(milestone.project_id) : '',
+    {
+      skip: !milestone?.project_id,
+    },
   );
 
   // Fetch tasks for the project if milestone has a project
@@ -144,7 +152,7 @@ export default function MilestoneDetailsPage() {
   return (
     <>
       <div className="mx-auto space-y-6">
-        <MilestoneActionBar
+        <ActionBar
           onEdit={() => setShowEditModal(true)}
           onDelete={handleDelete}
           onBack={() => navigate('/milestones')}
@@ -241,6 +249,8 @@ export default function MilestoneDetailsPage() {
         onSubmit={handleSubmit}
         isSaving={isUpdating}
         projects={projects}
+        phases={phases}
+        projectId={milestone?.project_id ? String(milestone.project_id) : ''}
       />
     </>
   );

@@ -1,12 +1,11 @@
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Modal } from '@/components/ui/modal';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Building2, Mail, Shield, Briefcase } from 'lucide-react';
-import { useForm } from 'react-hook-form';
+import { Briefcase, Building2, Mail, Shield } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { z } from 'zod';
 import {
@@ -22,6 +21,7 @@ const createUserSchema = z.object({
   email: z.string().email('Invalid email address'),
   name: z.string().min(1, 'Name is required'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
+  employee_id: z.string().optional(),
   department_id: z.number().optional(),
   designation_id: z.number().optional(),
   address: z.string().optional(),
@@ -33,6 +33,7 @@ const editUserSchema = z.object({
   email: z.string().email('Invalid email address'),
   name: z.string().min(1, 'Name is required'),
   password: z.string().min(6, 'Password must be at least 6 characters').optional().or(z.literal('')),
+  employee_id: z.string().optional(),
   department_id: z.number().optional(),
   designation_id: z.number().optional(),
   address: z.string().optional(),
@@ -80,6 +81,7 @@ export default function UserFormModal({ open, onClose, editingUser }: UserFormMo
         name: editingUser.name,
         email: editingUser.email,
         password: '',
+        employee_id: editingUser.employee_id || '',
         department_id: editingUser.department_id,
         designation_id: editingUser.designation_id,
         address: editingUser.address || '',
@@ -91,6 +93,7 @@ export default function UserFormModal({ open, onClose, editingUser }: UserFormMo
         name: '',
         email: '',
         password: '',
+        employee_id: '',
         department_id: undefined,
         designation_id: undefined,
         address: '',
@@ -107,6 +110,7 @@ export default function UserFormModal({ open, onClose, editingUser }: UserFormMo
         const updateData: any = {
           name: data.name,
           email: data.email,
+          employee_id: data.employee_id || undefined,
           department_id: data.department_id,
           designation_id: data.designation_id,
           address: data.address || undefined,
@@ -159,6 +163,7 @@ export default function UserFormModal({ open, onClose, editingUser }: UserFormMo
     <Modal
       open={open}
       onClose={onClose}
+      maxWidth="3xl"
       title={editingUser ? 'Edit User' : 'Create New User'}
       description={editingUser ? 'Update user information and permissions.' : 'Add a new user to your organization.'}
       footer={
@@ -178,164 +183,183 @@ export default function UserFormModal({ open, onClose, editingUser }: UserFormMo
         </>
       }
     >
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        {/* Name Field */}
-        <div className="space-y-2">
-          <Label htmlFor="name">Name *</Label>
-          <Input
-            {...register('name')}
-            placeholder="John Doe"
-          />
-          {errors.name && (
-            <p className="text-sm text-destructive">{errors.name.message}</p>
-          )}
-        </div>
-
-        {/* Email Field */}
-        <div className="space-y-2">
-          <Label htmlFor="email">Email *</Label>
-          <div className="relative">
-            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <div className="grid grid-cols-2 gap-4">
+          {/* Name Field */}
+          <div className="space-y-2">
+            <Label htmlFor="name">Name *</Label>
             <Input
-              {...register('email')}
-              type="email"
-              className="pl-10"
-              placeholder="user@example.com"
+              {...register('name')}
+              placeholder="John Doe"
             />
+            {errors.name && (
+              <p className="text-sm text-destructive">{errors.name.message}</p>
+            )}
           </div>
-          {errors.email && (
-            <p className="text-sm text-destructive">{errors.email.message}</p>
-          )}
-        </div>
 
-        {/* Password Field */}
-        <div className="space-y-2">
-          <Label htmlFor="password">
-            {editingUser ? 'New Password (leave blank to keep current)' : 'Password *'}
-          </Label>
-          <Input
-            {...register('password')}
-            type="password"
-            placeholder={editingUser ? '••••••••' : '••••••••'}
-          />
-          {errors.password && (
-            <p className="text-sm text-destructive">{errors.password.message}</p>
-          )}
-          {editingUser && (
-            <p className="text-xs text-muted-foreground">
-              Only enter a new password if you want to change it
-            </p>
-          )}
-        </div>
-
-        {/* Department Field */}
-        <div className="space-y-2">
-          <Label htmlFor="department_id">Department</Label>
-          <div className="relative">
-            <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
-            <select
-              {...register('department_id', { valueAsNumber: true })}
-              className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 pl-10 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-            >
-              <option value="">No Department</option>
-              {departmentsData?.map((dept: any) => (
-                <option key={dept.id} value={dept.id}>
-                  {dept.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          {errors.department_id && (
-            <p className="text-sm text-destructive">{errors.department_id.message}</p>
-          )}
-        </div>
-
-        {/* Designation Field */}
-        <div className="space-y-2">
-          <Label htmlFor="designation_id">Designation</Label>
-          <div className="relative">
-            <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
-            <select
-              {...register('designation_id', { valueAsNumber: true })}
-              className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 pl-10 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-            >
-              <option value="">No Designation</option>
-              {designationsData?.map((designation: any) => (
-                <option key={designation.id} value={designation.id}>
-                  {designation.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          {errors.designation_id && (
-            <p className="text-sm text-destructive">{errors.designation_id.message}</p>
-          )}
-        </div>
-
-        {/* Address Field */}
-        <div className="space-y-2">
-          <Label htmlFor="address">Address</Label>
-          <Input
-            {...register('address')}
-            placeholder="123 Main St, City, Country"
-          />
-          {errors.address && (
-            <p className="text-sm text-destructive">{errors.address.message}</p>
-          )}
-        </div>
-
-        {/* Status Field */}
-        <div className="space-y-2">
-          <Label htmlFor="status">Status</Label>
-          <select
-            {...register('status')}
-            className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-          >
-            <option value="pending">Pending</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-            <option value="suspended">Suspended</option>
-          </select>
-          {errors.status && (
-            <p className="text-sm text-destructive">{errors.status.message}</p>
-          )}
-        </div>
-
-        {/* Roles Field */}
-        {rolesData && (Array.isArray(rolesData) ? rolesData : rolesData.data)?.length > 0 ? (
+          {/* Employee ID Field */}
           <div className="space-y-2">
-            <Label>Roles</Label>
-            <div className="border rounded-md p-3 max-h-40 overflow-y-auto space-y-2 bg-muted/20">
-              {(Array.isArray(rolesData) ? rolesData : rolesData.data).map((role: any) => {
-                const isSelected = formSelectedRoles.includes(role.id);
-                return (
-                  <label
-                    key={role.id}
-                    className={`flex items-center gap-3 p-2 hover:bg-accent rounded-md cursor-pointer transition-colors ${isSelected ? 'bg-accent' : ''
-                      }`}
-                  >
-                    <Checkbox
-                      checked={isSelected}
-                      onCheckedChange={() => toggleRole(role.id)}
-                    />
-                    <Shield className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm font-medium">{role.name}</span>
-                  </label>
-                );
-              })}
+            <Label htmlFor="employee_id">Employee ID</Label>
+            <div className="relative">
+              <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                {...register('employee_id')}
+                className="pl-10"
+                placeholder="EMP001"
+              />
             </div>
-            <p className="text-xs text-muted-foreground">
-              {formSelectedRoles.length} role{formSelectedRoles.length !== 1 ? 's' : ''} selected
-            </p>
+            {errors.employee_id && (
+              <p className="text-sm text-destructive">{errors.employee_id.message}</p>
+            )}
           </div>
-        ) : (
+
+          {/* Email Field */}
           <div className="space-y-2">
-            <Label>Roles</Label>
-            <p className="text-sm text-muted-foreground p-3 border rounded-md bg-muted/20">
-              No roles available. Create roles first to assign them to users.
-            </p>
+            <Label htmlFor="email">Email *</Label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                {...register('email')}
+                type="email"
+                className="pl-10"
+                placeholder="user@example.com"
+              />
+            </div>
+            {errors.email && (
+              <p className="text-sm text-destructive">{errors.email.message}</p>
+            )}
           </div>
-        )}
+
+          {/* Password Field */}
+          <div className="space-y-2">
+            <Label htmlFor="password">
+              {editingUser ? 'New Password (leave blank to keep current)' : 'Password *'}
+            </Label>
+            <Input
+              {...register('password')}
+              type="password"
+              placeholder={editingUser ? '••••••••' : '••••••••'}
+            />
+            {errors.password && (
+              <p className="text-sm text-destructive">{errors.password.message}</p>
+            )}
+            {editingUser && (
+              <p className="text-xs text-muted-foreground">
+                Only enter a new password if you want to change it
+              </p>
+            )}
+          </div>
+
+          {/* Department Field */}
+          <div className="space-y-2">
+            <Label htmlFor="department_id">Department</Label>
+            <div className="relative">
+              <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
+              <select
+                {...register('department_id', { valueAsNumber: true })}
+                className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 pl-10 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              >
+                <option value="">No Department</option>
+                {departmentsData?.map((dept: any) => (
+                  <option key={dept.id} value={dept.id}>
+                    {dept.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {errors.department_id && (
+              <p className="text-sm text-destructive">{errors.department_id.message}</p>
+            )}
+          </div>
+
+          {/* Designation Field */}
+          <div className="space-y-2">
+            <Label htmlFor="designation_id">Designation</Label>
+            <div className="relative">
+              <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
+              <select
+                {...register('designation_id', { valueAsNumber: true })}
+                className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 pl-10 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              >
+                <option value="">No Designation</option>
+                {designationsData?.map((designation: any) => (
+                  <option key={designation.id} value={designation.id}>
+                    {designation.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {errors.designation_id && (
+              <p className="text-sm text-destructive">{errors.designation_id.message}</p>
+            )}
+          </div>
+
+          {/* Address Field */}
+          <div className="space-y-2 col-span-2">
+            <Label htmlFor="address">Address</Label>
+            <Input
+              {...register('address')}
+              placeholder="123 Main St, City, Country"
+            />
+            {errors.address && (
+              <p className="text-sm text-destructive">{errors.address.message}</p>
+            )}
+          </div>
+
+          {/* Status Field */}
+          <div className="space-y-2">
+            <Label htmlFor="status">Status</Label>
+            <select
+              {...register('status')}
+              className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+            >
+              <option value="pending">Pending</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+              <option value="suspended">Suspended</option>
+            </select>
+            {errors.status && (
+              <p className="text-sm text-destructive">{errors.status.message}</p>
+            )}
+          </div>
+
+          {/* Roles Field */}
+          {rolesData && (Array.isArray(rolesData) ? rolesData : rolesData.data)?.length > 0 ? (
+            <div className="space-y-2">
+              <Label>Roles</Label>
+              <div className="grid grid-cols-2 gap-2">
+                {(Array.isArray(rolesData) ? rolesData : rolesData.data).map((role: any) => {
+                  const isSelected = formSelectedRoles.includes(role.id);
+                  return (
+                    <button
+                      key={role.id}
+                      type="button"
+                      onClick={() => toggleRole(role.id)}
+                      className={`inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-all ${
+                        isSelected
+                          ? 'bg-primary text-primary-foreground shadow-sm'
+                          : 'bg-muted text-muted-foreground hover:bg-muted/80 border border-transparent hover:border-border'
+                      }`}
+                    >
+                      <Shield className="h-3.5 w-3.5 flex-shrink-0" />
+                      {role.name}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {formSelectedRoles.length} role{formSelectedRoles.length !== 1 ? 's' : ''} selected
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <Label>Roles</Label>
+              <p className="text-sm text-muted-foreground p-3 border rounded-md bg-muted/20">
+                No roles available. Create roles first to assign them to users.
+              </p>
+            </div>
+          )}
+        </div>
 
         {/* Form Errors */}
         {errors.root && (

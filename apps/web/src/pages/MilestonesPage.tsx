@@ -22,6 +22,7 @@ import {
   useCreateMilestoneMutation,
   useGetMilestonesQuery,
   useGetOverdueMilestonesQuery,
+  useGetPhasesByProjectQuery,
   useGetProjectsListQuery,
   useGetUpcomingMilestonesQuery,
   useUpdateMilestoneMutation,
@@ -47,6 +48,7 @@ export default function MilestonesPage() {
   const [editingMilestone, setEditingMilestone] = useState<any>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
+  const [selectedProjectId, setSelectedProjectId] = useState<string>('');
 
 
 
@@ -72,6 +74,9 @@ export default function MilestonesPage() {
   const { data: projects } = useGetProjectsListQuery(
     organizationId ? String(organizationId) : '',
   );
+  const { data: phases } = useGetPhasesByProjectQuery(selectedProjectId, {
+    skip: !selectedProjectId,
+  });
   const [createMilestone, { isLoading: isCreating }] = useCreateMilestoneMutation();
   const [updateMilestone, { isLoading: isUpdating }] = useUpdateMilestoneMutation();
 
@@ -105,6 +110,11 @@ export default function MilestonesPage() {
     if (!organizationId) {
       toast.error('Organization ID is required');
       return;
+    }
+
+    // Update selected project ID for phase loading
+    if (data.project_id) {
+      setSelectedProjectId(data.project_id);
     }
 
     try {
@@ -295,6 +305,8 @@ export default function MilestonesPage() {
         onSubmit={handleSubmit}
         isSaving={isCreating || isUpdating}
         projects={projects}
+        phases={phases || []}
+        projectId={selectedProjectId}
       />
     </>
   );

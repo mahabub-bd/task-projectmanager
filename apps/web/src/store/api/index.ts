@@ -143,6 +143,18 @@ export {
   useUpdateMilestoneProgressMutation,
 } from './milestonesApi';
 
+// Phases API
+export {
+  phasesApi,
+  useGetPhasesQuery,
+  useGetPhasesByProjectQuery,
+  useGetPhaseQuery,
+  useCreatePhaseMutation,
+  useUpdatePhaseMutation,
+  useDeletePhaseMutation,
+  useUpdatePhaseProgressMutation,
+} from './phasesApi';
+
 // Projects API
 export {
   projectsApi,

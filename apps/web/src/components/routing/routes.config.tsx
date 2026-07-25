@@ -13,6 +13,7 @@ const TasksPage = lazy(() => import('@/pages/TasksPage'));
 const TaskDetailsPage = lazy(() => import('@/pages/TaskDetailsPage'));
 const ProjectsPage = lazy(() => import('@/pages/ProjectsPage'));
 const ProjectDetailsPage = lazy(() => import('@/pages/ProjectDetailsPage'));
+const PhaseDetailsPage = lazy(() => import('@/pages/PhaseDetailsPage'));
 const MilestonesPage = lazy(() => import('@/pages/MilestonesPage'));
 const MilestoneDetailsPage = lazy(() => import('@/pages/MilestoneDetailsPage'));
 const UsersPage = lazy(() => import('@/pages/UsersPage'));
@@ -63,6 +64,7 @@ export const routes: AppRoute[] = [
 
   { path: '/projects', element: <ProjectsPage />, permission: 'read:projects' },
   { path: '/projects/:projectId', element: <ProjectDetailsPage />, permission: 'read:projects' },
+  { path: '/phases/:phaseId', element: <PhaseDetailsPage /> },
 
   { path: '/organizations', element: <OrganizationsPage />, permission: 'read:organizations' },
   { path: '/organizations/:id', element: <OrganizationDetailsPage />, permission: 'read:organizations' },

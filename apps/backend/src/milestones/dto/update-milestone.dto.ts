@@ -85,4 +85,22 @@ export class UpdateMilestoneDto {
   @IsOptional()
   @IsNumber({}, { message: 'Project ID must be a number' })
   project_id?: number;
+
+  @ApiProperty({
+    example: 1,
+    description: 'Phase ID',
+    required: false
+  })
+  @IsOptional()
+  @IsNumber({}, { message: 'Phase ID must be a number' })
+  phase_id?: number;
+
+  @ApiProperty({
+    example: 2,
+    description: 'Order of the milestone within the phase',
+    required: false
+  })
+  @IsOptional()
+  @IsInt({ message: 'Order must be an integer' })
+  order?: number;
 }

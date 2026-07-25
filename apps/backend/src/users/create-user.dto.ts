@@ -20,6 +20,15 @@ export class CreateUserDto {
   name: string;
 
   @ApiProperty({
+    example: 'EMP001',
+    description: 'Employee ID',
+    required: false
+  })
+  @IsOptional()
+  @IsString({ message: 'Employee ID must be a string' })
+  employee_id?: string;
+
+  @ApiProperty({
     example: 'password123',
     description: 'User password'
   })

@@ -33,6 +33,7 @@ A comprehensive enterprise-grade project and task management application built w
 - **PostgreSQL** - Database
 - **Passport** - Authentication middleware
 - **JWT** - Token-based authentication
+- **Socket.IO** - Real-time WebSocket notifications
 - **Nodemailer** - Email service
 - **AWS S3 SDK** - File storage (optional)
 
@@ -164,7 +165,15 @@ project-and-taskmanager/
 │   │   │   ├── users/    # User management
 │   │   │   ├── projects/ # Project & task logic
 │   │   │   ├── organizations/
-│   │   │   └── main.ts   # Application entry point
+│   │   │   ├── notifications/    # Real-time notification system
+│   │   │   │   ├── notifications.controller.ts
+│   │   │   │   ├── notifications.service.ts
+│   │   │   │   ├── notifications.gateway.ts
+│   │   │   │   ├── notifications.module.ts
+│   │   │   │   └── dto/        # Data transfer objects
+│   │   │   ├── common/         # Shared utilities & guards
+│   │   │   ├── entities/       # TypeORM entities
+│   │   │   └── main.ts         # Application entry point
 │   │   └── test/
 │   └── web/              # React frontend
 │       ├── src/
@@ -235,13 +244,105 @@ Contributions are welcome! Please follow these guidelines:
 - Write meaningful commit messages
 - Add tests for new features
 
+## Notification System
+
+The application includes a comprehensive notification system with real-time updates via WebSocket and user-configurable preferences.
+
+### Notification Types
+
+| Type | Description |
+|------|-------------|
+| `task_assigned` | User assigned to a new task |
+| `task_updated` | Task details modified |
+| `task_completed` | Task marked as completed |
+| `task_overdue` | Task past its due date |
+| `project_created` | New project created |
+| `project_updated` | Project details modified |
+| `milestone_due` | Milestone approaching due date |
+| `milestone_completed` | Milestone marked complete |
+| `comment_added` | New comment on task/project |
+| `mention` | User mentioned in a comment |
+| `role_updated` | User role changed |
+| `department_updated` | Department details modified |
+
+### Notification Priority Levels
+
+- `low` - Informational updates (comments, minor changes)
+- `medium` - Standard updates (task updates, project changes)
+- `high` - Important alerts (new assignments, mentions)
+- `urgent` - Critical notifications (overdue tasks, imminent deadlines)
+
+### Real-time Notifications
+
+The system uses WebSocket (Socket.IO) for real-time notification delivery:
+
+**Connection Endpoint:** `ws://localhost:3001/notifications`
+
+**Authentication:** JWT token required via handshake auth or Authorization header
+
+**Events:**
+- `notification` - New notification received
+- `unread-count` - Updated unread notification count
+- `joined-organization` - Successfully joined organization room
+- `left-organization` - Successfully left organization room
+
+### API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/notifications` | Get all notifications (supports `unreadOnly`, `limit`, `offset` query params) |
+| `GET` | `/notifications/:id` | Get single notification by ID |
+| `GET` | `/notifications/unread-count` | Get unread notification count |
+| `GET` | `/notifications/preferences` | Get user notification preferences |
+| `PUT` | `/notifications/preferences/:type` | Update notification preference for a type |
+| `POST` | `/notifications` | Create a new notification |
+| `PUT` | `/notifications/:id/read` | Mark notification as read |
+| `POST` | `/notifications/mark-all-read` | Mark all notifications as read |
+| `DELETE` | `/notifications/:id` | Delete a notification |
+
+### Notification Preferences
+
+Users can configure how they receive notifications per notification type:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `email_enabled` | boolean | Enable email notifications for this type |
+| `in_app_enabled` | boolean | Enable in-app notifications for this type |
+| `reminder_hours` | number | Hours before due date to send reminders (default: 24) |
+
+### Service Helper Methods
+
+The `NotificationsService` provides convenient methods for creating specific notification types:
+
+- `notifyTaskAssigned()` - Create task assignment notification
+- `notifyTaskUpdated()` - Create task update notification
+- `notifyTaskCompleted()` - Create task completion notification
+- `notifyCommentAdded()` - Create new comment notification
+- `notifyMention()` - Create mention notification
+- `notifyMilestoneDue()` - Create milestone due reminder
+- `notifyProjectUpdated()` - Create project update notification
+
+### WebSocket Rooms
+
+Users can join organization-specific rooms for collaborative notifications:
+
+```javascript
+// Join organization room
+socket.emit('join-organization', { organizationId: 123 });
+
+// Leave organization room
+socket.emit('leave-organization', { organizationId: 123 });
+```
+
 ## Roadmap
 
 - [ ] Mobile responsive design improvements
 - [ ] Advanced reporting and analytics
 - [ ] Calendar view for tasks and milestones
 - [ ] File attachments for tasks and projects
-- [ ] Email notifications
+- [x] In-app notifications with WebSocket support
+- [ ] Email notifications (backend infrastructure ready)
+- [ ] Push notifications (mobile)
 - [ ] Dark mode
 - [ ] Multi-language support
 - [ ] Performance optimizations

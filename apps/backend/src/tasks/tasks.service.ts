@@ -337,18 +337,21 @@ export class TasksService {
   async assignUsers(id: number, assignTaskDto: AssignTaskDto, userId: number): Promise<Task> {
     const task = await this.findOne(id);
 
-    // Get old assignments for audit log
+    // Get old assignments for audit log and to avoid duplicates
     const oldAssignments = await this.taskAssignmentRepository.find({
       where: { task_id: id },
       relations: ['user'],
     });
     const oldAssignedUserIds = oldAssignments.map(a => a.user_id);
 
-    // Clear existing assignments
-    await this.taskAssignmentRepository.delete({ task_id: id });
-
-    // Create new assignments
+    // Add new assignments (additive, not replacement)
+    const newAssignments: number[] = [];
     for (const userIdToAssign of assignTaskDto.user_ids) {
+      // Skip if already assigned
+      if (oldAssignedUserIds.includes(userIdToAssign)) {
+        continue;
+      }
+
       const assignment = this.taskAssignmentRepository.create({
         task_id: id,
         user_id: userIdToAssign,
@@ -357,32 +360,36 @@ export class TasksService {
         notes: assignTaskDto.notes,
       });
       await this.taskAssignmentRepository.save(assignment);
+      newAssignments.push(userIdToAssign);
     }
 
-    // Update primary assignee
-    await this.taskRepository.update(id, { assigned_to: assignTaskDto.user_ids[0] });
+    // Update primary assignee if this is the first assignment or adding new users
+    if (oldAssignedUserIds.length === 0 && newAssignments.length > 0) {
+      await this.taskRepository.update(id, { assigned_to: newAssignments[0] });
+    }
 
-    // Create audit log
-    await this.auditLogsService.create({
-      user_id: userId,
-      action: AuditAction.ASSIGN,
-      entity_type: 'Task',
-      entity_id: id,
-      old_values: {
-        assigned_user_ids: oldAssignedUserIds,
-      },
-      new_values: {
-        assigned_user_ids: assignTaskDto.user_ids,
-        notes: assignTaskDto.notes,
-      },
-      description: `Assigned task "${task.title}" to ${assignTaskDto.user_ids.length} user(s)`,
-      organization_id: task.department?.organization_id,
-    });
+    // Create audit log only if new assignments were made
+    if (newAssignments.length > 0) {
+      await this.auditLogsService.create({
+        user_id: userId,
+        action: AuditAction.ASSIGN,
+        entity_type: 'Task',
+        entity_id: id,
+        old_values: {
+          assigned_user_ids: oldAssignedUserIds,
+        },
+        new_values: {
+          newly_assigned: newAssignments,
+          all_assigned: [...oldAssignedUserIds, ...newAssignments],
+          notes: assignTaskDto.notes,
+        },
+        description: `Added ${newAssignments.length} user(s) to task "${task.title}"`,
+        organization_id: task.department?.organization_id,
+      });
 
-    // Send notifications to newly assigned users
-    const organizationId = task.project?.organization_id || task.department?.organization_id || 1;
-    for (const userIdToAssign of assignTaskDto.user_ids) {
-      if (!oldAssignedUserIds.includes(userIdToAssign)) {
+      // Send notifications to newly assigned users
+      const organizationId = task.project?.organization_id || task.department?.organization_id || 1;
+      for (const userIdToAssign of newAssignments) {
         await this.notificationsService.notifyTaskAssigned(
           userIdToAssign,
           organizationId,

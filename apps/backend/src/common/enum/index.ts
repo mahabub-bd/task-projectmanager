@@ -6,6 +6,14 @@ export enum MilestoneStatus {
   CANCELLED = 'cancelled',
 }
 
+export enum PhaseStatus {
+  NOT_STARTED = 'not_started',
+  IN_PROGRESS = 'in_progress',
+  COMPLETED = 'completed',
+  ON_HOLD = 'on_hold',
+  CANCELLED = 'cancelled',
+}
+
 export enum NotificationType {
   TASK_ASSIGNED = 'task_assigned',
   TASK_UPDATED = 'task_updated',

@@ -78,6 +78,7 @@ export class ProjectsService {
       .leftJoinAndSelect('project.manager', 'manager')
       .leftJoinAndSelect('project.organization', 'organization')
       .leftJoinAndSelect('project.milestones', 'milestones')
+      .leftJoinAndSelect('project.phases', 'phases')
       .leftJoinAndSelect('project.tasks', 'tasks')
       .where('1=1');
 
@@ -112,6 +113,7 @@ export class ProjectsService {
       relations: [
         'manager',
         'milestones',
+        'phases',
         'tasks',
         'organization',
         'status_history',
@@ -138,7 +140,7 @@ export class ProjectsService {
     // Load project with relations to get members and manager
     const project = await this.projectRepository.findOne({
       where: { id },
-      relations: ['members', 'members.user', 'manager'],
+      relations: ['members', 'members.user', 'manager', 'phases'],
     });
 
     if (!project) {
@@ -331,7 +333,7 @@ export class ProjectsService {
         organization_id: organizationId,
         status: ProjectStatus.ACTIVE,
       },
-      relations: ['manager', 'organization', 'milestones', 'tasks'],
+      relations: ['manager', 'organization', 'milestones', 'phases', 'tasks'],
       order: { created_at: 'DESC' },
     });
   }
@@ -344,6 +346,7 @@ export class ProjectsService {
       .leftJoinAndSelect('project.manager', 'manager')
       .leftJoinAndSelect('project.organization', 'organization')
       .leftJoinAndSelect('project.milestones', 'milestones')
+      .leftJoinAndSelect('project.phases', 'phases')
       .leftJoinAndSelect('project.tasks', 'tasks')
       .where('project.organization_id = :organizationId', { organizationId })
       .andWhere('project.status = :status', { status: ProjectStatus.ACTIVE })
@@ -360,6 +363,7 @@ export class ProjectsService {
       .leftJoinAndSelect('project.manager', 'manager')
       .leftJoinAndSelect('project.organization', 'organization')
       .leftJoinAndSelect('project.milestones', 'milestones')
+      .leftJoinAndSelect('project.phases', 'phases')
       .leftJoinAndSelect('project.tasks', 'tasks')
       .where('project.organization_id = :organizationId', { organizationId })
       .andWhere('project.status = :status', { status: ProjectStatus.ACTIVE })
@@ -466,6 +470,27 @@ export class ProjectsService {
     });
 
     const savedMember = await this.projectMemberRepository.save(member);
+
+    // Create status history entry for activity timeline
+    const memberName = addMemberDto.user_id
+      ? project.members?.find((m: any) => m.user_id === addMemberDto.user_id)?.user?.name
+      : project.members?.find((m: any) => m.department_id === addMemberDto.department_id)?.department?.name;
+
+    await this.projectStatusHistoryRepository.save({
+      project_id: projectId,
+      from_status: null,
+      to_status: project.status,
+      changed_by: userId,
+      changed_at: new Date(),
+      reason: `Added ${memberName || 'member'} as ${addMemberDto.role}`,
+      metadata: {
+        action: 'member_added',
+        member_id: savedMember.id,
+        user_id: addMemberDto.user_id,
+        department_id: addMemberDto.department_id,
+        role: addMemberDto.role,
+      },
+    });
 
     // Log the action
     await this.auditLogsService.create({

@@ -9,6 +9,7 @@ import {
 import { BaseEntity } from './base.entity';
 import { Milestone } from './milestone.entity';
 import { Organization } from './organization.entity';
+import { Phase } from './phase.entity';
 import { ProjectMember } from './project-member.entity';
 import { ProjectStatusHistory } from './project-status-history.entity';
 import { Task } from './task.entity';
@@ -100,6 +101,12 @@ export class Project extends BaseEntity {
 
   @Column({ name: 'milestone_count', default: 0 })
   milestone_count: number;
+
+  @Column({ name: 'phase_count', default: 0 })
+  phase_count: number;
+
+  @OneToMany(() => Phase, (phase) => phase.project)
+  phases: Phase[];
 
   @OneToMany(() => Milestone, (milestone) => milestone.project)
   milestones: Milestone[];

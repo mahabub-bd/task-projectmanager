@@ -22,6 +22,9 @@ export function useBreadcrumbs(): Breadcrumb[] {
       if (location.pathname.startsWith('/projects/') && location.pathname !== '/projects') {
         breadcrumbs.push({ label: 'Project Details', href: location.pathname });
       }
+    } else if (location.pathname.startsWith('/phases/')) {
+      breadcrumbs.push({ label: 'Projects', href: '/projects' });
+      breadcrumbs.push({ label: 'Phase Details', href: location.pathname });
     } else if (location.pathname.startsWith('/milestones')) {
       breadcrumbs.push({ label: 'Milestones', href: '/milestones' });
     }

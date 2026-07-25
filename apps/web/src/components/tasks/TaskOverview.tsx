@@ -44,63 +44,34 @@ export default function TaskOverview({
   color,
   isOverdue = false,
 }: TaskOverviewProps) {
+  const normalizedProgress = Math.min(100, Math.max(0, progress));
+
   return (
     <Card>
-      <CardContent className="p-6">
-        <div className="space-y-4">
-          {/* Title and Color with Progress in top right */}
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-2xl font-bold">{title}</h1>
+      <CardContent className="p-4 sm:p-5">
+        <div className="flex items-start gap-4">
+          <div className="min-w-0 flex-1 space-y-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="truncate text-xl font-bold tracking-tight sm:text-2xl">{title}</h1>
               {color && (
-                <div className="h-4 w-4 rounded-full shrink-0" style={{ backgroundColor: color }} />
+                <span className="h-3 w-3 shrink-0 rounded-full ring-2 ring-background" style={{ backgroundColor: color }} aria-label="Task color" />
               )}
               {isOverdue && <Badge variant="destructive">Overdue</Badge>}
             </div>
-            {/* Progress Circle - Top Right */}
-            <div className="relative h-24 w-24 shrink-0">
-              <svg className="h-24 w-24 -rotate-90" viewBox="0 0 36 36">
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  className="stroke-muted"
-                  strokeWidth="3"
-                />
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  className="stroke-primary"
-                  strokeWidth="3"
-                  strokeDasharray={`${progress}, 100`}
-                  strokeLinecap="round"
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-[18px] font-semibold">{progress}%</span>
+            {description && <p className="line-clamp-2 text-sm leading-5 text-muted-foreground whitespace-pre-wrap">{description}</p>}
+            {(status || priority) && (
+              <div className="flex flex-wrap items-center gap-2">
+                {status && getStatusBadge(status)}
+                {priority && getPriorityBadge(priority)}
               </div>
-            </div>
+            )}
           </div>
-          {/* Description */}
-          {description && (
-            <div className="space-y-1">
-              <label className="text-sm font-medium text-muted-foreground">Description</label>
-              <p className="text-sm text-muted-foreground whitespace-pre-wrap">{description}</p>
-            </div>
-          )}
-          {/* Status and Priority */}
-          <div className="flex gap-4 items-center">
-            {status && (
-              <div className=" flex gap-2 items-center">
-                <label className="text-sm font-medium text-muted-foreground">Status</label>
-                <div>{getStatusBadge(status)}</div>
-              </div>
-            )}
-            {priority && (
-              <div className=" flex gap-2 items-center">
-                <label className="text-sm font-medium text-muted-foreground">Priority</label>
-                <div>{getPriorityBadge(priority)}</div>
-              </div>
-            )}
+          <div className="relative h-16 w-16 shrink-0" aria-label={`${normalizedProgress}% complete`}>
+            <svg className="h-16 w-16 -rotate-90" viewBox="0 0 36 36" aria-hidden="true">
+              <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" className="stroke-muted" strokeWidth="3.5" />
+              <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" className="stroke-primary" strokeWidth="3.5" strokeDasharray={`${normalizedProgress}, 100`} strokeLinecap="round" />
+            </svg>
+            <span className="absolute inset-0 flex items-center justify-center text-xs font-semibold">{normalizedProgress}%</span>
           </div>
         </div>
       </CardContent>

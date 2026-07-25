@@ -8,13 +8,15 @@ import {
 } from 'typeorm';
 import { MilestoneStatus } from '../common/enum';
 import { BaseEntity } from './base.entity';
-import { Organization } from './organization.entity';
-import { Project } from './project.entity';
 import { MilestoneStatusHistory } from './milestone-status-history.entity';
+import { Organization } from './organization.entity';
+import { Phase } from './phase.entity';
+import { Project } from './project.entity';
 
 @Entity('milestones')
 @Index(['organization_id'])
 @Index(['project_id'])
+@Index(['phase_id'])
 @Index(['status'])
 @Index(['start_date'])
 @Index(['end_date'])
@@ -66,6 +68,19 @@ export class Milestone extends BaseEntity {
   })
   @JoinColumn({ name: 'project_id' })
   project: Project | null;
+
+  @Column({ name: 'phase_id', nullable: true })
+  phase_id: number | null;
+
+  @ManyToOne(() => Phase, (phase) => phase.milestones, {
+    onDelete: 'SET NULL',
+    nullable: true,
+  })
+  @JoinColumn({ name: 'phase_id' })
+  phase: Phase | null;
+
+  @Column({ type: 'int', default: 0 })
+  order: number;
 
   @OneToMany(() => MilestoneStatusHistory, (history) => history.milestone)
   status_history: MilestoneStatusHistory[];

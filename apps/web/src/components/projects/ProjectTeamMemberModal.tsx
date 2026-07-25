@@ -6,19 +6,32 @@ import { Textarea } from '@/components/ui/textarea';
 import { useAppSelector } from '@/store/store';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { useAssignUsersToTaskMutation, useGetDepartmentsListQuery, useGetUsersByDepartmentQuery } from '../../store/api';
+import { useAddProjectMemberMutation, useGetDepartmentsListQuery, useGetUsersByDepartmentQuery } from '../../store/api';
 
-interface TaskAssignModalProps {
+interface ProjectTeamMemberModalProps {
   open: boolean;
   onClose: () => void;
-  taskId: string | null;
-  taskTitle: string;
-  currentAssignments?: number[];
+  projectId: string | null;
+  projectName: string;
+  currentMemberIds?: number[];
 }
 
-export default function TaskAssignModal({ open, onClose, taskId, taskTitle, currentAssignments = [] }: TaskAssignModalProps) {
-  const [selectedUserIds, setSelectedUserIds] = useState<number[]>(currentAssignments);
+const roleOptions = [
+  { value: 'lead', label: 'Lead' },
+  { value: 'member', label: 'Member' },
+  { value: 'viewer', label: 'Viewer' },
+];
+
+export default function ProjectTeamMemberModal({
+  open,
+  onClose,
+  projectId,
+  projectName,
+  currentMemberIds = [],
+}: ProjectTeamMemberModalProps) {
+  const [selectedUserIds, setSelectedUserIds] = useState<number[]>([]);
   const [selectedDepartmentId, setSelectedDepartmentId] = useState<string>('');
+  const [selectedRole, setSelectedRole] = useState<string>('member');
   const [notes, setNotes] = useState('');
 
   const { user } = useAppSelector((state) => state.auth);
@@ -28,12 +41,12 @@ export default function TaskAssignModal({ open, onClose, taskId, taskTitle, curr
   const { data: usersData } = useGetUsersByDepartmentQuery(selectedDepartmentId, {
     skip: !selectedDepartmentId,
   });
-  const [assignUsers] = useAssignUsersToTaskMutation();
+  const [addMember] = useAddProjectMemberMutation();
 
   const departments = Array.isArray(departmentsData) ? departmentsData : [];
   const users = Array.isArray(usersData) ? usersData : [];
 
-  // Change department - keep selected users, just show different users in list
+  // Change department - keep selected users
   const handleDepartmentChange = (value: string) => {
     setSelectedDepartmentId(value);
   };
@@ -45,37 +58,56 @@ export default function TaskAssignModal({ open, onClose, taskId, taskTitle, curr
   };
 
   const handleAssign = async () => {
-    if (!taskId || selectedUserIds.length === 0) {
+    if (!projectId || selectedUserIds.length === 0) {
       toast.error('Please select at least one user');
       return;
     }
 
     try {
-      await assignUsers({
-        taskId,
-        userIds: selectedUserIds,
-        notes: notes.trim() || undefined,
-      }).unwrap();
-      toast.success('Users assigned successfully');
+      // Add each selected user as a member
+      for (const userId of selectedUserIds) {
+        await addMember({
+          projectId,
+          user_id: userId,
+          role: selectedRole as any,
+          notes: notes.trim() || undefined,
+        }).unwrap();
+      }
+      toast.success(`${selectedUserIds.length} member(s) added successfully`);
       onClose();
+      // Reset form
+      setSelectedUserIds([]);
+      setSelectedDepartmentId('');
+      setSelectedRole('member');
+      setNotes('');
     } catch {
-      toast.error('Failed to assign users');
+      toast.error('Failed to add member(s)');
     }
+  };
+
+  const handleClose = () => {
+    onClose();
+    // Reset form
+    setSelectedUserIds([]);
+    setSelectedDepartmentId('');
+    setSelectedRole('member');
+    setNotes('');
   };
 
   return (
     <Modal
       open={open}
-      onClose={onClose}
-      title={`Assign Users to "${taskTitle}"`}
-      description={taskTitle}
+      onClose={handleClose}
+      maxWidth="2xl"
+      title={`Add Team Members to "${projectName}"`}
+      description={projectName}
       footer={
         <>
-          <Button type="button" variant="outline" onClick={onClose}>
+          <Button type="button" variant="outline" onClick={handleClose}>
             Cancel
           </Button>
           <Button onClick={handleAssign} disabled={selectedUserIds.length === 0}>
-            Assign {selectedUserIds.length > 0 ? `(${selectedUserIds.length})` : ''}
+            Add {selectedUserIds.length > 0 ? `(${selectedUserIds.length})` : ''}
           </Button>
         </>
       }
@@ -103,6 +135,23 @@ export default function TaskAssignModal({ open, onClose, taskId, taskTitle, curr
           )}
         </div>
 
+        {/* Role Selection */}
+        <div>
+          <label htmlFor="role" className="text-sm font-medium mb-2 block">Member Role</label>
+          <Select value={selectedRole} onValueChange={setSelectedRole}>
+            <SelectTrigger id="role">
+              <SelectValue placeholder="Select role..." />
+            </SelectTrigger>
+            <SelectContent>
+              {roleOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
         {/* User Selection */}
         {selectedDepartmentId && (
           <div>
@@ -113,7 +162,7 @@ export default function TaskAssignModal({ open, onClose, taskId, taskTitle, curr
               ) : (
                 users.map((user: any) => {
                 const isSelected = selectedUserIds.includes(user.id);
-                const isAssigned = currentAssignments.includes(user.id);
+                const isMember = currentMemberIds.includes(user.id);
                 return (
                   <label
                     key={user.id}
@@ -122,7 +171,7 @@ export default function TaskAssignModal({ open, onClose, taskId, taskTitle, curr
                   >
                     <Checkbox checked={isSelected} onCheckedChange={() => toggleUser(user.id)} />
                     <div className="flex-1 flex items-center gap-2">
-                      <div className="h-8 w-8 rounded-full bg-linear-to-br from-blue-500 to-cyan-600 flex items-center justify-center text-white text-xs font-semibold">
+                      <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center text-white text-xs font-semibold">
                         {user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -130,30 +179,30 @@ export default function TaskAssignModal({ open, onClose, taskId, taskTitle, curr
                         <p className="text-xs text-muted-foreground truncate">{user.email}</p>
                       </div>
                     </div>
-                    {isAssigned && !isSelected && (
-                      <span className="text-xs text-muted-foreground">(currently assigned)</span>
+                    {isMember && !isSelected && (
+                      <span className="text-xs text-muted-foreground">(already member)</span>
                     )}
                   </label>
                 );
               })
             )}
-          </div>
-          <p className="text-xs text-muted-foreground mt-2">
-            {selectedUserIds.length} user{selectedUserIds.length !== 1 ? 's' : ''} selected
-          </p>
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              {selectedUserIds.length} user{selectedUserIds.length !== 1 ? 's' : ''} selected
+            </p>
           </div>
         )}
 
         {/* Assignment Notes */}
         <div>
           <label htmlFor="notes" className="text-sm font-medium mb-2 block">
-            Assignment Notes <span className="text-muted-foreground font-normal">(optional)</span>
+            Notes <span className="text-muted-foreground font-normal">(optional)</span>
           </label>
           <Textarea
             id="notes"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            placeholder="Add any notes or instructions for the assignee(s)..."
+            placeholder="Add any notes about the member assignment..."
             rows={3}
           />
         </div>

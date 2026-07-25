@@ -17,11 +17,10 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-interface MilestoneFormModalProps {
+interface PhaseFormModalProps {
   open: boolean;
   onClose: () => void;
-  initialMilestone?: {
-    id?: string | number;
+  initialPhase?: {
     name?: string;
     description?: string;
     status?: string;
@@ -30,19 +29,15 @@ interface MilestoneFormModalProps {
     due_date?: string;
     progress?: number;
     color?: string;
-    project_id?: string;
-    phase_id?: string;
-    order?: number;
   };
-  onSubmit: (data: MilestoneFormData) => void;
+  onSubmit: (data: PhaseFormData) => void;
   isSaving: boolean;
-  projects?: any[];
-  phases?: any[];
-  projectId?: string;
+  projectId: string;
+  organizationId: string;
 }
 
-export const milestoneFormSchema = z.object({
-  name: z.string().min(1, 'Milestone name is required'),
+export const phaseFormSchema = z.object({
+  name: z.string().min(1, 'Phase name is required'),
   description: z.string().optional(),
   status: z.enum(['not_started', 'in_progress', 'completed', 'on_hold', 'cancelled']),
   start_date: z.string().optional(),
@@ -50,29 +45,22 @@ export const milestoneFormSchema = z.object({
   due_date: z.string().optional(),
   progress: z.number().min(0).max(100),
   color: z.string(),
-  project_id: z.string().optional(),
-  phase_id: z.string().optional(),
   order: z.number().min(0).optional(),
 });
 
-export type MilestoneFormData = z.infer<typeof milestoneFormSchema>;
+export type PhaseFormData = z.infer<typeof phaseFormSchema>;
 
-const milestoneColors = ['#ef4444', '#f97316', '#f59e0b', '#84cc16', '#10b981', '#06b6d4', '#3b82f6', '#8b5cf6', '#d946ef', '#f43f5e'];
+const phaseColors = ['#ef4444', '#f97316', '#f59e0b', '#84cc16', '#10b981', '#06b6d4', '#3b82f6', '#8b5cf6', '#d946ef', '#f43f5e'];
 
-export default function MilestoneFormModal({
+export default function PhaseFormModal({
   open,
   onClose,
-  initialMilestone,
+  initialPhase,
   onSubmit,
   isSaving,
-  projects = [],
-  phases = [],
   projectId,
-}: MilestoneFormModalProps) {
-  // A phase can pass project/phase defaults for a new milestone. Only an
-  // existing milestone (one with an id) should put this form in edit mode.
-  const isEditing = Boolean(initialMilestone?.id);
-
+  organizationId,
+}: PhaseFormModalProps) {
   const {
     register,
     handleSubmit,
@@ -80,8 +68,8 @@ export default function MilestoneFormModal({
     watch,
     reset,
     formState: { errors },
-  } = useForm<MilestoneFormData>({
-    resolver: zodResolver(milestoneFormSchema),
+  } = useForm<PhaseFormData>({
+    resolver: zodResolver(phaseFormSchema),
     defaultValues: {
       name: '',
       description: '',
@@ -91,8 +79,6 @@ export default function MilestoneFormModal({
       due_date: '',
       progress: 0,
       color: '#3b82f6',
-      project_id: '',
-      phase_id: '',
       order: 0,
     },
   });
@@ -104,15 +90,12 @@ export default function MilestoneFormModal({
   const dueDateValue = watch('due_date');
 
   useEffect(() => {
-    if (initialMilestone) {
-      // Convert dates to yyyy-MM-dd format for the form
+    if (initialPhase) {
       const formatDate = (date: any) => {
         if (!date) return '';
-        // Handle ISO string dates from API
         if (typeof date === 'string') {
-          return date.split('T')[0]; // Extract yyyy-MM-dd from ISO string
+          return date.split('T')[0];
         }
-        // Handle Date objects
         if (date instanceof Date) {
           return format(date, 'yyyy-MM-dd');
         }
@@ -120,45 +103,48 @@ export default function MilestoneFormModal({
       };
 
       reset({
-        name: initialMilestone.name || '',
-        description: initialMilestone.description || '',
-        status: (initialMilestone.status || 'not_started') as any,
-        start_date: formatDate(initialMilestone.start_date),
-        end_date: formatDate(initialMilestone.end_date),
-        due_date: formatDate(initialMilestone.due_date),
-        progress: initialMilestone.progress || 0,
-        color: initialMilestone.color || '#3b82f6',
-        project_id: initialMilestone.project_id ? String(initialMilestone.project_id) : '',
-        phase_id: initialMilestone.phase_id ? String(initialMilestone.phase_id) : '',
-        order: initialMilestone.order || 0,
+        name: initialPhase.name || '',
+        description: initialPhase.description || '',
+        status: (initialPhase.status || 'not_started') as any,
+        start_date: formatDate(initialPhase.start_date),
+        end_date: formatDate(initialPhase.end_date),
+        due_date: formatDate(initialPhase.due_date),
+        progress: initialPhase.progress || 0,
+        color: initialPhase.color || '#3b82f6',
+        order: initialPhase.order || 0,
       });
     } else {
       reset();
     }
-  }, [initialMilestone, reset, open]);
+  }, [initialPhase, reset, open]);
 
-  const onFormSubmit = (data: MilestoneFormData) => {
-    onSubmit(data);
+  const onFormSubmit = (data: PhaseFormData) => {
+    const submitData = {
+      ...data,
+      project_id: Number(projectId),
+      organization_id: Number(organizationId),
+    };
+    onSubmit(submitData);
   };
 
   return (
     <Modal
       open={open}
       onClose={onClose}
-      title={isEditing ? 'Edit Milestone' : 'Create New Milestone'}
+      title={initialPhase ? 'Edit Phase' : 'Create New Phase'}
       className="max-w-2xl"
       footer={
         <>
           <Button type="button" variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" form="milestone-form" disabled={isSaving}>
-            {isSaving ? 'Saving...' : isEditing ? 'Update' : 'Create'}
+          <Button type="submit" form="phase-form" disabled={isSaving}>
+            {isSaving ? 'Saving...' : initialPhase ? 'Update' : 'Create'}
           </Button>
         </>
       }
     >
-      <form id="milestone-form" onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
+      <form id="phase-form" onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
         <div>
           <Label htmlFor="name">
             Name <span className="text-destructive">*</span>
@@ -166,7 +152,7 @@ export default function MilestoneFormModal({
           <Input
             id="name"
             {...register('name')}
-            placeholder="Milestone name"
+            placeholder="Phase name"
             className={errors.name ? 'border-destructive' : ''}
           />
           {errors.name && (
@@ -179,7 +165,7 @@ export default function MilestoneFormModal({
           <Textarea
             id="description"
             {...register('description')}
-            placeholder="Milestone description"
+            placeholder="Phase description"
             rows={3}
             className="mt-2"
           />
@@ -188,7 +174,7 @@ export default function MilestoneFormModal({
           )}
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-1">
+        <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <Label htmlFor="status">Status</Label>
             <Select
@@ -290,7 +276,7 @@ export default function MilestoneFormModal({
         <div>
           <Label htmlFor="color">Color</Label>
           <div className="flex flex-wrap gap-2 mt-2">
-            {milestoneColors.map((color) => (
+            {phaseColors.map((color) => (
               <button
                 key={color}
                 type="button"
@@ -309,69 +295,12 @@ export default function MilestoneFormModal({
         <input type="hidden" {...register('color')} />
 
         <div>
-          <Label htmlFor="project_id">Project</Label>
-          <Select
-            value={watch('project_id') || 'none'}
-            onValueChange={(value) =>
-              setValue('project_id', value === 'none' ? '' : value)
-            }
-          >
-            <SelectTrigger className="mt-2">
-              <SelectValue placeholder="Select a project (optional)" />
-            </SelectTrigger>
-            <SelectContent>
-              {projects && projects.length > 0 ? (
-                projects.map((project: any) => (
-                  <SelectItem key={project.id} value={String(project.id)}>
-                    {project.name}
-                  </SelectItem>
-                ))
-              ) : (
-                <SelectItem value="none" disabled>
-                  No projects available
-                </SelectItem>
-              )}
-            </SelectContent>
-          </Select>
-          {errors.project_id && (
-            <p className="mt-1 text-sm text-destructive">{errors.project_id.message}</p>
-          )}
-        </div>
-
-        {projectId && phases && phases.length > 0 && (
-          <div>
-            <Label htmlFor="phase_id">Phase</Label>
-            <Select
-              value={watch('phase_id') || 'none'}
-              onValueChange={(value) =>
-                setValue('phase_id', value === 'none' ? '' : value)
-              }
-            >
-              <SelectTrigger className="mt-2">
-                <SelectValue placeholder="Select a phase (optional)" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">No phase</SelectItem>
-                {phases.map((phase: any) => (
-                  <SelectItem key={phase.id} value={String(phase.id)}>
-                    {phase.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {errors.phase_id && (
-              <p className="mt-1 text-sm text-destructive">{errors.phase_id.message}</p>
-            )}
-          </div>
-        )}
-
-        <div>
           <Label htmlFor="order">Order</Label>
           <Input
             id="order"
             type="number"
             {...register('order', { valueAsNumber: true })}
-            placeholder="Milestone order within phase"
+            placeholder="Phase order within project"
             className="mt-2"
           />
           {errors.order && (

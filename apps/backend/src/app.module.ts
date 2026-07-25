@@ -9,6 +9,7 @@ import { DivisionsModule } from './divisions/divisions.module';
 import { DepartmentsModule } from './departments/departments.module';
 import { DesignationsModule } from './designations/designations.module';
 import { ProjectsModule } from './projects/projects.module';
+import { PhasesModule } from './phases/phases.module';
 import { MilestonesModule } from './milestones/milestones.module';
 import { TagsModule } from './tags/tags.module';
 import { TasksModule } from './tasks/tasks.module';
@@ -38,6 +39,7 @@ import { Workflow } from './entities/workflow.entity';
 import { WorkflowState } from './entities/workflow-state.entity';
 import { WorkflowTransition } from './entities/workflow-transition.entity';
 import { Project } from './entities/project.entity';
+import { Phase } from './entities/phase.entity';
 import { Milestone } from './entities/milestone.entity';
 import { Task } from './entities/task.entity';
 import { TaskAssignment } from './entities/task-assignment.entity';
@@ -87,6 +89,7 @@ import { MilestoneStatusHistory } from './entities/milestone-status-history.enti
           Project,
           ProjectStatusHistory,
           ProjectMember,
+          Phase,
           Milestone,
           MilestoneStatusHistory,
           Task,
@@ -119,6 +122,7 @@ import { MilestoneStatusHistory } from './entities/milestone-status-history.enti
     DepartmentsModule,
     DesignationsModule,
     ProjectsModule,
+    PhasesModule,
     MilestonesModule,
     TagsModule,
     TasksModule,

@@ -1,22 +1,18 @@
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Edit, Trash2, UserPlus } from 'lucide-react';
+import { ArrowRight, Edit, Trash2, UserPlus, Users } from 'lucide-react';
 
-interface TaskActionBarProps {
+interface ActionBarProps {
   onEdit?: () => void;
   onDelete?: () => void;
-  onAssign?: () => void;
   onBack?: () => void;
+  onAssign?: () => void;
+  onAddMember?: () => void;
 }
 
-export default function TaskActionBar({ onEdit, onDelete, onAssign, onBack }: TaskActionBarProps) {
+export default function ActionBar({ onEdit, onDelete, onBack, onAssign, onAddMember }: ActionBarProps) {
   return (
-    <div className="flex items-center justify-between mb-4">
-      {onBack && (
-        <Button variant="ghost" size="icon" onClick={onBack} className="shrink-0">
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-      )}
-      <div className="flex items-center gap-1.5 shrink-0 ml-auto">
+    <div className="flex items-center justify-end mb-4">
+      <div className="flex items-center gap-1.5 shrink-0">
         {onAssign && (
           <Button variant="outline" size="sm" className="h-8 px-3 text-xs" onClick={onAssign}>
             <UserPlus className="h-3.5 w-3.5 mr-1.5" />
@@ -29,9 +25,21 @@ export default function TaskActionBar({ onEdit, onDelete, onAssign, onBack }: Ta
             Edit
           </Button>
         )}
+        {onAddMember && (
+          <Button variant="outline" size="sm" className="h-8 px-3 text-xs" onClick={onAddMember}>
+            <Users className="h-3.5 w-3.5 mr-1.5" />
+            Add Member
+          </Button>
+        )}
         {onDelete && (
           <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={onDelete}>
             <Trash2 className="h-3.5 w-3.5" />
+          </Button>
+        )}
+        {onBack && (
+          <Button variant="default" size="sm" onClick={onBack} className="h-8 px-3 text-xs">
+            Back
+            <ArrowRight className="h-3.5 w-3.5 mr-1.5" />
           </Button>
         )}
       </div>

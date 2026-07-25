@@ -6,7 +6,9 @@ import {
   Param,
   Query,
   UseGuards,
+  Res,
 } from '@nestjs/common';
+import { Response } from 'express';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -105,5 +107,20 @@ export class AuditLogsController {
       statusCode: HttpStatus.OK,
       data: auditLogs || [],
     };
+  }
+
+  @Get('export')
+  @RequirePermissions('audit:read')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Export audit logs as CSV' })
+  @ApiResponse({ status: 200, description: 'CSV file generated successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden - Insufficient permissions' })
+  async exportAuditLogs(@Query() query: QueryAuditLogsDto, @Res() res: Response): Promise<void> {
+    const csvData = await this.auditLogsService.exportToCsv(query);
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', `attachment; filename="audit-logs-${new Date().toISOString().split('T')[0]}.csv"`);
+    res.send(csvData);
   }
 }

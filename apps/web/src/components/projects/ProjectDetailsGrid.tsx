@@ -1,7 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar as CalendarIcon, DollarSign, User } from 'lucide-react';
 import { format } from 'date-fns';
+import { Calendar as CalendarIcon, DollarSign, Flag, ListTodo, User } from 'lucide-react';
 
 const safeFormatDate = (dateValue: string | Date | null | undefined, formatStr: string = 'MMM d, yyyy') => {
   if (!dateValue) return 'Not set';
@@ -42,15 +42,20 @@ export default function ProjectDetailsGrid({ project, onStatusChange, onPriority
   };
 
   return (
-    <div className="rounded-lg border bg-card p-6">
-      <h2 className="text-lg font-semibold mb-4">Project Details</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* Status */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-muted-foreground">Status</label>
+    <section className="overflow-hidden rounded-xl border bg-card shadow-sm">
+      <div className="flex items-center justify-between border-b px-4 py-3 sm:px-5">
+        <div>
+          <h2 className="text-base font-semibold">Project Details</h2>
+          <p className="text-xs text-muted-foreground">Status, schedule, and team overview</p>
+        </div>
+        {isOverdue && <Badge variant="destructive">Overdue</Badge>}
+      </div>
+      <div className="grid gap-px bg-border sm:grid-cols-6">
+        <div className="space-y-1.5 bg-card p-4">
+          <label className="text-xs font-medium text-muted-foreground">Status</label>
           {onStatusChange ? (
             <Select value={project.status} onValueChange={onStatusChange}>
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="h-8 w-full text-sm">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -62,18 +67,17 @@ export default function ProjectDetailsGrid({ project, onStatusChange, onPriority
               </SelectContent>
             </Select>
           ) : (
-            <Badge className={statusColors[project.status] || 'bg-gray-100'}>
+            <Badge className={`w-fit ${statusColors[project.status] || 'bg-gray-100'}`}>
               {project.status?.replace('_', ' ').toUpperCase() || 'N/A'}
             </Badge>
           )}
         </div>
 
-        {/* Priority */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-muted-foreground">Priority</label>
+        <div className="space-y-1.5 bg-card p-4">
+          <label className="text-xs font-medium text-muted-foreground">Priority</label>
           {onPriorityChange ? (
             <Select value={project.priority || 'medium'} onValueChange={onPriorityChange}>
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="h-8 w-full text-sm">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -84,83 +88,74 @@ export default function ProjectDetailsGrid({ project, onStatusChange, onPriority
               </SelectContent>
             </Select>
           ) : (
-            <Badge className={priorityColors[project.priority] || 'bg-gray-100'}>
+            <Badge className={`w-fit ${priorityColors[project.priority] || 'bg-gray-100'}`}>
               {(project.priority || 'medium').toUpperCase()}
             </Badge>
           )}
         </div>
 
-        {/* Budget */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-muted-foreground">Budget</label>
-          <div className="flex items-center gap-2 text-sm">
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+        <div className="space-y-1.5 bg-card p-4">
+          <label className="text-xs font-medium text-muted-foreground">Budget</label>
+          <div className="flex items-center gap-1.5 text-sm">
+            <DollarSign className="h-3.5 w-3.5 text-muted-foreground" />
             <span className="font-medium">
               {project.budget ? project.budget.toLocaleString() : 'Not set'}
             </span>
           </div>
         </div>
 
-        {/* Manager */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-muted-foreground">Project Manager</label>
-          <div className="flex items-center gap-2 text-sm">
-            <User className="h-4 w-4 text-muted-foreground" />
+        <div className="space-y-1.5 bg-card p-4">
+          <label className="text-xs font-medium text-muted-foreground">Project Manager</label>
+          <div className="flex items-center gap-1.5 text-sm">
+            <User className="h-3.5 w-3.5 text-muted-foreground" />
             <span className="font-medium">
               {project.manager?.name || 'Not assigned'}
             </span>
           </div>
         </div>
 
-        {/* Start Date */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-muted-foreground">Start Date</label>
-          <div className="flex items-center gap-2 text-sm">
-            <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+        <div className="space-y-1.5 bg-card p-4">
+          <label className="text-xs font-medium text-muted-foreground">Start Date</label>
+          <div className="flex items-center gap-1.5 text-sm">
+            <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground" />
             <span>{safeFormatDate(project.start_date)}</span>
           </div>
         </div>
 
-        {/* Due Date */}
-        <div className={`space-y-2 ${isOverdue ? 'bg-red-50 dark:bg-red-950/20 -mx-2 px-2 py-1 rounded' : ''}`}>
-          <label className="text-sm font-medium text-muted-foreground">Due Date</label>
-          <div className={`flex items-center gap-2 text-sm ${isOverdue ? 'text-red-600 dark:text-red-400 font-medium' : ''}`}>
-            <CalendarIcon className="h-4 w-4" />
+        <div className={`space-y-1.5 p-4 ${isOverdue ? 'bg-red-50/70 dark:bg-red-950/20' : 'bg-card'}`}>
+          <label className="text-xs font-medium text-muted-foreground">Due Date</label>
+          <div className={`flex items-center gap-1.5 text-sm ${isOverdue ? 'font-medium text-red-600 dark:text-red-400' : ''}`}>
+            <CalendarIcon className="h-3.5 w-3.5" />
             <span>{safeFormatDate(project.due_date)}</span>
-            {isOverdue && <Badge variant="destructive" className="ml-2">Overdue</Badge>}
           </div>
         </div>
 
-        {/* End Date */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-muted-foreground">End Date</label>
-          <div className="flex items-center gap-2 text-sm">
-            <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+        <div className="space-y-1.5 bg-card p-4">
+          <label className="text-xs font-medium text-muted-foreground">End Date</label>
+          <div className="flex items-center gap-1.5 text-sm">
+            <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground" />
             <span>{safeFormatDate(project.end_date)}</span>
           </div>
         </div>
 
-        {/* Team Members Count */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-muted-foreground">Team Members</label>
-          <div className="flex items-center gap-2 text-sm">
-            <User className="h-4 w-4 text-muted-foreground" />
+        <div className="space-y-1.5 bg-card p-4">
+          <label className="text-xs font-medium text-muted-foreground">Team Members</label>
+          <div className="flex items-center gap-1.5 text-sm">
+            <User className="h-3.5 w-3.5 text-muted-foreground" />
             <span className="font-medium">
               {project.members?.length || 0} members
             </span>
           </div>
         </div>
 
-        {/* Tasks & Milestones Count */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-muted-foreground">Tasks & Milestones</label>
-          <div className="flex items-center gap-4 text-sm">
-            <span className="font-medium">{project.task_count || 0} tasks</span>
-            <span className="text-muted-foreground">•</span>
-            <span className="font-medium">{project.milestone_count || 0} milestones</span>
+        <div className="space-y-1.5 bg-card p-4">
+          <label className="text-xs font-medium text-muted-foreground">Work Items</label>
+          <div className="flex items-center gap-3 text-sm">
+            <span className="flex items-center gap-1.5 font-medium"><ListTodo className="h-3.5 w-3.5 text-muted-foreground" />{project.task_count || 0}</span>
+            <span className="flex items-center gap-1.5 font-medium"><Flag className="h-3.5 w-3.5 text-muted-foreground" />{project.milestone_count || 0}</span>
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }
