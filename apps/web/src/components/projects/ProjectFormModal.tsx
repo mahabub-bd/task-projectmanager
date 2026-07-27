@@ -207,22 +207,9 @@ export default function ProjectFormModal({
       className='max-w-2xl'
       onClose={onClose}
       title={editingProject ? 'Edit Project' : 'Create New Project'}
-      footer={
-        <>
-          <Button type="button" variant="outline" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            form="project-form"
-            disabled={isSaving}
-          >
-            {isSaving ? 'Saving...' : editingProject ? 'Update' : 'Create'}
-          </Button>
-        </>
-      }
+      footer={null}
     >
-      <form id="project-form" onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
+      <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
         <div>
           <Label htmlFor="name">
             Name <span className="text-destructive">*</span>
@@ -500,6 +487,16 @@ export default function ProjectFormModal({
         </div>
 
         <input type="hidden" {...register('color')} />
+
+        {/* Form Actions */}
+        <div className="flex items-center justify-end gap-2 pt-4 border-t">
+          <Button type="button" variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button type="submit" disabled={isSaving}>
+            {isSaving ? 'Saving...' : editingProject ? 'Update' : 'Create'}
+          </Button>
+        </div>
       </form>
     </Modal>
   );

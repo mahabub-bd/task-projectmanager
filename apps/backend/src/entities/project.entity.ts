@@ -33,8 +33,10 @@ export enum ProjectPriority {
 @Entity('projects')
 @Index(['organization_id'])
 @Index(['status'])
+@Index(['organization_id', 'status']) // Composite index for common queries
 @Index(['start_date'])
 @Index(['end_date'])
+@Index(['due_date'])
 @Index(['manager_id'])
 export class Project extends BaseEntity {
   @Column({ length: 200 })

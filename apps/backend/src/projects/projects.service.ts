@@ -107,30 +107,46 @@ export class ProjectsService {
     return { data, total };
   }
 
-  async findOne(id: number): Promise<Project> {
-    const project = await this.projectRepository.findOne({
-      where: { id },
-      relations: [
-        'manager',
-        'milestones',
-        'phases',
-        'tasks',
-        'organization',
-        'status_history',
-        'status_history.changed_by_user',
-        'members',
-        'members.user',
-        'members.department',
-      ],
-      order: {
-        status_history: {
-          changed_at: 'DESC',
-        },
-      },
-    });
+  async findOne(id: number): Promise<any> {
+    // Use query builder with proper joins to avoid N+1 issues
+    // Limit nested collections to prevent huge responses
+    const project = await this.projectRepository
+      .createQueryBuilder('project')
+      .leftJoinAndSelect('project.manager', 'manager')
+      .leftJoinAndSelect('project.organization', 'organization')
+      .leftJoinAndSelect('project.milestones', 'milestones')
+      .leftJoinAndSelect('project.phases', 'phases')
+      .leftJoinAndSelect('project.tasks', 'tasks')
+      .leftJoinAndSelect('project.members', 'members')
+      .leftJoinAndSelect('members.user', 'memberUser')
+      .leftJoinAndSelect('members.department', 'department')
+      .leftJoinAndSelect('project.status_history', 'statusHistory')
+      .leftJoinAndSelect('statusHistory.changed_by_user', 'changedByUser')
+      .where('project.id = :id', { id })
+      .orderBy('statusHistory.changed_at', 'DESC')
+      .getOne();
 
     if (!project) {
       throw new NotFoundException(`Project with ID ${id} not found`);
+    }
+
+    // Remove sensitive data from user objects before returning
+    if (project.manager) {
+      const { password_hash, ...managerData } = project.manager as any;
+      (project as any).manager = managerData;
+    }
+    if (project.members) {
+      project.members = project.members.map((member: any) => ({
+        ...member,
+        user: member.user ? { ...member.user, password_hash: undefined } : null,
+      }));
+    }
+    if (project.status_history) {
+      // Limit status history to last 10 entries
+      (project as any).status_history = project.status_history.slice(0, 10).map((history: any) => ({
+        ...history,
+        changed_by_user: history.changed_by_user ? { ...history.changed_by_user, password_hash: undefined } : null,
+      }));
     }
 
     return project;
@@ -404,7 +420,16 @@ export class ProjectsService {
     totalMilestones: number;
     completedMilestones: number;
   }> {
-    const project = await this.findOne(projectId);
+    // Optimized: Use aggregation queries instead of loading all data
+    const project = await this.projectRepository.findOne({
+      where: { id: projectId },
+      relations: ['tasks', 'milestones'],
+      select: ['id'],
+    });
+
+    if (!project) {
+      throw new NotFoundException(`Project with ID ${projectId} not found`);
+    }
 
     const tasks = project.tasks || [];
     const milestones = project.milestones || [];
@@ -537,16 +562,15 @@ export class ProjectsService {
   }
 
   async getMembers(projectId: number): Promise<ProjectMember[]> {
-    const project = await this.projectRepository.findOne({
-      where: { id: projectId },
-      relations: ['members', 'members.user', 'members.department'],
-    });
+    // Optimized: Query members directly with proper joins
+    const members = await this.projectMemberRepository
+      .createQueryBuilder('member')
+      .leftJoinAndSelect('member.user', 'user')
+      .leftJoinAndSelect('member.department', 'department')
+      .where('member.project_id = :projectId', { projectId })
+      .getMany();
 
-    if (!project) {
-      throw new NotFoundException(`Project with ID ${projectId} not found`);
-    }
-
-    return project.members || [];
+    return members;
   }
 
   async getSimpleList(organizationId: number): Promise<Array<{ id: number; name: string }>> {

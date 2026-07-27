@@ -61,7 +61,7 @@ export function Sidebar({ isOpen, onClose, navigation, collapsedGroups, onToggle
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto px-2 xl:px-3 py-4 space-y-4 xl:space-y-6">
+      <nav className="sidebar-nav flex-1 overflow-y-auto px-2 xl:px-3 py-4 space-y-4 xl:space-y-6">
         {navigation.map((group) => (
           <div key={group.title}>
             <button

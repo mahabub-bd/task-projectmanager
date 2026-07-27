@@ -272,6 +272,29 @@ body {
   background-clip: padding-box;
 }
 
+/* Sidebar scrollbar styles */
+.sidebar-nav {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--muted-foreground) / 0.3) transparent;
+}
+
+.sidebar-nav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.2);
+  border-radius: 3px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.4);
+}
+
 /* Dashboard grid layout - only show columns on 1920px+ screens */
 @media (min-width: 1920px) {
   .grid-layout-1920 {
