@@ -115,7 +115,7 @@ export default function ProjectTeamMemberModal({
       <div className="space-y-4">
         {/* Department Selection */}
         <div>
-          <label htmlFor="department" className="text-sm font-medium mb-2 block">Select Department</label>
+          <label htmlFor="department" className="text-sm font-medium mb-2 block text-foreground">Select Department</label>
           <Select value={selectedDepartmentId} onValueChange={handleDepartmentChange}>
             <SelectTrigger id="department">
               <SelectValue placeholder="Choose a department..." />
@@ -129,7 +129,7 @@ export default function ProjectTeamMemberModal({
             </SelectContent>
           </Select>
           {selectedDepartmentId && (
-            <p className="text-xs text-muted-foreground mt-2">
+            <p className="text-xs text-muted-foreground dark:text-muted-foreground/70 mt-2">
               {users.length} user{users.length !== 1 ? 's' : ''} in this department
             </p>
           )}
@@ -137,7 +137,7 @@ export default function ProjectTeamMemberModal({
 
         {/* Role Selection */}
         <div>
-          <label htmlFor="role" className="text-sm font-medium mb-2 block">Member Role</label>
+          <label htmlFor="role" className="text-sm font-medium mb-2 block text-foreground">Member Role</label>
           <Select value={selectedRole} onValueChange={setSelectedRole}>
             <SelectTrigger id="role">
               <SelectValue placeholder="Select role..." />
@@ -155,10 +155,10 @@ export default function ProjectTeamMemberModal({
         {/* User Selection */}
         {selectedDepartmentId && (
           <div>
-            <label className="text-sm font-medium mb-2 block">Select Users</label>
-            <div className="border rounded-md p-3 max-h-64 overflow-y-auto space-y-1 bg-muted/20">
+            <label className="text-sm font-medium mb-2 block text-foreground">Select Users</label>
+            <div className="border dark:border-border rounded-md p-3 max-h-64 overflow-y-auto space-y-1 bg-muted/30 dark:bg-muted/10">
               {users.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-4">No users available in this department</p>
+                <p className="text-sm text-muted-foreground dark:text-muted-foreground/70 text-center py-4">No users available in this department</p>
               ) : (
                 users.map((user: any) => {
                 const isSelected = selectedUserIds.includes(user.id);
@@ -166,28 +166,28 @@ export default function ProjectTeamMemberModal({
                 return (
                   <label
                     key={user.id}
-                    className={`flex items-center gap-3 p-2 hover:bg-accent rounded-md cursor-pointer transition-colors ${isSelected ? 'bg-accent' : ''
+                    className={`flex items-center gap-3 p-2 hover:bg-accent dark:hover:bg-accent/30 rounded-md cursor-pointer transition-colors ${isSelected ? 'bg-accent dark:bg-accent/40' : ''
                       }`}
                   >
                     <Checkbox checked={isSelected} onCheckedChange={() => toggleUser(user.id)} />
                     <div className="flex-1 flex items-center gap-2">
-                      <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center text-white text-xs font-semibold">
+                      <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-600 dark:from-blue-600 dark:to-cyan-700 flex items-center justify-center text-white text-xs font-semibold shadow-sm">
                         {user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">{user.name}</p>
+                        <p className="text-sm font-medium truncate text-foreground">{user.name}</p>
                         <p className="text-xs text-muted-foreground truncate">{user.email}</p>
                       </div>
                     </div>
                     {isMember && !isSelected && (
-                      <span className="text-xs text-muted-foreground">(already member)</span>
+                      <span className="text-xs text-muted-foreground dark:text-muted-foreground/70">(already member)</span>
                     )}
                   </label>
                 );
               })
             )}
             </div>
-            <p className="text-xs text-muted-foreground mt-2">
+            <p className="text-xs text-muted-foreground dark:text-muted-foreground/70 mt-2">
               {selectedUserIds.length} user{selectedUserIds.length !== 1 ? 's' : ''} selected
             </p>
           </div>
@@ -195,8 +195,8 @@ export default function ProjectTeamMemberModal({
 
         {/* Assignment Notes */}
         <div>
-          <label htmlFor="notes" className="text-sm font-medium mb-2 block">
-            Notes <span className="text-muted-foreground font-normal">(optional)</span>
+          <label htmlFor="notes" className="text-sm font-medium mb-2 block text-foreground">
+            Notes <span className="text-muted-foreground dark:text-muted-foreground/70 font-normal">(optional)</span>
           </label>
           <Textarea
             id="notes"

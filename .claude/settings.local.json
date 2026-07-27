@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git commit -m 'fix: add --legacy-peer-deps to npm install in Dockerfile *)"
+      "Bash(git commit -m 'fix: add --legacy-peer-deps to npm install in Dockerfile *)",
+      "Bash(npx --yes pnpm add cache-manager @nestjs/cache-manager redis)",
+      "Bash(npx --yes pnpm add cache-manager-redis-store@3)",
+      "Bash(npx --yes pnpm add compression)",
+      "Bash(npx --yes pnpm add -D @types/compression)"
     ]
   }
 }

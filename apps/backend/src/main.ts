@@ -5,6 +5,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
+import compression from 'compression';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
@@ -12,6 +13,22 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const configService = app.get(ConfigService);
+
+  // Enable gzip compression - compresses all responses
+  app.use(
+    compression({
+      filter: (req: any, res: any) => {
+        // Don't compress if the request already has compression
+        if (req.headers['x-no-compression']) {
+          return false;
+        }
+        // Use compression for all text-based responses
+        return /text|javascript|json/.test(res.getHeader('Content-Type') as string);
+      },
+      threshold: 1024, // Only compress responses larger than 1KB
+      level: 6, // Compression level (1-9, 6 is default)
+    }),
+  );
 
   // Apply logging interceptor globally
   app.useGlobalInterceptors(new LoggingInterceptor());

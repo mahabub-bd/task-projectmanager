@@ -24,6 +24,7 @@ import { CommonModule } from './common/controllers/common.module';
 import { RolesGuard } from './common/guards/roles.guard';
 import { PermissionsGuard } from './common/guards/permissions.guard';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
+import { AppCacheModule } from './cache/cache.module';
 
 // Entities must be loaded in order to avoid circular dependency issues
 import { Organization } from './entities/organization.entity';
@@ -134,6 +135,7 @@ import { MilestoneStatusHistory } from './entities/milestone-status-history.enti
     NotificationsModule,
     AppNotificationsModule,
     CommonModule,
+    AppCacheModule,
   ],
   controllers: [],
   providers: [

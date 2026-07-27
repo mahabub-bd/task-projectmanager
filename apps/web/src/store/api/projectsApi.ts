@@ -8,14 +8,22 @@ export const projectsApi = apiSlice.injectEndpoints({
         params,
       }),
       providesTags: ['Project'],
+      // Keep cache for 5 minutes
+      keepUnusedDataFor: 300,
     }),
     getProject: builder.query({
-      query: (id: string) => `/projects/${id}`,
+      query: (id: string, relations?: string) => ({
+        url: `/projects/${id}`,
+        params: relations ? { relations } : undefined,
+      }),
       providesTags: (_result, _error, id) => [{ type: 'Project', id }],
+      // Keep individual project cache for 10 minutes
+      keepUnusedDataFor: 600,
     }),
     getProjectStats: builder.query({
       query: (id: string) => `/projects/${id}/stats`,
       providesTags: (_result, _error, id) => [{ type: 'Project', id }],
+      keepUnusedDataFor: 180,
     }),
     createProject: builder.mutation({
       query: (data: any) => ({
@@ -32,6 +40,19 @@ export const projectsApi = apiSlice.injectEndpoints({
         body: data,
       }),
       invalidatesTags: (_result, _error, { id }) => [{ type: 'Project', id }, 'Project', 'Milestone', 'Task'],
+      // Optimistic update
+      async onQueryStarted({ id, ...patch }, { dispatch, queryFulfilled }) {
+        const patchResult = dispatch(
+          projectsApi.util.updateQueryData('getProject', id, (draft) => {
+            Object.assign(draft, patch);
+          })
+        );
+        try {
+          await queryFulfilled;
+        } catch {
+          patchResult.undo();
+        }
+      },
     }),
     deleteProject: builder.mutation({
       query: (id: string) => ({
@@ -43,14 +64,17 @@ export const projectsApi = apiSlice.injectEndpoints({
     getActiveProjects: builder.query({
       query: (organizationId: string) => `/projects/active/${organizationId}`,
       providesTags: ['Project'],
+      keepUnusedDataFor: 120,
     }),
     getUpcomingProjects: builder.query({
       query: (organizationId: string) => `/projects/upcoming/${organizationId}`,
       providesTags: ['Project'],
+      keepUnusedDataFor: 120,
     }),
     getOverdueProjects: builder.query({
       query: (organizationId: string) => `/projects/overdue/${organizationId}`,
       providesTags: ['Project'],
+      keepUnusedDataFor: 120,
     }),
     updateProjectProgress: builder.mutation({
       query: (id: string) => ({
@@ -70,10 +94,13 @@ export const projectsApi = apiSlice.injectEndpoints({
     getProjectMembers: builder.query({
       query: (projectId: string) => `/projects/${projectId}/members`,
       providesTags: (_result, _error, projectId) => [{ type: 'Project', id: projectId }],
+      keepUnusedDataFor: 180,
     }),
     getProjectsList: builder.query({
       query: (organizationId: string) => `/projects/list/${organizationId}`,
       providesTags: ['Project'],
+      // Dropdown data changes rarely - cache for 10 minutes
+      keepUnusedDataFor: 600,
     }),
     removeProjectMember: builder.mutation({
       query: ({ projectId, memberId }: { projectId: string; memberId: string }) => ({

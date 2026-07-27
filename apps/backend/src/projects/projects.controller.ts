@@ -1,3 +1,4 @@
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import {
   Body,
   Controller,
@@ -10,6 +11,7 @@ import {
   Post,
   Query,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -58,6 +60,8 @@ export class ProjectsController {
   @Get()
   @RequirePermissions('projects:read')
   @HttpCode(HttpStatus.OK)
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(60) // Cache for 1 minute (shorter for lists)
   @ApiOperation({ summary: 'Get all projects with filters and pagination' })
   @ApiResponse({ status: 200, description: 'Projects retrieved successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -78,6 +82,8 @@ export class ProjectsController {
   @Get('active/:organizationId')
   @RequirePermissions('projects:read')
   @HttpCode(HttpStatus.OK)
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(120) // Cache for 2 minutes
   @ApiOperation({ summary: 'Get active projects for an organization' })
   @ApiResponse({ status: 200, description: 'Active projects retrieved successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -97,6 +103,8 @@ export class ProjectsController {
   @Get('upcoming/:organizationId')
   @RequirePermissions('projects:read')
   @HttpCode(HttpStatus.OK)
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(120)
   @ApiOperation({ summary: 'Get upcoming projects for an organization' })
   @ApiResponse({ status: 200, description: 'Upcoming projects retrieved successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -116,6 +124,8 @@ export class ProjectsController {
   @Get('overdue/:organizationId')
   @RequirePermissions('projects:read')
   @HttpCode(HttpStatus.OK)
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(120)
   @ApiOperation({ summary: 'Get overdue projects for an organization' })
   @ApiResponse({ status: 200, description: 'Overdue projects retrieved successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -135,13 +145,19 @@ export class ProjectsController {
   @Get(':id')
   @RequirePermissions('projects:read')
   @HttpCode(HttpStatus.OK)
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(300) // Cache for 5 minutes
   @ApiOperation({ summary: 'Get project by ID' })
   @ApiResponse({ status: 200, description: 'Project retrieved successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden - Insufficient permissions' })
   @ApiResponse({ status: 404, description: 'Project not found' })
-  async findOne(@Param('id') id: number): Promise<SuccessResponse> {
-    const project = await this.projectsService.findOne(id);
+  async findOne(
+    @Param('id') id: number,
+    @Query('relations') relations?: string,
+  ): Promise<SuccessResponse> {
+    const relationsArray = relations ? relations.split(',') : undefined;
+    const project = await this.projectsService.findOne(id, relationsArray);
 
     return {
       message: 'Project retrieved successfully',
@@ -153,6 +169,8 @@ export class ProjectsController {
   @Get(':id/stats')
   @RequirePermissions('projects:read')
   @HttpCode(HttpStatus.OK)
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(180) // Cache for 3 minutes
   @ApiOperation({ summary: 'Get project statistics' })
   @ApiResponse({ status: 200, description: 'Project statistics retrieved successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -256,6 +274,8 @@ export class ProjectsController {
   @Get(':id/members')
   @RequirePermissions('projects:read')
   @HttpCode(HttpStatus.OK)
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(180)
   @ApiOperation({ summary: 'Get project members' })
   @ApiResponse({ status: 200, description: 'Project members retrieved successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -274,6 +294,8 @@ export class ProjectsController {
   @Get('list/:organizationId')
   @RequirePermissions('projects:read')
   @HttpCode(HttpStatus.OK)
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(300) // Cache for 5 minutes (dropdown data changes rarely)
   @ApiOperation({ summary: 'Get simplified project list for dropdowns' })
   @ApiResponse({ status: 200, description: 'Project list retrieved successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })

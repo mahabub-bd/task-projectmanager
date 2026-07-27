@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AuditLogsService } from '../audit-logs/audit-logs.service';
@@ -13,6 +13,8 @@ import { QueryProjectsDto } from './dto/query-projects.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { NotificationsService } from '../notifications/notifications.service';
 import { NotificationService as EmailNotificationService } from '../email/notification.service';
+import { Cache } from 'cache-manager';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @Injectable()
 export class ProjectsService {
@@ -26,6 +28,7 @@ export class ProjectsService {
     private auditLogsService: AuditLogsService,
     private notificationsService: NotificationsService,
     private emailNotificationService: EmailNotificationService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   async create(createProjectDto: CreateProjectDto, userId: number): Promise<Project> {
@@ -107,23 +110,47 @@ export class ProjectsService {
     return { data, total };
   }
 
-  async findOne(id: number): Promise<any> {
-    // Use query builder with proper joins to avoid N+1 issues
-    // Limit nested collections to prevent huge responses
-    const project = await this.projectRepository
+  async findOne(id: number, relations?: string[]): Promise<any> {
+    // Check cache first
+    const cacheKey = `project:${id}:${relations?.join(',') || 'full'}`;
+    const cached = await this.cacheManager.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
+    // Determine which relations to load based on request
+    // Default minimal relations for better performance
+    const loadRelations = relations || ['manager', 'organization'];
+
+    // Build query with only needed relations
+    const queryBuilder = this.projectRepository
       .createQueryBuilder('project')
       .leftJoinAndSelect('project.manager', 'manager')
-      .leftJoinAndSelect('project.organization', 'organization')
-      .leftJoinAndSelect('project.milestones', 'milestones')
-      .leftJoinAndSelect('project.phases', 'phases')
-      .leftJoinAndSelect('project.tasks', 'tasks')
-      .leftJoinAndSelect('project.members', 'members')
-      .leftJoinAndSelect('members.user', 'memberUser')
-      .leftJoinAndSelect('members.department', 'department')
-      .leftJoinAndSelect('project.status_history', 'statusHistory')
-      .leftJoinAndSelect('statusHistory.changed_by_user', 'changedByUser')
+      .leftJoinAndSelect('project.organization', 'organization');
+
+    // Conditionally add relations based on what's requested
+    if (loadRelations.includes('milestones')) {
+      queryBuilder.leftJoinAndSelect('project.milestones', 'milestones');
+    }
+    if (loadRelations.includes('phases')) {
+      queryBuilder.leftJoinAndSelect('project.phases', 'phases');
+    }
+    if (loadRelations.includes('tasks')) {
+      queryBuilder.leftJoinAndSelect('project.tasks', 'tasks');
+    }
+    if (loadRelations.includes('members')) {
+      queryBuilder.leftJoinAndSelect('project.members', 'members')
+        .leftJoinAndSelect('members.user', 'memberUser')
+        .leftJoinAndSelect('members.department', 'department');
+    }
+    if (loadRelations.includes('status_history')) {
+      queryBuilder.leftJoinAndSelect('project.status_history', 'statusHistory')
+        .leftJoinAndSelect('statusHistory.changed_by_user', 'changedByUser')
+        .orderBy('statusHistory.changed_at', 'DESC');
+    }
+
+    const project = await queryBuilder
       .where('project.id = :id', { id })
-      .orderBy('statusHistory.changed_at', 'DESC')
       .getOne();
 
     if (!project) {
@@ -148,6 +175,9 @@ export class ProjectsService {
         changed_by_user: history.changed_by_user ? { ...history.changed_by_user, password_hash: undefined } : null,
       }));
     }
+
+    // Cache the result for 5 minutes
+    await this.cacheManager.set(cacheKey, project, 300);
 
     return project;
   }
