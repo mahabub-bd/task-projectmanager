@@ -6,19 +6,25 @@ This directory contains the RTK Query API slices organized by feature. Each API 
 
 ```
 api/
-├── baseApi.ts           # Base API configuration with auth and token refresh
-├── authApi.ts           # Authentication endpoints (login, register, profile, etc.)
-├── usersApi.ts          # User management endpoints
-├── departmentsApi.ts    # Department endpoints
-├── projectsApi.ts       # Project endpoints
-├── tasksApi.ts          # Task endpoints (including comments)
-├── organizationsApi.ts  # Organization endpoints
-├── rolesApi.ts          # Role endpoints (including permissions)
-├── permissionsApi.ts    # Permission endpoints (including audit logs)
-├── tagsApi.ts           # Tag endpoints
-├── milestonesApi.ts     # Milestone endpoints
-├── index.ts             # Main export file (re-exports all APIs)
-└── README.md            # This file
+├── baseApi.ts                    # Base API configuration with auth and token refresh
+├── authApi.ts                    # Authentication endpoints (login, register, profile, etc.)
+├── usersApi.ts                   # User management endpoints
+├── divisionsApi.ts               # Division hierarchy endpoints
+├── departmentsApi.ts             # Department endpoints
+├── designationsApi.ts            # Designation/Job title endpoints
+├── organizationsApi.ts           # Organization endpoints
+├── projectsApi.ts                # Project endpoints
+├── phasesApi.ts                  # Phase endpoints
+├── milestonesApi.ts              # Milestone endpoints
+├── tasksApi.ts                   # Task endpoints (including comments)
+├── rolesApi.ts                   # Role endpoints (including permissions)
+├── permissionsApi.ts             # Permission endpoints (including audit logs)
+├── tagsApi.ts                    # Tag endpoints
+├── notificationsApi.ts           # App notification endpoints
+├── notificationPreferencesApi.ts # Notification preferences endpoints
+├── activityApi.ts                # Activity log endpoints
+├── index.ts                      # Main export file (re-exports all APIs)
+└── README.md                     # This file
 ```
 
 ## Usage
@@ -48,35 +54,63 @@ import { useGetProjectsQuery } from '@/store/api/projectsApi';
 - Get current user
 - Update profile
 - Change password
+- Refresh token
 
 ### usersApi.ts
 - CRUD operations for users
 - User list (simplified for dropdowns)
 - Users by department
+- Online users
+- Organization directory
 - User role assignments
+
+### divisionsApi.ts
+- CRUD operations for divisions
+- Division tree (hierarchical structure)
+- Division list (simplified for dropdowns)
+- Division departments
 
 ### departmentsApi.ts
 - CRUD operations for departments
 - Department list (simplified for dropdowns)
 - Department projects and tasks
 
+### designationsApi.ts
+- CRUD operations for designations (job titles)
+- Designation list (simplified for dropdowns)
+
+### organizationsApi.ts
+- CRUD operations for organizations
+- Organization logo upload/delete
+
 ### projectsApi.ts
 - CRUD operations for projects
 - Project stats
 - Active, upcoming, overdue projects
 - Project member management
+- Project list (simplified for dropdowns)
+- Update project progress
+
+### phasesApi.ts
+- CRUD operations for phases
+- Phases by project
+- Update phase progress
+
+### milestonesApi.ts
+- CRUD operations for milestones
+- Upcoming and overdue milestones
+- Update milestone progress
 
 ### tasksApi.ts
 - CRUD operations for tasks
 - Task comments
+- Task comment likes
 - Task user assignments
-
-### organizationsApi.ts
-- CRUD operations for organizations
 
 ### rolesApi.ts
 - CRUD operations for roles
-- Role permission management
+- Role permissions management
+- Assign/remove permissions to roles
 
 ### permissionsApi.ts
 - CRUD operations for permissions
@@ -87,10 +121,20 @@ import { useGetProjectsQuery } from '@/store/api/projectsApi';
 - Get tags
 - Create tags
 
-### milestonesApi.ts
-- CRUD operations for milestones
-- Upcoming and overdue milestones
-- Update milestone progress
+### notificationsApi.ts
+- Get notifications (paginated)
+- Get unread notifications
+- Get notification count
+- Mark as read / Mark all as read
+- Delete notifications
+
+### notificationPreferencesApi.ts
+- Get user notification preferences
+- Update notification preferences (email/push settings)
+
+### activityApi.ts
+- Get activity log
+- User activity tracking
 
 ## Migration from apiSlice.ts
 

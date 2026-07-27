@@ -1,6 +1,7 @@
 import { TablePagination } from '@/components/shared/TablePagination';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import SearchBar from '@/components/ui/SearchBar';
 import StatsCard from '@/components/ui/stats-card';
 import {
@@ -24,6 +25,15 @@ export default function UsersPage() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
+  const [deleteDialog, setDeleteDialog] = useState<{
+    open: boolean;
+    userId: number | null;
+    userName: string;
+  }>({
+    open: false,
+    userId: null,
+    userName: '',
+  });
 
   // Build query params with pagination and filters
   const queryParams = useMemo(() => {
@@ -70,14 +80,23 @@ export default function UsersPage() {
     setEditingUser(null);
   };
 
-  const handleDeleteUser = async (id: number) => {
-    if (!window.confirm('Are you sure you want to delete this user?')) return;
+  const handleDeleteUser = (id: number, name: string) => {
+    setDeleteDialog({ open: true, userId: id, userName: name });
+  };
+
+  const confirmDeleteUser = async () => {
+    if (!deleteDialog.userId) return;
 
     try {
-      await deleteUser(id.toString()).unwrap();
+      await deleteUser(deleteDialog.userId.toString()).unwrap();
+      setDeleteDialog({ open: false, userId: null, userName: '' });
     } catch {
       // Toast is handled by RTK Query callers elsewhere
     }
+  };
+
+  const closeDeleteDialog = () => {
+    setDeleteDialog({ open: false, userId: null, userName: '' });
   };
 
   if (isLoading) {
@@ -172,6 +191,17 @@ export default function UsersPage() {
       )}
 
       <UserFormModal open={isFormOpen} onClose={closeForm} editingUser={editingUser} />
+
+      <ConfirmDialog
+        open={deleteDialog.open}
+        onClose={closeDeleteDialog}
+        onConfirm={confirmDeleteUser}
+        title="Delete User"
+        description={`Are you sure you want to delete "${deleteDialog.userName}"? This action cannot be undone.`}
+        confirmText="Delete User"
+        cancelText="Cancel"
+        variant="danger"
+      />
     </div>
   );
 }

@@ -11,7 +11,7 @@ import {
 interface OrganizationsTableViewProps {
   organizations: any[];
   onEditOrganization: (organization: any) => void;
-  onDeleteOrganization: (organizationId: number) => void;
+  onDeleteOrganization: (organizationId: number, organizationName: string) => void;
   onNavigate?: (path: string) => void;
 }
 
@@ -101,7 +101,7 @@ export default function OrganizationsTableView({
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => onDeleteOrganization(organization.id)}
+                  onClick={() => onDeleteOrganization(organization.id, organization.name)}
                   className="text-destructive hover:text-destructive"
                   title="Delete"
                 >

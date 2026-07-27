@@ -1,6 +1,7 @@
 import { TablePagination } from '@/components/shared/TablePagination';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import SearchBar from '@/components/ui/SearchBar';
 import StatsCard from '@/components/ui/stats-card';
 import { Building, Building2, FolderOpen, Plus } from 'lucide-react';
@@ -19,6 +20,15 @@ export default function DivisionsPage() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
+  const [deleteDialog, setDeleteDialog] = useState<{
+    open: boolean;
+    divisionId: number | null;
+    divisionName: string;
+  }>({
+    open: false,
+    divisionId: null,
+    divisionName: '',
+  });
 
   // Build query params with pagination and filters
   const queryParams = useMemo(() => {
@@ -75,14 +85,23 @@ export default function DivisionsPage() {
     setEditingDivision(null);
   };
 
-  const handleDeleteDivision = async (id: number) => {
-    if (!window.confirm('Are you sure you want to delete this division?')) return;
+  const handleDeleteDivision = (id: number, name: string) => {
+    setDeleteDialog({ open: true, divisionId: id, divisionName: name });
+  };
+
+  const confirmDeleteDivision = async () => {
+    if (!deleteDialog.divisionId) return;
 
     try {
-      await deleteDivision(id.toString()).unwrap();
+      await deleteDivision(deleteDialog.divisionId.toString()).unwrap();
+      setDeleteDialog({ open: false, divisionId: null, divisionName: '' });
     } catch {
       // Error handled by toast
     }
+  };
+
+  const closeDeleteDialog = () => {
+    setDeleteDialog({ open: false, divisionId: null, divisionName: '' });
   };
 
   const handleDivisionClick = (divisionId: number) => {
@@ -185,6 +204,17 @@ export default function DivisionsPage() {
       )}
 
       <DivisionFormModal open={isFormOpen} onClose={closeForm} editingDivision={editingDivision} />
+
+      <ConfirmDialog
+        open={deleteDialog.open}
+        onClose={closeDeleteDialog}
+        onConfirm={confirmDeleteDivision}
+        title="Delete Division"
+        description={`Are you sure you want to delete "${deleteDialog.divisionName}"? This action cannot be undone.`}
+        confirmText="Delete Division"
+        cancelText="Cancel"
+        variant="danger"
+      />
     </div>
   );
 }

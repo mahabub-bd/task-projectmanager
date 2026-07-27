@@ -8,7 +8,7 @@ import { getDepartmentAvatarColor, getDepartmentInitials } from './utils/departm
 interface DepartmentsTableViewProps {
   departments: any[];
   onEditDepartment: (department: any) => void;
-  onDeleteDepartment: (departmentId: number) => void;
+  onDeleteDepartment: (departmentId: number, departmentName: string) => void;
   onDepartmentClick?: (departmentId: number) => void;
 }
 
@@ -97,7 +97,7 @@ export default function DepartmentsTableView({
                   variant="ghost"
                   onClick={(e) => {
                     e.stopPropagation();
-                    onDeleteDepartment(department.id);
+                    onDeleteDepartment(department.id, department.name);
                   }}
                   title="Delete department"
                 >

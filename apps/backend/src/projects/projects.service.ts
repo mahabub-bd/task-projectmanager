@@ -119,8 +119,8 @@ export class ProjectsService {
     }
 
     // Determine which relations to load based on request
-    // Default minimal relations for better performance
-    const loadRelations = relations || ['manager', 'organization'];
+    // Default relations include manager, organization, tasks, and milestones for project details
+    const loadRelations = relations || ['manager', 'organization', 'tasks', 'milestones', 'phases'];
 
     // Build query with only needed relations
     const queryBuilder = this.projectRepository
@@ -130,13 +130,17 @@ export class ProjectsService {
 
     // Conditionally add relations based on what's requested
     if (loadRelations.includes('milestones')) {
-      queryBuilder.leftJoinAndSelect('project.milestones', 'milestones');
+      queryBuilder.leftJoinAndSelect('project.milestones', 'milestones')
+        .addOrderBy('milestones.due_date', 'ASC');
     }
     if (loadRelations.includes('phases')) {
-      queryBuilder.leftJoinAndSelect('project.phases', 'phases');
+      queryBuilder.leftJoinAndSelect('project.phases', 'phases')
+        .addOrderBy('phases.order', 'ASC');
     }
     if (loadRelations.includes('tasks')) {
-      queryBuilder.leftJoinAndSelect('project.tasks', 'tasks');
+      queryBuilder.leftJoinAndSelect('project.tasks', 'tasks')
+        .addOrderBy('tasks.priority', 'DESC')
+        .addOrderBy('tasks.due_date', 'ASC');
     }
     if (loadRelations.includes('members')) {
       queryBuilder.leftJoinAndSelect('project.members', 'members')

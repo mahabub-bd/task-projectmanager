@@ -11,7 +11,7 @@ import {
 interface UsersTableViewProps {
   users: any[];
   onEditUser: (user: any) => void;
-  onDeleteUser: (userId: number) => void;
+  onDeleteUser: (userId: number, userName: string) => void;
 }
 
 export default function UsersTableView({
@@ -132,7 +132,7 @@ export default function UsersTableView({
                   <Button size="icon" variant="ghost" onClick={() => onEditUser(user)} title="Edit user">
                     <Edit className="h-4 w-4" />
                   </Button>
-                  <Button size="icon" variant="ghost" onClick={() => onDeleteUser(user.id)} title="Delete user">
+                  <Button size="icon" variant="ghost" onClick={() => onDeleteUser(user.id, user.name)} title="Delete user">
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>

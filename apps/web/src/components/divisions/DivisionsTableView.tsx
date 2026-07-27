@@ -6,7 +6,7 @@ import { Building2, Edit, Trash2, Users } from 'lucide-react';
 interface DivisionsTableViewProps {
   divisions: any[];
   onEditDivision: (division: any) => void;
-  onDeleteDivision: (divisionId: number) => void;
+  onDeleteDivision: (divisionId: number, divisionName: string) => void;
   onDivisionClick?: (divisionId: number) => void;
 }
 
@@ -124,7 +124,7 @@ export default function DivisionsTableView({
                   variant="ghost"
                   onClick={(e) => {
                     e.stopPropagation();
-                    onDeleteDivision(division.id);
+                    onDeleteDivision(division.id, division.name);
                   }}
                   title="Delete division"
                 >

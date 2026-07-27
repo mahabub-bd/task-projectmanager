@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import SearchBar from '@/components/ui/SearchBar';
 import StatsCard from '@/components/ui/stats-card';
 import { Building2, Globe, Mail, Phone, Plus } from 'lucide-react';
@@ -17,6 +18,15 @@ export default function OrganizationsPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingOrganization, setEditingOrganization] = useState<any | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [deleteDialog, setDeleteDialog] = useState<{
+    open: boolean;
+    organizationId: number | null;
+    organizationName: string;
+  }>({
+    open: false,
+    organizationId: null,
+    organizationName: '',
+  });
   const { data: organizationsData, isLoading } = useGetOrganizationsQuery(undefined);
   const [deleteOrganization] = useDeleteOrganizationMutation();
 
@@ -32,15 +42,24 @@ export default function OrganizationsPage() {
     setIsFormOpen(true);
   };
 
-  const handleDelete = async (id: number) => {
-    if (!window.confirm('Are you sure you want to delete this organization?')) return;
+  const handleDelete = (id: number, name: string) => {
+    setDeleteDialog({ open: true, organizationId: id, organizationName: name });
+  };
+
+  const confirmDeleteOrganization = async () => {
+    if (!deleteDialog.organizationId) return;
 
     try {
-      await deleteOrganization(String(id)).unwrap();
+      await deleteOrganization(String(deleteDialog.organizationId)).unwrap();
       toast.success('Organization deleted successfully!');
+      setDeleteDialog({ open: false, organizationId: null, organizationName: '' });
     } catch (error: any) {
       toast.error(error?.data?.message || 'Failed to delete organization');
     }
+  };
+
+  const closeDeleteDialog = () => {
+    setDeleteDialog({ open: false, organizationId: null, organizationName: '' });
   };
 
   const handleAddNew = () => {
@@ -116,6 +135,17 @@ export default function OrganizationsPage() {
         open={isFormOpen}
         onClose={handleCloseForm}
         editingOrganization={editingOrganization}
+      />
+
+      <ConfirmDialog
+        open={deleteDialog.open}
+        onClose={closeDeleteDialog}
+        onConfirm={confirmDeleteOrganization}
+        title="Delete Organization"
+        description={`Are you sure you want to delete "${deleteDialog.organizationName}"? This action cannot be undone.`}
+        confirmText="Delete Organization"
+        cancelText="Cancel"
+        variant="danger"
       />
     </div>
   );

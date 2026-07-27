@@ -1,6 +1,7 @@
 import { TablePagination } from '@/components/shared/TablePagination';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import SearchBar from '@/components/ui/SearchBar';
 import StatsCard from '@/components/ui/stats-card';
 import { BadgeCheck, Building2, Briefcase, Plus } from 'lucide-react';
@@ -22,6 +23,15 @@ export default function DesignationsPage() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
+  const [deleteDialog, setDeleteDialog] = useState<{
+    open: boolean;
+    designationId: number | null;
+    designationName: string;
+  }>({
+    open: false,
+    designationId: null,
+    designationName: '',
+  });
 
   const queryParams = useMemo(() => {
     const params: Record<string, string> = {};
@@ -69,13 +79,23 @@ export default function DesignationsPage() {
     setEditingDesignation(null);
   };
 
-  const handleDeleteDesignation = async (id: number) => {
-    if (!window.confirm('Are you sure you want to delete this designation?')) return;
+  const handleDeleteDesignation = (id: number, name: string) => {
+    setDeleteDialog({ open: true, designationId: id, designationName: name });
+  };
+
+  const confirmDeleteDesignation = async () => {
+    if (!deleteDialog.designationId) return;
+
     try {
-      await deleteDesignation(id.toString()).unwrap();
+      await deleteDesignation(deleteDialog.designationId.toString()).unwrap();
+      setDeleteDialog({ open: false, designationId: null, designationName: '' });
     } catch {
       // Error handled by toast
     }
+  };
+
+  const closeDeleteDialog = () => {
+    setDeleteDialog({ open: false, designationId: null, designationName: '' });
   };
 
   const handleDesignationClick = (designationId: number) => {
@@ -175,6 +195,17 @@ export default function DesignationsPage() {
         open={isFormOpen}
         onClose={closeForm}
         editingDesignation={editingDesignation}
+      />
+
+      <ConfirmDialog
+        open={deleteDialog.open}
+        onClose={closeDeleteDialog}
+        onConfirm={confirmDeleteDesignation}
+        title="Delete Designation"
+        description={`Are you sure you want to delete "${deleteDialog.designationName}"? This action cannot be undone.`}
+        confirmText="Delete Designation"
+        cancelText="Cancel"
+        variant="danger"
       />
     </div>
   );

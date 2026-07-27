@@ -7,7 +7,7 @@ import { getDesignationAvatarColor, getDesignationInitials } from './utils/desig
 interface DesignationsTableViewProps {
   designations: any[];
   onEditDesignation: (designation: any) => void;
-  onDeleteDesignation: (designationId: number) => void;
+  onDeleteDesignation: (designationId: number, designationName: string) => void;
   onDesignationClick?: (designationId: number) => void;
 }
 
@@ -88,7 +88,7 @@ export default function DesignationsTableView({
                   variant="ghost"
                   onClick={(e) => {
                     e.stopPropagation();
-                    onDeleteDesignation(designation.id);
+                    onDeleteDesignation(designation.id, designation.name);
                   }}
                 >
                   <Trash2 className="h-4 w-4" />

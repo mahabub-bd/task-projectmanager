@@ -112,7 +112,7 @@ export default function ProjectSpotlight({ projects, isLoading, onNavigate }: Pr
                     key={project.id}
                     type="button"
                     onClick={() => onNavigate(`/projects/${project.id}`)}
-                    className="w-full text-left rounded-t-lg p-2.5 transition-all duration-200 hover:bg-accent/50 group border-b last:border-b-0 border-border/50"
+                    className="w-full text-left rounded-t-lg p-2.5 transition-all cursor-pointer duration-200 hover:bg-accent/50 group border-b last:border-b-0 border-border/50"
                   >
                     <div className="flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between">
                       <div className="min-w-0 flex-1 space-y-1.5">

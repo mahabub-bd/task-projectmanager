@@ -1,6 +1,7 @@
 import { TablePagination } from '@/components/shared/TablePagination';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import SearchBar from '@/components/ui/SearchBar';
 import StatsCard from '@/components/ui/stats-card';
 import { Briefcase, Building, Building2, Plus } from 'lucide-react';
@@ -19,6 +20,15 @@ export default function DepartmentsPage() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
+  const [deleteDialog, setDeleteDialog] = useState<{
+    open: boolean;
+    departmentId: number | null;
+    departmentName: string;
+  }>({
+    open: false,
+    departmentId: null,
+    departmentName: '',
+  });
 
   // Build query params with pagination and filters
   const queryParams = useMemo(() => {
@@ -73,14 +83,23 @@ export default function DepartmentsPage() {
     setEditingDepartment(null);
   };
 
-  const handleDeleteDepartment = async (id: number) => {
-    if (!window.confirm('Are you sure you want to delete this department?')) return;
+  const handleDeleteDepartment = (id: number, name: string) => {
+    setDeleteDialog({ open: true, departmentId: id, departmentName: name });
+  };
+
+  const confirmDeleteDepartment = async () => {
+    if (!deleteDialog.departmentId) return;
 
     try {
-      await deleteDepartment(id.toString()).unwrap();
+      await deleteDepartment(deleteDialog.departmentId.toString()).unwrap();
+      setDeleteDialog({ open: false, departmentId: null, departmentName: '' });
     } catch {
       // Error handled by toast
     }
+  };
+
+  const closeDeleteDialog = () => {
+    setDeleteDialog({ open: false, departmentId: null, departmentName: '' });
   };
 
   const handleDepartmentClick = (departmentId: number) => {
@@ -182,6 +201,17 @@ export default function DepartmentsPage() {
       )}
 
       <DepartmentFormModal open={isFormOpen} onClose={closeForm} editingDepartment={editingDepartment} />
+
+      <ConfirmDialog
+        open={deleteDialog.open}
+        onClose={closeDeleteDialog}
+        onConfirm={confirmDeleteDepartment}
+        title="Delete Department"
+        description={`Are you sure you want to delete "${deleteDialog.departmentName}"? This action cannot be undone.`}
+        confirmText="Delete Department"
+        cancelText="Cancel"
+        variant="danger"
+      />
     </div>
   );
 }

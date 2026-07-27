@@ -64,7 +64,7 @@ export default function QuickActions({ onNavigate }: QuickActionsProps) {
         <button
           key={action.title}
           onClick={() => onNavigate(action.onClick())}
-          className="group relative overflow-hidden rounded-xl border-2 bg-card p-4 text-left transition-all duration-300 hover:shadow-lg hover:border-primary/50"
+          className="group relative overflow-hidden rounded-xl cursor-pointer border-2 bg-card p-4 text-left transition-all duration-300 hover:shadow-lg hover:border-primary/50"
         >
           {/* Background gradient decoration */}
           <div className={`absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-5 ${action.color}`} />
