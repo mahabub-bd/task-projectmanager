@@ -5,7 +5,14 @@
       "Bash(npx --yes pnpm add cache-manager @nestjs/cache-manager redis)",
       "Bash(npx --yes pnpm add cache-manager-redis-store@3)",
       "Bash(npx --yes pnpm add compression)",
-      "Bash(npx --yes pnpm add -D @types/compression)"
+      "Bash(npx --yes pnpm add -D @types/compression)",
+      "Bash(node scripts/validate_palette.js \"#2563eb,#9333ea,#059669,#d97706\" --mode light)",
+      "Bash(node scripts/validate_palette.js \"#60a5fa,#c084fc,#34d399,#fbbf24\" --mode dark)",
+      "Bash(node scripts/validate_palette.js \"#2563eb,#059669,#d97706,#9333ea\" --mode light)",
+      "Bash(node scripts/validate_palette.js \"#60a5fa,#34d399,#fbbf24,#c084fc\" --mode dark)",
+      "Bash(node scripts/validate_palette.js \"#3b82f6,#10b981,#f59e0b,#a855f7\" --mode dark)",
+      "Bash(node scripts/validate_palette.js \"#3b82f6,#059669,#d97706,#a855f7\" --mode dark)",
+      "Bash(node_modules/.bin/tsc --noEmit)"
     ]
   }
 }

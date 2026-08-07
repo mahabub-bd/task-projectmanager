@@ -18,8 +18,8 @@ export class NotificationSchedulerService {
     private milestoneRepository: Repository<Milestone>,
   ) {}
 
-  // Run every hour to check for tasks due soon
-  @Cron(CronExpression.EVERY_HOUR)
+  // Run every day at midnight to check for tasks due soon
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async handleTaskDueSoonReminders() {
     this.logger.log('Checking for tasks due soon...');
 
@@ -57,8 +57,8 @@ export class NotificationSchedulerService {
     this.logger.log(`Sent ${tasksDueSoon.length} task due soon reminders`);
   }
 
-  // Run every hour to check for overdue tasks
-  @Cron(CronExpression.EVERY_HOUR)
+  // Run every day at midnight to check for overdue tasks
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async handleTaskOverdueNotifications() {
     this.logger.log('Checking for overdue tasks...');
 

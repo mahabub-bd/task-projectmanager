@@ -1,5 +1,7 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Building2, TrendingDown, TrendingUp } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { ArrowRight, Building2, FolderKanban, Gauge, Users } from 'lucide-react';
 
 interface Department {
   id: number;
@@ -22,12 +24,6 @@ interface DepartmentOverviewProps {
   onNavigate?: (path: string) => void;
 }
 
-const getProgressBg = (progress: number) => {
-  if (progress >= 80) return 'bg-green-500';
-  if (progress >= 50) return 'bg-yellow-500';
-  return 'bg-orange-500';
-};
-
 export default function DepartmentOverview({ departmentStats, onNavigate }: DepartmentOverviewProps) {
   const totalDepartments = departmentStats.length;
   const totalProjects = departmentStats.reduce((sum, dept) => sum + dept.totalProjects, 0);
@@ -39,101 +35,100 @@ export default function DepartmentOverview({ departmentStats, onNavigate }: Depa
   // Sort departments by progress
   const sortedDepartments = [...departmentStats].sort((a, b) => b.progress - a.progress);
 
+  // Stat tiles: label + value, identity chip beside the text (never colored text).
+  // Hue order keeps blue/purple at opposite ends so they are never adjacent.
+  const summaryStats = [
+    { label: 'Departments', value: `${totalDepartments}`, icon: Building2, chip: 'bg-blue-500/10 text-blue-600 dark:text-blue-500' },
+    { label: 'Projects', value: `${totalProjects}`, icon: FolderKanban, chip: 'bg-emerald-500/10 text-emerald-600' },
+    { label: 'Progress', value: `${avgCompletionRate}%`, icon: Gauge, chip: 'bg-amber-500/10 text-amber-600' },
+    { label: 'Team Members', value: `${totalTeamMembers}`, icon: Users, chip: 'bg-purple-500/10 text-purple-600 dark:text-purple-500' },
+  ];
+
   return (
-    <Card className="h-full">
-      <CardHeader className="pb-4 pt-5 px-5">
-        <CardTitle className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500 text-white dark:bg-blue-600">
-              <Building2 className="h-5 w-5" />
+    <Card className="h-full border-2">
+      <CardContent className="p-4 h-full flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between gap-3 mb-4">
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            <div className="rounded-lg bg-primary/10 p-1.5 shrink-0">
+              <Building2 className="h-4 w-4 text-primary" />
             </div>
-            <div>
-              <div className="text-base font-bold dark:text-white">Department Overview</div>
-              <p className="text-xs text-muted-foreground dark:text-muted-foreground mt-0.5">Performance & Statistics</p>
+            <div className="min-w-0">
+              <h3 className="text-base font-bold truncate">Department Overview</h3>
+              <p className="text-xs text-muted-foreground truncate">Performance & Statistics</p>
             </div>
           </div>
-          {avgCompletionRate >= 70 ? (
-            <TrendingUp className="h-4 w-4 text-green-600 dark:text-green-400" />
-          ) : (
-            <TrendingDown className="h-4 w-4 text-orange-600 dark:text-orange-400" />
-          )}
-        </CardTitle>
-      </CardHeader>
-
-      <CardContent className="space-y-4 px-5 pb-5">
-        {/* Summary Stats */}
-        <div className="grid grid-cols-4 gap-3">
-          <div className="rounded-lg border  dark:border-blue-900/50 p-3">
-            <p className="text-xs text-muted-foreground dark:text-blue-200 mb-1">Departments</p>
-            <p className="text-2xl font-bold dark:text-white">{totalDepartments}</p>
-          </div>
-
-          <div className="rounded-lg border dark:bg-purple-950/40 dark:border-purple-900/50 p-3">
-            <p className="text-xs text-muted-foreground dark:text-purple-200 mb-1">Team Members</p>
-            <p className="text-2xl font-bold dark:text-white">{totalTeamMembers}</p>
-          </div>
-
-          <div className="rounded-lg border dark:bg-green-950/40 dark:border-green-900/50 p-3">
-            <p className="text-xs text-muted-foreground dark:text-green-200 mb-1">Projects</p>
-            <p className="text-2xl font-bold dark:text-white">{totalProjects}</p>
-          </div>
-
-          <div className="rounded-lg border dark:bg-amber-950/40 dark:border-amber-900/50 p-3">
-            <p className="text-xs text-muted-foreground dark:text-amber-200 mb-1">Progress</p>
-            <p className="text-2xl font-bold dark:text-white">{avgCompletionRate}%</p>
-          </div>
+          <Button variant="ghost" size="sm" onClick={() => onNavigate?.('/departments')} className="gap-1 shrink-0 -mr-1">
+            <span className="hidden xl:inline">View all</span>
+            <ArrowRight className="h-4 w-4" />
+          </Button>
         </div>
 
-        {/* Department List */}
-        <div className="space-y-2">
-          <p className="text-xs font-semibold text-muted-foreground dark:text-muted-foreground uppercase">Top Performers</p>
+        {/* Summary stat tiles */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
+          {summaryStats.map((stat) => {
+            const Icon = stat.icon;
+
+            return (
+              <div key={stat.label} className="rounded-lg border p-2.5 space-y-1.5 min-w-0">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <div className={`rounded-md p-1 shrink-0 ${stat.chip}`}>
+                    <Icon className="h-3 w-3" />
+                  </div>
+                  <p className="text-[11px] text-muted-foreground truncate">{stat.label}</p>
+                </div>
+                <p className="text-lg font-bold leading-none tracking-tight">{stat.value}</p>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Top performers — single-series bars, direct-labeled */}
+        <div className="flex flex-col flex-1 min-h-0">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">Top Performers</p>
 
           {sortedDepartments.length === 0 ? (
-            <div className="text-center py-8">
-              <Building2 className="h-8 w-8 mx-auto text-muted-foreground dark:text-muted-foreground mb-2" />
-              <p className="text-sm text-muted-foreground dark:text-muted-foreground">No departments found</p>
+            <div className="flex-1 flex items-center justify-center">
+              <div className="text-center">
+                <Building2 className="mx-auto h-10 w-10 text-muted-foreground/50 mb-2" />
+                <p className="text-xs text-muted-foreground">No departments found</p>
+              </div>
             </div>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-1.5 flex-1 overflow-y-auto -mx-1">
               {sortedDepartments.slice(0, 4).map((dept, index) => (
-                <div
+                <button
                   key={dept.department.id}
-                  onClick={() => onNavigate?.(`/departments`)}
-                  className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:bg-accent dark:bg-card/50 dark:hover:bg-accent/50 cursor-pointer transition-colors"
+                  type="button"
+                  onClick={() => onNavigate?.('/departments')}
+                  className="w-full text-left rounded-lg p-2.5 hover:bg-accent/50 transition-colors cursor-pointer group"
                 >
-                  <span className="text-sm font-bold text-muted-foreground dark:text-muted-foreground w-5">#{index + 1}</span>
-
-                  <div className="flex-1">
-                    <p className="font-medium text-sm dark:text-white">{dept.department.name}</p>
-                    <p className="text-xs text-muted-foreground dark:text-muted-foreground">
-                      {dept.activeProjects} projects · {dept.teamMembers} members
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-semibold text-muted-foreground w-5 shrink-0 tabular-nums">
+                      #{index + 1}
+                    </span>
+                    <p className="text-xs font-semibold truncate flex-1 min-w-0 group-hover:text-primary transition-colors">
+                      {dept.department.name}
                     </p>
+                    <span className="text-xs font-bold shrink-0 tabular-nums">{dept.progress}%</span>
                   </div>
 
-                  <div className="text-right">
-                    <p className="text-sm font-bold dark:text-white">{dept.progress}%</p>
-                    <div className="h-1.5 w-12 rounded-full bg-muted dark:bg-muted/50 overflow-hidden">
-                      <div
-                        className={`h-full ${getProgressBg(dept.progress)}`}
-                        style={{ width: `${dept.progress}%` }}
-                      />
-                    </div>
+                  <p className="text-[11px] text-muted-foreground mt-1 pl-7">
+                    {dept.activeProjects} {dept.activeProjects === 1 ? 'project' : 'projects'} · {dept.teamMembers} {dept.teamMembers === 1 ? 'member' : 'members'}
+                  </p>
+
+                  <div className="pl-7 mt-1.5">
+                    <Progress
+                      value={dept.progress}
+                      className="h-1.5"
+                      aria-label={`${dept.department.name} completion: ${dept.progress}%`}
+                    />
                   </div>
-                </div>
+                </button>
               ))}
             </div>
           )}
         </div>
-
-        {/* View All Button */}
-        {totalDepartments > 4 && (
-          <button
-            onClick={() => onNavigate?.('/departments')}
-            className="w-full py-2 text-sm text-primary hover:underline"
-          >
-            View all departments →
-          </button>
-        )}
       </CardContent>
     </Card>
   );

@@ -15,10 +15,10 @@ import { useGetNotificationsQuery, useMarkAsReadMutation, useMarkAllAsReadMutati
 import { formatDistanceToNow } from 'date-fns';
 
 const priorityBorders = {
-  low: 'border-l-muted-foreground',
-  medium: 'border-l-blue-500',
-  high: 'border-l-orange-500',
-  urgent: 'border-l-red-500',
+  low: 'border-l-slate-500 dark:border-l-gray-500',
+  medium: 'border-l-blue-600 dark:border-l-blue-500',
+  high: 'border-l-orange-600 dark:border-l-orange-500',
+  urgent: 'border-l-red-600 dark:border-l-red-500',
 };
 
 interface NotificationDrawerProps {
@@ -150,7 +150,7 @@ export default function NotificationDrawer({ trigger }: NotificationDrawerProps)
                           {notification.title}
                         </p>
                         {!notification.read_at && (
-                          <span className="h-2 w-2 rounded-full bg-blue-500 flex-shrink-0 mt-1" />
+                          <span className="h-2 w-2 rounded-full bg-blue-600 dark:bg-blue-500 flex-shrink-0 mt-1" />
                         )}
                       </div>
                       <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
