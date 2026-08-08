@@ -11,7 +11,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, User, Mail, FileText, Camera } from 'lucide-react';
+import { Loader2, User, Mail, FileText } from 'lucide-react';
 import { useState } from 'react';
 import { useAppSelector } from '@/store/hooks';
 import { useUpdateProfileMutation } from '@/store/api';
