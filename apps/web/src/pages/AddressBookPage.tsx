@@ -1,13 +1,13 @@
+import AddressBookTableView from '@/components/address-book/AddressBookTableView';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import AddressBookTableView from '@/components/address-book/AddressBookTableView';
 import { useGetDepartmentsListQuery, useGetDesignationsListQuery, useGetDivisionsListQuery, useGetOrganizationDirectoryQuery } from '@/store/api';
-import { Search, Users, FileSpreadsheet, FileText } from 'lucide-react';
+import type { RootState } from '@/store/store';
+import { FileSpreadsheet, FileText, Search, Users } from 'lucide-react';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
-import type { RootState } from '@/store/store';
 
 export default function AddressBookPage() {
   const [search, setSearch] = useState('');
