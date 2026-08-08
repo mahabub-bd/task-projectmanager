@@ -95,6 +95,10 @@ export {
   useDeleteOrganizationMutation,
   useUploadOrganizationLogoMutation,
   useDeleteOrganizationLogoMutation,
+  useUploadOrganizationDarkLogoMutation,
+  useDeleteOrganizationDarkLogoMutation,
+  useUploadOrganizationLightLogoMutation,
+  useDeleteOrganizationLightLogoMutation,
 } from './organizationsApi';
 
 // Roles API

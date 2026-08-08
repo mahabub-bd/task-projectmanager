@@ -10,10 +10,11 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Key, Loader2 } from 'lucide-react';
+import { Key, Loader2, Lock, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useChangePasswordMutation } from '@/store/api';
+import { cn } from '@/lib/utils';
 
 interface ChangePasswordDialogProps {
   trigger?: React.ReactNode;
@@ -32,6 +33,28 @@ export function ChangePasswordDialog({ trigger }: ChangePasswordDialogProps) {
     newPassword?: string;
     confirmPassword?: string;
   }>({});
+
+  const getPasswordStrength = (password: string) => {
+    if (!password) return 0;
+    let strength = 0;
+    if (password.length >= 8) strength++;
+    if (password.length >= 12) strength++;
+    if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+    if (/\d/.test(password)) strength++;
+    if (/[^a-zA-Z\d]/.test(password)) strength++;
+    return Math.min(strength, 4);
+  };
+
+  const passwordStrength = getPasswordStrength(formData.newPassword);
+
+  const strengthLabels = ['Weak', 'Fair', 'Good', 'Strong', 'Very Strong'];
+  const strengthColors = [
+    'bg-destructive',
+    'bg-orange-500',
+    'bg-yellow-500',
+    'bg-lime-500',
+    'bg-green-500',
+  ];
 
   const validateForm = () => {
     const newErrors: typeof errors = {};
@@ -106,101 +129,168 @@ export function ChangePasswordDialog({ trigger }: ChangePasswordDialogProps) {
           </Button>
         </DialogTrigger>
       )}
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Change Password</DialogTitle>
-          <DialogDescription>
-            Enter your current password and a new password. Make sure to choose a strong password.
-          </DialogDescription>
+      <DialogContent className="sm:max-w-[450px] dark:bg-card dark:border-border/60">
+        <DialogHeader className="space-y-2 pb-4">
+          <div className="flex items-center gap-3">
+            <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 dark:from-primary/10 dark:to-primary/5 flex items-center justify-center">
+              <Lock className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <DialogTitle className="text-lg">Change Password</DialogTitle>
+              <DialogDescription className="text-sm">
+                Secure your account with a new password
+              </DialogDescription>
+            </div>
+          </div>
         </DialogHeader>
-        <form onSubmit={handleSubmit}>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="current-password">Current Password</Label>
-              <Input
-                id="current-password"
-                type="password"
-                value={formData.currentPassword}
-                onChange={(e) => {
-                  setFormData({ ...formData, currentPassword: e.target.value });
-                  if (errors.currentPassword) setErrors({ ...errors, currentPassword: undefined });
-                }}
-                className={errors.currentPassword ? 'border-destructive' : ''}
-                placeholder="Enter current password"
-                required
-              />
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="space-y-4">
+            {/* Current Password */}
+            <div className="space-y-2">
+              <Label htmlFor="current-password" className="text-sm font-medium">
+                Current Password
+              </Label>
+              <div className="relative">
+                <Input
+                  id="current-password"
+                  type="password"
+                  value={formData.currentPassword}
+                  onChange={(e) => {
+                    setFormData({ ...formData, currentPassword: e.target.value });
+                    if (errors.currentPassword) setErrors({ ...errors, currentPassword: undefined });
+                  }}
+                  className={cn(
+                    'pl-10 h-10 dark:bg-background/50 dark:border-border/60',
+                    errors.currentPassword && 'border-destructive focus-visible:ring-destructive'
+                  )}
+                  placeholder="Enter current password"
+                  required
+                />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+              </div>
               {errors.currentPassword && (
-                <p className="text-xs text-destructive">{errors.currentPassword}</p>
+                <p className="text-xs text-destructive flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" />
+                  {errors.currentPassword}
+                </p>
               )}
             </div>
 
-            <div className="grid gap-2">
-              <Label htmlFor="new-password">New Password</Label>
-              <Input
-                id="new-password"
-                type="password"
-                value={formData.newPassword}
-                onChange={(e) => {
-                  setFormData({ ...formData, newPassword: e.target.value });
-                  if (errors.newPassword) setErrors({ ...errors, newPassword: undefined });
-                }}
-                className={errors.newPassword ? 'border-destructive' : ''}
-                placeholder="Enter new password"
-                required
-              />
+            {/* New Password */}
+            <div className="space-y-2">
+              <Label htmlFor="new-password" className="text-sm font-medium">
+                New Password
+              </Label>
+              <div className="relative">
+                <Input
+                  id="new-password"
+                  type="password"
+                  value={formData.newPassword}
+                  onChange={(e) => {
+                    setFormData({ ...formData, newPassword: e.target.value });
+                    if (errors.newPassword) setErrors({ ...errors, newPassword: undefined });
+                  }}
+                  className={cn(
+                    'pl-10 h-10 dark:bg-background/50 dark:border-border/60',
+                    errors.newPassword && 'border-destructive focus-visible:ring-destructive'
+                  )}
+                  placeholder="Enter new password"
+                  required
+                />
+                <Key className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+              </div>
               {errors.newPassword && (
-                <p className="text-xs text-destructive">{errors.newPassword}</p>
-              )}
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="confirm-password">Confirm New Password</Label>
-              <Input
-                id="confirm-password"
-                type="password"
-                value={formData.confirmPassword}
-                onChange={(e) => {
-                  setFormData({ ...formData, confirmPassword: e.target.value });
-                  if (errors.confirmPassword) setErrors({ ...errors, confirmPassword: undefined });
-                }}
-                className={errors.confirmPassword ? 'border-destructive' : ''}
-                placeholder="Confirm new password"
-                required
-              />
-              {errors.confirmPassword && (
-                <p className="text-xs text-destructive">{errors.confirmPassword}</p>
+                <p className="text-xs text-destructive flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" />
+                  {errors.newPassword}
+                </p>
               )}
             </div>
 
             {/* Password Strength Indicator */}
             {formData.newPassword && (
               <div className="space-y-2">
-                <Label className="text-xs text-muted-foreground">Password Strength</Label>
-                <div className="flex gap-1">
-                  <div
-                    className={`h-1 flex-1 rounded ${
-                      formData.newPassword.length >= 6 ? 'bg-green-500' : 'bg-gray-200'
-                    }`}
-                  />
-                  <div
-                    className={`h-1 flex-1 rounded ${
-                      formData.newPassword.length >= 8 ? 'bg-green-500' : 'bg-gray-200'
-                    }`}
-                  />
-                  <div
-                    className={`h-1 flex-1 rounded ${
-                      formData.newPassword.length >= 12 ? 'bg-green-500' : 'bg-gray-200'
-                    }`}
-                  />
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-muted-foreground">Password strength</span>
+                  <span className={cn(
+                    'font-medium',
+                    passwordStrength <= 1 && 'text-destructive',
+                    passwordStrength === 2 && 'text-orange-500',
+                    passwordStrength === 3 && 'text-yellow-500',
+                    passwordStrength >= 4 && 'text-green-500'
+                  )}>
+                    {passwordStrength >= 4 && <CheckCircle2 className="h-3 w-3 inline mr-1" />}
+                    {strengthLabels[passwordStrength]}
+                  </span>
+                </div>
+                <div className="flex gap-1.5 h-1.5">
+                  {[0, 1, 2, 3, 4].map((level) => (
+                    <div
+                      key={level}
+                      className={cn(
+                        'h-full flex-1 rounded-full transition-colors duration-200',
+                        passwordStrength > level
+                          ? strengthColors[passwordStrength]
+                          : 'bg-muted dark:bg-muted/50'
+                      )}
+                    />
+                  ))}
                 </div>
               </div>
             )}
+
+            {/* Confirm Password */}
+            <div className="space-y-2">
+              <Label htmlFor="confirm-password" className="text-sm font-medium">
+                Confirm New Password
+              </Label>
+              <div className="relative">
+                <Input
+                  id="confirm-password"
+                  type="password"
+                  value={formData.confirmPassword}
+                  onChange={(e) => {
+                    setFormData({ ...formData, confirmPassword: e.target.value });
+                    if (errors.confirmPassword) setErrors({ ...errors, confirmPassword: undefined });
+                  }}
+                  className={cn(
+                    'pl-10 h-10 dark:bg-background/50 dark:border-border/60',
+                    errors.confirmPassword && 'border-destructive focus-visible:ring-destructive'
+                  )}
+                  placeholder="Confirm new password"
+                  required
+                />
+                <CheckCircle2 className={cn(
+                  'absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 transition-colors pointer-events-none',
+                  formData.confirmPassword && formData.newPassword === formData.confirmPassword
+                    ? 'text-green-500'
+                    : 'text-muted-foreground'
+                )} />
+              </div>
+              {errors.confirmPassword && (
+                <p className="text-xs text-destructive flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" />
+                  {errors.confirmPassword}
+                </p>
+              )}
+            </div>
           </div>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={handleCancel}>
+
+          <DialogFooter className="gap-2 sm:gap-0 pt-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleCancel}
+              className="dark:bg-secondary/50 dark:hover:bg-secondary/70"
+            >
               Cancel
             </Button>
-            <Button type="submit" disabled={isLoading}>
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className={cn('min-w-[120px]', isLoading && 'opacity-80')}
+            >
               {isLoading ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />

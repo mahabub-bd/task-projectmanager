@@ -22,23 +22,22 @@ export default function DepartmentDetailsPage() {
   const navigate = useNavigate();
   const [showEditModal, setShowEditModal] = useState(false);
 
-  const { data: response, isLoading, isError } = useGetDepartmentQuery(departmentId || '', {
+  const { data: department, isLoading, isError } = useGetDepartmentQuery(departmentId || '', {
     skip: !departmentId,
   });
 
-  const department = response?.data;
   const [deleteDepartment] = useDeleteDepartmentMutation();
 
   // Use dedicated endpoints for department projects and tasks
-  const { data: projectsResponse } = useGetDepartmentProjectsQuery(departmentId || '', {
+  const { data: departmentProjects } = useGetDepartmentProjectsQuery(departmentId || '', {
     skip: !departmentId,
   });
-  const { data: tasksResponse } = useGetDepartmentTasksQuery(departmentId || '', {
+  const { data: departmentTasks } = useGetDepartmentTasksQuery(departmentId || '', {
     skip: !departmentId,
   });
 
-  const departmentProjects = Array.isArray(projectsResponse?.data) ? projectsResponse.data : [];
-  const departmentTasks = Array.isArray(tasksResponse?.data) ? tasksResponse.data : [];
+  const projects = Array.isArray(departmentProjects) ? departmentProjects : [];
+  const tasks = Array.isArray(departmentTasks) ? departmentTasks : [];
   const membersCount = Array.isArray(department?.users) ? department.users.length : 0;
 
   const handleDelete = async () => {
@@ -85,8 +84,8 @@ export default function DepartmentDetailsPage() {
 
         <DepartmentDetailsGrid
           department={department}
-          projectsCount={departmentProjects.length}
-          tasksCount={departmentTasks.length}
+          projectsCount={projects.length}
+          tasksCount={tasks.length}
           membersCount={membersCount}
         />
 

@@ -19,6 +19,37 @@ export class DivisionsService {
     private userRepository: Repository<User>,
   ) {}
 
+  // Private method to format division object for API response
+  private formatDivisionForResponse(division: Division & { users_count?: number }): any {
+    return {
+      id: division.id,
+      created_at: division.created_at,
+      updated_at: division.updated_at,
+      name: division.name,
+      description: division.description,
+      organization_id: division.organization_id,
+      parent_division_id: division.parent_division_id,
+      users_count: (division as any).users_count || 0,
+      organization: division.organization ? {
+        id: division.organization.id,
+        name: division.organization.name,
+      } : null,
+      parent: division.parent ? {
+        id: division.parent.id,
+        name: division.parent.name,
+      } : null,
+      children: division.children?.map((child: any) => ({
+        id: child.id,
+        name: child.name,
+      })) || [],
+      departments: division.departments?.map((dept: any) => ({
+        id: dept.id,
+        name: dept.name,
+        description: dept.description,
+      })) || [],
+    };
+  }
+
   async create(createDivisionDto: CreateDivisionDto, currentUser?: any): Promise<Division> {
     // Verify parent division exists if provided
     if (createDivisionDto.parent_division_id) {
@@ -39,7 +70,7 @@ export class DivisionsService {
     return this.divisionRepository.save(division);
   }
 
-  async findAll(query: QueryDivisionsDto): Promise<{ data: any[]; total: number }> {
+  async findAll(query: QueryDivisionsDto): Promise<{ items: any[]; total: number }> {
     const {
       organization_id,
       status,
@@ -85,14 +116,14 @@ export class DivisionsService {
           .where('department.division_id = :divisionId', { divisionId: division.id })
           .getCount();
 
-        return {
+        return this.formatDivisionForResponse({
           ...division,
           users_count: userCount,
-        };
+        } as Division & { users_count: number });
       })
     );
 
-    return { data: divisionsWithCounts, total };
+    return { items: divisionsWithCounts, total };
   }
 
   async findOne(id: number): Promise<Division> {

@@ -285,6 +285,8 @@ export class AuthService {
       organization_id: user.organization_id,
       organization_name: user.organization?.name,
       organization_logo: user.organization?.logo_url,
+      organization_dark_logo: user.organization?.dark_logo_url,
+      organization_light_logo: user.organization?.light_logo_url,
       department_id: user.department_id,
       department_name: user.department?.name,
       roles: user.user_roles?.map((ur) => ({

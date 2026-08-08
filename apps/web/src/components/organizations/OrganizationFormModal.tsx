@@ -13,6 +13,8 @@ import {
   useCreateOrganizationMutation,
   useUpdateOrganizationMutation,
   useUploadOrganizationLogoMutation,
+  useUploadOrganizationDarkLogoMutation,
+  useUploadOrganizationLightLogoMutation,
 } from '../../store/api/index';
 
 const createOrganizationSchema = z.object({
@@ -50,9 +52,15 @@ export default function OrganizationFormModal({
   const [createOrganization] = useCreateOrganizationMutation();
   const [updateOrganization] = useUpdateOrganizationMutation();
   const [uploadLogo] = useUploadOrganizationLogoMutation();
+  const [uploadDarkLogo] = useUploadOrganizationDarkLogoMutation();
+  const [uploadLightLogo] = useUploadOrganizationLightLogoMutation();
 
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string>('');
+  const [darkLogoFile, setDarkLogoFile] = useState<File | null>(null);
+  const [darkLogoPreview, setDarkLogoPreview] = useState<string>('');
+  const [lightLogoFile, setLightLogoFile] = useState<File | null>(null);
+  const [lightLogoPreview, setLightLogoPreview] = useState<string>('');
 
   const {
     register,
@@ -82,13 +90,13 @@ export default function OrganizationFormModal({
         phone: editingOrganization.phone || '',
         email: editingOrganization.email || '',
       });
-      // Set logo preview if exists
-      if (editingOrganization.logo_url) {
-        setLogoPreview(editingOrganization.logo_url);
-      } else {
-        setLogoPreview('');
-      }
+      // Set logo previews if exist
+      setLogoPreview(editingOrganization.logo_url || '');
+      setDarkLogoPreview(editingOrganization.dark_logo_url || '');
+      setLightLogoPreview(editingOrganization.light_logo_url || '');
       setLogoFile(null);
+      setDarkLogoFile(null);
+      setLightLogoFile(null);
     } else {
       reset({
         name: '',
@@ -99,7 +107,11 @@ export default function OrganizationFormModal({
         email: '',
       });
       setLogoPreview('');
+      setDarkLogoPreview('');
+      setLightLogoPreview('');
       setLogoFile(null);
+      setDarkLogoFile(null);
+      setLightLogoFile(null);
     }
   }, [editingOrganization, reset, open]);
 
@@ -112,11 +124,23 @@ export default function OrganizationFormModal({
           ...data,
         }).unwrap();
 
-        // Upload logo if a new file is selected
+        // Upload logos if new files are selected
         if (logoFile) {
           await uploadLogo({
             id: editingOrganization.id,
             file: logoFile,
+          }).unwrap();
+        }
+        if (darkLogoFile) {
+          await uploadDarkLogo({
+            id: editingOrganization.id,
+            file: darkLogoFile,
+          }).unwrap();
+        }
+        if (lightLogoFile) {
+          await uploadLightLogo({
+            id: editingOrganization.id,
+            file: lightLogoFile,
           }).unwrap();
         }
 
@@ -125,17 +149,25 @@ export default function OrganizationFormModal({
         // Create organization first
         const result = await createOrganization(data as OrganizationFormData).unwrap();
 
-        // Upload logo if a file was selected and organization was created successfully
+        // Upload logos if files were selected and organization was created successfully
+        const logoPromises = [];
         if (logoFile && result?.id) {
+          logoPromises.push(uploadLogo({ id: result.id, file: logoFile }).unwrap());
+        }
+        if (darkLogoFile && result?.id) {
+          logoPromises.push(uploadDarkLogo({ id: result.id, file: darkLogoFile }).unwrap());
+        }
+        if (lightLogoFile && result?.id) {
+          logoPromises.push(uploadLightLogo({ id: result.id, file: lightLogoFile }).unwrap());
+        }
+
+        if (logoPromises.length > 0) {
           try {
-            await uploadLogo({
-              id: result.id,
-              file: logoFile,
-            }).unwrap();
-            toast.success('Organization created with logo!');
+            await Promise.all(logoPromises);
+            toast.success('Organization created with logos!');
           } catch (logoError) {
             console.error('Logo upload failed:', logoError);
-            toast.success('Organization created, but logo upload failed');
+            toast.success('Organization created, but some logos may have failed to upload');
           }
         } else {
           toast.success('Organization created successfully!');
@@ -144,6 +176,10 @@ export default function OrganizationFormModal({
       reset();
       setLogoFile(null);
       setLogoPreview('');
+      setDarkLogoFile(null);
+      setDarkLogoPreview('');
+      setLightLogoFile(null);
+      setLightLogoPreview('');
       onClose();
     } catch (error: any) {
       const errorMessage =
@@ -178,6 +214,58 @@ export default function OrganizationFormModal({
     const reader = new FileReader();
     reader.onloadend = () => {
       setLogoPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleDarkLogoChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Only image files are allowed');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('File size must be less than 5MB');
+      return;
+    }
+
+    setDarkLogoFile(file);
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setDarkLogoPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleLightLogoChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Only image files are allowed');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('File size must be less than 5MB');
+      return;
+    }
+
+    setLightLogoFile(file);
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setLightLogoPreview(reader.result as string);
     };
     reader.readAsDataURL(file);
   };
@@ -272,6 +360,128 @@ export default function OrganizationFormModal({
               </div>
               <p className="text-xs text-muted-foreground">
                 Recommended: Square image, max 5MB (JPG, PNG, WebP)
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Dark Logo Upload Section */}
+        <div className="space-y-2">
+          <Label>Dark Logo (for dark theme)</Label>
+          <div className="flex items-center gap-4">
+            {/* Dark Logo Preview */}
+            <div className="relative shrink-0">
+              {darkLogoPreview ? (
+                <div className="relative group">
+                  <img
+                    src={darkLogoPreview}
+                    alt="Organization dark logo"
+                    className="h-20 w-20 rounded-lg object-cover border"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDarkLogoPreview('');
+                      setDarkLogoFile(null);
+                    }}
+                    className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-destructive text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive/80"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              ) : (
+                <div className="h-20 w-20 rounded-lg border-2 border-dashed flex items-center justify-center bg-muted/30">
+                  <ImageIcon className="h-8 w-8 text-muted-foreground" />
+                </div>
+              )}
+            </div>
+
+            {/* Upload Controls */}
+            <div className="flex-1 space-y-2">
+              <input
+                type="file"
+                id="dark-logo"
+                accept="image/*"
+                onChange={handleDarkLogoChange}
+                className="hidden"
+              />
+              <div className="flex gap-2 flex-wrap">
+                <label
+                  htmlFor="dark-logo"
+                  className="flex items-center gap-2 px-4 py-2 text-sm border rounded-lg cursor-pointer hover:bg-accent transition-colors"
+                >
+                  <Upload className="h-4 w-4" />
+                  {darkLogoFile ? darkLogoFile.name : 'Choose File'}
+                </label>
+                {darkLogoPreview && !editingOrganization && (
+                  <span className="text-xs text-muted-foreground flex items-center">
+                    Dark logo will be uploaded after creating the organization
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Recommended: Light-colored logo for dark backgrounds, max 5MB (JPG, PNG, WebP)
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Light Logo Upload Section */}
+        <div className="space-y-2">
+          <Label>Light Logo (for light theme)</Label>
+          <div className="flex items-center gap-4">
+            {/* Light Logo Preview */}
+            <div className="relative shrink-0">
+              {lightLogoPreview ? (
+                <div className="relative group">
+                  <img
+                    src={lightLogoPreview}
+                    alt="Organization light logo"
+                    className="h-20 w-20 rounded-lg object-cover border"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLightLogoPreview('');
+                      setLightLogoFile(null);
+                    }}
+                    className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-destructive text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive/80"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              ) : (
+                <div className="h-20 w-20 rounded-lg border-2 border-dashed flex items-center justify-center bg-muted/30">
+                  <ImageIcon className="h-8 w-8 text-muted-foreground" />
+                </div>
+              )}
+            </div>
+
+            {/* Upload Controls */}
+            <div className="flex-1 space-y-2">
+              <input
+                type="file"
+                id="light-logo"
+                accept="image/*"
+                onChange={handleLightLogoChange}
+                className="hidden"
+              />
+              <div className="flex gap-2 flex-wrap">
+                <label
+                  htmlFor="light-logo"
+                  className="flex items-center gap-2 px-4 py-2 text-sm border rounded-lg cursor-pointer hover:bg-accent transition-colors"
+                >
+                  <Upload className="h-4 w-4" />
+                  {lightLogoFile ? lightLogoFile.name : 'Choose File'}
+                </label>
+                {lightLogoPreview && !editingOrganization && (
+                  <span className="text-xs text-muted-foreground flex items-center">
+                    Light logo will be uploaded after creating the organization
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Recommended: Dark-colored logo for light backgrounds, max 5MB (JPG, PNG, WebP)
               </p>
             </div>
           </div>

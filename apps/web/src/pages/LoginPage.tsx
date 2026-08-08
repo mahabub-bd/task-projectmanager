@@ -1,10 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AlertCircle, ArrowRight, CheckSquare, Eye, EyeOff, LockKeyhole, Mail, ShieldCheck, Sparkles, Zap } from 'lucide-react';
+import { AlertCircle, ArrowRight, Eye, EyeOff, LockKeyhole, Mail, ShieldCheck, Sparkles, Zap } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { Link, useNavigate } from 'react-router-dom';
 import * as z from 'zod';
+import { useTheme } from '../contexts/ThemeContext';
 import { Alert, AlertDescription } from '../components/ui/alert';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -27,12 +28,14 @@ const workspaceItems = [
 export default function LoginPage() {
   const navigate = useNavigate();
   const { login, isLoading } = useAuth();
+  const { theme } = useTheme();
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: '', password: '' },
   });
+  const logoSrc = theme === 'dark' ? '/dark_logo.png' : '/light_logo.png';
 
   const onSubmit = async (data: LoginFormData) => {
     setError('');
@@ -67,10 +70,7 @@ export default function LoginPage() {
 
           <div className="relative flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="taskflow-logo-mark flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-[#2b2251] shadow-lg shadow-black/20">
-                <CheckSquare className="taskflow-logo-icon h-5 w-5" strokeWidth={2.6} />
-              </div>
-              <span className="text-lg font-semibold tracking-tight">Taskflow</span>
+              <img src={logoSrc} alt="Taskflow" className="h-11 w-auto object-contain" />
             </div>
             <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-medium text-violet-100">Work better, together</span>
           </div>
@@ -100,8 +100,7 @@ export default function LoginPage() {
         <section className="flex items-center justify-center px-5 py-10 sm:px-10 lg:px-14 xl:px-20">
           <div className="w-full max-w-[25rem]">
             <div className="mb-10 flex items-center gap-3 lg:hidden">
-              <div className="taskflow-logo-mark flex h-11 w-11 items-center justify-center rounded-2xl bg-[#2b2251] text-white"><CheckSquare className="taskflow-logo-icon h-5 w-5" strokeWidth={2.6} /></div>
-              <span className="text-lg font-semibold tracking-tight text-slate-900">Taskflow</span>
+              <img src={logoSrc} alt="Taskflow" className="h-11 w-auto object-contain" />
             </div>
 
             <div className="mb-8">

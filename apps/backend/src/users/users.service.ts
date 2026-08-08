@@ -25,6 +25,67 @@ export class UsersService {
     private readonly auditLogsService: AuditLogsService,
   ) { }
 
+  // Private method to get full user entity for internal use
+  private async findUserEntity(id: number): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: { id },
+      relations: ['organization', 'department', 'department.division', 'designation', 'user_roles', 'user_roles.role'],
+    });
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+    return user;
+  }
+
+  // Private method to format user object for API response
+  private formatUserForResponse(user: User): any {
+    return {
+      id: user.id,
+      created_at: user.created_at,
+      updated_at: user.updated_at,
+      name: user.name,
+      email: user.email,
+      employee_id: user.employee_id,
+      phone_number: user.phone_number,
+      status: user.status,
+      avatar_url: user.avatar_url,
+      bio: user.bio,
+      address: user.address,
+      organization_id: user.organization_id,
+      department_id: user.department_id,
+      designation_id: user.designation_id,
+      is_verified: user.is_verified,
+      is_online: user.is_online,
+      last_seen_at: user.last_seen_at,
+      organization: user.organization ? {
+        id: user.organization.id,
+        name: user.organization.name,
+        logo_url: user.organization.logo_url,
+        dark_logo_url: user.organization.dark_logo_url,
+        light_logo_url: user.organization.light_logo_url,
+      } : null,
+      department: user.department ? {
+        id: user.department.id,
+        name: user.department.name,
+        division: user.department.division ? {
+          id: user.department.division.id,
+          name: user.department.division.name,
+        } : null,
+      } : null,
+      designation: user.designation ? {
+        id: user.designation.id,
+        name: user.designation.name,
+      } : null,
+      user_roles: user.user_roles?.map((ur: any) => ({
+        id: ur.id,
+        role: {
+          id: ur.role.id,
+          name: ur.role.name,
+        },
+      })) || [],
+    };
+  }
+
   async create(createUserDto: CreateUserDto, currentUser?: any): Promise<User> {
     const existingUser = await this.userRepository.findOne({
       where: { email: createUserDto.email },
@@ -82,7 +143,7 @@ export class UsersService {
     return savedUser;
   }
 
-  async findAll(query: QueryUsersDto): Promise<{ data: User[]; total: number }> {
+  async findAll(query: QueryUsersDto): Promise<{ items: any[]; total: number }> {
     const {
       department_id,
       organization_id,
@@ -127,23 +188,20 @@ export class UsersService {
       .take(limit)
       .getManyAndCount();
 
-    return { data, total };
+    return {
+      items: data.map(user => this.formatUserForResponse(user)),
+      total,
+    };
   }
 
-  async findOne(id: number): Promise<User> {
-    const user = await this.userRepository.findOne({
-      where: { id },
-      relations: ['organization', 'department', 'department.division', 'designation', 'user_roles', 'user_roles.role'],
-    });
-    if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
-    }
-    return user;
+  async findOne(id: number): Promise<any> {
+    const user = await this.findUserEntity(id);
+    return this.formatUserForResponse(user);
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto, currentUser?: any): Promise<User> {
+  async update(id: number, updateUserDto: UpdateUserDto, currentUser?: any): Promise<any> {
     // Get old user data for audit log
-    const oldUser = await this.findOne(id);
+    const oldUser = await this.findUserEntity(id);
 
     // Check if employee_id already exists (only if changing to a different value)
     if (updateUserDto.employee_id !== undefined && updateUserDto.employee_id !== oldUser.employee_id) {
@@ -180,7 +238,7 @@ export class UsersService {
     });
 
     await this.userRepository.update(id, updateData);
-    const updatedUser = await this.findOne(id);
+    const updatedUser = await this.findUserEntity(id);
 
     // Create audit log with only changed values
     const oldValues: Record<string, any> = {};
@@ -204,7 +262,7 @@ export class UsersService {
       organization_id: updatedUser.organization_id,
     });
 
-    return updatedUser;
+    return this.formatUserForResponse(updatedUser);
   }
 
   async remove(id: number, currentUser?: any): Promise<void> {
@@ -238,9 +296,9 @@ export class UsersService {
     return userRoles.map((ur) => ur.role);
   }
 
-  async setUserRoles(userId: number, assignRolesDto: AssignRolesDto, currentUser?: any): Promise<User> {
+  async setUserRoles(userId: number, assignRolesDto: AssignRolesDto, currentUser?: any): Promise<any> {
     // Verify user exists
-    const user = await this.findOne(userId);
+    const user = await this.findUserEntity(userId);
 
     // Get old roles for audit log
     const oldUserRoles = await this.getUserRoles(userId);
@@ -284,7 +342,9 @@ export class UsersService {
       organization_id: user.organization_id,
     });
 
-    return user;
+    // Return updated user with new roles
+    const updatedUser = await this.findUserEntity(userId);
+    return this.formatUserForResponse(updatedUser);
   }
 
   async findAllSimple(organizationId?: number): Promise<Array<{ id: number; name: string }>> {

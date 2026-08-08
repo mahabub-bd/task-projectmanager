@@ -35,6 +35,12 @@ export class Organization extends BaseEntity {
   @Column({ name: 'logo_url', length: 500, nullable: true })
   logo_url: string;
 
+  @Column({ name: 'dark_logo_url', length: 500, nullable: true })
+  dark_logo_url: string;
+
+  @Column({ name: 'light_logo_url', length: 500, nullable: true })
+  light_logo_url: string;
+
   @Column({ type: 'jsonb', nullable: true })
   settings: Record<string, any>;
 

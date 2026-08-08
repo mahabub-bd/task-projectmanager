@@ -183,4 +183,102 @@ export class OrganizationsController {
       data: organization,
     };
   }
+
+  @Post(':id/dark-logo')
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiConsumes('multipart/form-data')
+  @RequirePermissions('update:organizations')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Upload organization dark logo' })
+  @ApiResponse({ status: 200, description: 'Dark logo uploaded successfully' })
+  @ApiResponse({ status: 400, description: 'No file uploaded' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden - Insufficient permissions' })
+  @ApiResponse({ status: 404, description: 'Organization not found' })
+  async uploadDarkLogo(
+    @Param('id') id: number,
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<SuccessResponse> {
+    if (!file) {
+      throw new Error('No file uploaded');
+    }
+
+    const organization = await this.organizationsService.uploadDarkLogo(
+      id,
+      file,
+    );
+
+    return {
+      message: 'Dark logo uploaded successfully',
+      statusCode: HttpStatus.OK,
+      data: organization,
+    };
+  }
+
+  @Delete(':id/dark-logo')
+  @RequirePermissions('update:organizations')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Delete organization dark logo' })
+  @ApiResponse({ status: 200, description: 'Dark logo deleted successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden - Insufficient permissions' })
+  @ApiResponse({ status: 404, description: 'Organization not found' })
+  async removeDarkLogo(@Param('id') id: number): Promise<SuccessResponse> {
+    const organization = await this.organizationsService.removeDarkLogo(id);
+
+    return {
+      message: 'Dark logo deleted successfully',
+      statusCode: HttpStatus.OK,
+      data: organization,
+    };
+  }
+
+  @Post(':id/light-logo')
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiConsumes('multipart/form-data')
+  @RequirePermissions('update:organizations')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Upload organization light logo' })
+  @ApiResponse({ status: 200, description: 'Light logo uploaded successfully' })
+  @ApiResponse({ status: 400, description: 'No file uploaded' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden - Insufficient permissions' })
+  @ApiResponse({ status: 404, description: 'Organization not found' })
+  async uploadLightLogo(
+    @Param('id') id: number,
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<SuccessResponse> {
+    if (!file) {
+      throw new Error('No file uploaded');
+    }
+
+    const organization = await this.organizationsService.uploadLightLogo(
+      id,
+      file,
+    );
+
+    return {
+      message: 'Light logo uploaded successfully',
+      statusCode: HttpStatus.OK,
+      data: organization,
+    };
+  }
+
+  @Delete(':id/light-logo')
+  @RequirePermissions('update:organizations')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Delete organization light logo' })
+  @ApiResponse({ status: 200, description: 'Light logo deleted successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 403, description: 'Forbidden - Insufficient permissions' })
+  @ApiResponse({ status: 404, description: 'Organization not found' })
+  async removeLightLogo(@Param('id') id: number): Promise<SuccessResponse> {
+    const organization = await this.organizationsService.removeLightLogo(id);
+
+    return {
+      message: 'Light logo deleted successfully',
+      statusCode: HttpStatus.OK,
+      data: organization,
+    };
+  }
 }

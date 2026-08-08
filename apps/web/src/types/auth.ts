@@ -18,6 +18,8 @@ export interface User {
   organization_id: number;
   organization_name?: string;
   organization_logo?: string;
+  organization_dark_logo?: string;
+  organization_light_logo?: string;
   department_id: number | null;
   department_name?: string;
   roles?: Role[];

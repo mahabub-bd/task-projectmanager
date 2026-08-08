@@ -17,9 +17,26 @@ import {
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppSelector } from '../store/hooks';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function ProfilePage() {
   const { user } = useAppSelector((state) => state.auth);
+  const { theme } = useTheme();
+
+  // Determine which logo to use based on theme
+  const getLogoUrl = () => {
+    if (!user) return '';
+    if (theme === 'dark' && user.organization_dark_logo) {
+      return user.organization_dark_logo;
+    }
+    if (theme === 'light' && user.organization_light_logo) {
+      return user.organization_light_logo;
+    }
+    // Fallback to default logo
+    return user.organization_logo || '';
+  };
+
+  const logoUrl = getLogoUrl();
 
   const getInitials = (name: string) =>
     name
@@ -92,7 +109,7 @@ export default function ProfilePage() {
               label="Organization"
               value={user.organization_name || 'Not assigned'}
               detail={user.organization_id ? `ID: ${user.organization_id}` : undefined}
-              image={user.organization_logo}
+              image={logoUrl}
             />
             <ProfileMeta
               icon={<Building2 className="h-4 w-4" />}

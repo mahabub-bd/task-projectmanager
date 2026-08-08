@@ -19,7 +19,9 @@ const MilestoneDetailsPage = lazy(() => import('@/pages/MilestoneDetailsPage'));
 const UsersPage = lazy(() => import('@/pages/UsersPage'));
 const AddressBookPage = lazy(() => import('@/pages/AddressBookPage'));
 const DivisionsPage = lazy(() => import('@/pages/DivisionsPage'));
+const DivisionDetailsPage = lazy(() => import('@/pages/DivisionDetailsPage'));
 const DepartmentsPage = lazy(() => import('@/pages/DepartmentsPage'));
+const DepartmentDetailsPage = lazy(() => import('@/pages/DepartmentDetailsPage'));
 const DesignationsPage = lazy(() => import('@/pages/DesignationsPage'));
 const OrganizationsPage = lazy(() => import('@/pages/OrganizationsPage'));
 const OrganizationDetailsPage = lazy(() => import('@/pages/OrganizationDetailsPage'));
@@ -56,7 +58,9 @@ export const routes: AppRoute[] = [
   { path: '/users', element: <UsersPage />, permission: 'read:users' },
   { path: '/address-book', element: <AddressBookPage />, permission: 'read:users' },
   { path: '/divisions', element: <DivisionsPage />, permission: 'read:divisions' },
+  { path: '/divisions/:divisionId', element: <DivisionDetailsPage />, permission: 'read:divisions' },
   { path: '/departments', element: <DepartmentsPage />, permission: 'read:departments' },
+  { path: '/departments/:departmentId', element: <DepartmentDetailsPage />, permission: 'read:departments' },
   { path: '/designations', element: <DesignationsPage />, permission: 'read:designations' },
 
   { path: '/milestones', element: <MilestonesPage />, permission: 'read:milestones' },

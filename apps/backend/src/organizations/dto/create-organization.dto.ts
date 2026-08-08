@@ -67,4 +67,34 @@ export class CreateOrganizationDto {
   @IsEmail({}, { message: 'Email must be a valid email address' })
   @MaxLength(255, { message: 'Email must not exceed 255 characters' })
   email?: string;
+
+  @ApiProperty({
+    example: 'https://example.com/logo.png',
+    description: 'Organization logo URL',
+    required: false
+  })
+  @IsOptional()
+  @IsUrl({}, { message: 'Logo URL must be a valid URL' })
+  @MaxLength(500, { message: 'Logo URL must not exceed 500 characters' })
+  logo_url?: string;
+
+  @ApiProperty({
+    example: 'https://example.com/dark-logo.png',
+    description: 'Organization dark logo URL for dark theme',
+    required: false
+  })
+  @IsOptional()
+  @IsUrl({}, { message: 'Dark logo URL must be a valid URL' })
+  @MaxLength(500, { message: 'Dark logo URL must not exceed 500 characters' })
+  dark_logo_url?: string;
+
+  @ApiProperty({
+    example: 'https://example.com/light-logo.png',
+    description: 'Organization light logo URL for light theme',
+    required: false
+  })
+  @IsOptional()
+  @IsUrl({}, { message: 'Light logo URL must be a valid URL' })
+  @MaxLength(500, { message: 'Light logo URL must not exceed 500 characters' })
+  light_logo_url?: string;
 }

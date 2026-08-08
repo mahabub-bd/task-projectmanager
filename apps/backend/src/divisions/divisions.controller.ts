@@ -72,7 +72,7 @@ export class DivisionsController {
       message: 'Divisions retrieved successfully',
       statusCode: HttpStatus.OK,
       data: {
-        items: result.data,
+        items: result.items,
         total: result.total,
       },
     };

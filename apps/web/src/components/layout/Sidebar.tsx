@@ -1,9 +1,11 @@
+import { useTheme } from '@/contexts/ThemeContext';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/store/authHooks';
-import { Building2, ChevronRight, X } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { NavGroup } from './types';
 import type { PageAction } from '@/types/components';
+import { ChevronRight, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Logo } from './Logo';
+import { NavGroup } from './types';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -17,6 +19,22 @@ interface SidebarProps {
 
 export function Sidebar({ isOpen, onClose, navigation, collapsedGroups, onToggleGroup, isActive, pageActions }: SidebarProps) {
   const { user } = useAuth();
+  const { theme } = useTheme();
+
+  // Determine which logo to use based on theme
+  const getLogoUrl = () => {
+    if (theme === 'dark' && user?.organization_dark_logo) {
+      return user.organization_dark_logo;
+    }
+    if (theme === 'light' && user?.organization_light_logo) {
+      return user.organization_light_logo;
+    }
+    // Fallback to generic logo if available
+    return user?.organization_logo || null;
+  };
+
+  const logoUrl = getLogoUrl();
+  const hasThemeSpecificLogos = user?.organization_light_logo || user?.organization_dark_logo;
 
   return (
     <aside
@@ -30,26 +48,26 @@ export function Sidebar({ isOpen, onClose, navigation, collapsedGroups, onToggle
       <div className="h-16 border-b bg-card/95 backdrop-blur supports-backdrop-filter:bg-card/60">
         <div className="flex h-full items-center justify-between px-3 xl:px-4">
           <div className="flex items-center gap-2 xl:gap-3">
-            {user?.organization_logo ? (
+            {hasThemeSpecificLogos && logoUrl ? (
               <div className="h-16 xl:h-14 w-16 xl:w-14 overflow-hidden flex items-center justify-center">
                 <img
-                  src={user.organization_logo}
-                  alt={user.organization_name || 'Organization'}
+                  src={logoUrl}
+                  alt={user?.organization_name || 'Organization'}
                   className="h-full w-full object-cover"
                 />
               </div>
             ) : (
-              <div className="flex h-9 xl:h-10 w-9 xl:w-10 items-center justify-center rounded-xl bg-linear-to-br from-primary to-primary/80 text-primary-foreground shadow-lg">
-                <Building2 className="h-4 xl:h-5 w-4 xl:w-5" />
-              </div>
+              <>
+                <Logo className="h-9 xl:h-10 w-auto" />
+                {user?.organization_name && (
+                  <div className="flex flex-col">
+                    <span className="text-sm xl:text-base font-semibold">
+                      {user.organization_name}
+                    </span>
+                  </div>
+                )}
+              </>
             )}
-            <div className="flex flex-col">
-              {user?.organization_name && (
-                <span className="text-sm xl:text-base font-semibold">
-                  {user.organization_name}
-                </span>
-              )}
-            </div>
           </div>
           <button
             onClick={onClose}

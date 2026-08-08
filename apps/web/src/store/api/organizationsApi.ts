@@ -55,6 +55,44 @@ export const organizationsApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: (_result, _error, id) => [{ type: 'Organization', id: String(id) }, 'Organization'],
     }),
+    uploadOrganizationDarkLogo: builder.mutation({
+      query: ({ id, file }: { id: string | number; file: File }) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        return {
+          url: `/organizations/${id}/dark-logo`,
+          method: 'POST',
+          body: formData,
+        };
+      },
+      invalidatesTags: (_result, _error, args) => [{ type: 'Organization', id: String(args?.id) }, 'Organization'],
+    }),
+    deleteOrganizationDarkLogo: builder.mutation({
+      query: (id: string | number) => ({
+        url: `/organizations/${id}/dark-logo`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: (_result, _error, id) => [{ type: 'Organization', id: String(id) }, 'Organization'],
+    }),
+    uploadOrganizationLightLogo: builder.mutation({
+      query: ({ id, file }: { id: string | number; file: File }) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        return {
+          url: `/organizations/${id}/light-logo`,
+          method: 'POST',
+          body: formData,
+        };
+      },
+      invalidatesTags: (_result, _error, args) => [{ type: 'Organization', id: String(args?.id) }, 'Organization'],
+    }),
+    deleteOrganizationLightLogo: builder.mutation({
+      query: (id: string | number) => ({
+        url: `/organizations/${id}/light-logo`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: (_result, _error, id) => [{ type: 'Organization', id: String(id) }, 'Organization'],
+    }),
   }),
 });
 
@@ -66,4 +104,8 @@ export const {
   useDeleteOrganizationMutation,
   useUploadOrganizationLogoMutation,
   useDeleteOrganizationLogoMutation,
+  useUploadOrganizationDarkLogoMutation,
+  useDeleteOrganizationDarkLogoMutation,
+  useUploadOrganizationLightLogoMutation,
+  useDeleteOrganizationLightLogoMutation,
 } = organizationsApi;
