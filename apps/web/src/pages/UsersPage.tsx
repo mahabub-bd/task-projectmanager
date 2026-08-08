@@ -111,7 +111,7 @@ export default function UsersPage() {
     <div className="space-y-6">
       <p className="text-muted-foreground">Manage users and their permissions</p>
 
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StatsCard title="Total Users" value={stats.total} icon={UsersIcon} />
         <StatsCard
           title="Active"
@@ -172,10 +172,10 @@ export default function UsersPage() {
         </>
       ) : (
         <Card>
-          <CardContent className="p-12 text-center">
-            <UsersIcon className="mx-auto mb-4 h-16 w-16 text-muted-foreground/50" />
-            <h3 className="mb-2 text-lg font-semibold">No users found</h3>
-            <p className="mb-6 text-muted-foreground">
+          <CardContent className="p-8 text-center sm:p-12">
+            <UsersIcon className="mx-auto mb-4 h-12 w-12 text-muted-foreground/50 sm:h-16 sm:w-16" />
+            <h3 className="mb-2 text-base font-semibold sm:text-lg">No users found</h3>
+            <p className="mb-6 text-sm text-muted-foreground">
               {searchQuery
                 ? `No users match "${searchQuery}"`
                 : 'Create your first user to get started!'}
@@ -183,7 +183,8 @@ export default function UsersPage() {
             {!searchQuery && (
               <Button onClick={openCreateForm}>
                 <UserPlus className="h-4 w-4" />
-                Create First User
+                <span className="hidden sm:inline">Create First User</span>
+                <span className="sm:hidden">Create User</span>
               </Button>
             )}
           </CardContent>

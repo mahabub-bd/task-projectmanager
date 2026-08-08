@@ -45,8 +45,8 @@ export default function DepartmentProjects({ projects, onProjectClick }: Departm
   const projectCount = projects.length;
 
   return (
-    <div className="rounded-lg border bg-card p-6">
-      <div className="mb-4 flex items-center justify-between">
+    <div className="rounded-lg border bg-card p-4 sm:p-6">
+      <div className="mb-4 flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-2">
           <FolderKanban className="h-5 w-5 text-primary" />
           <h3 className="text-lg font-semibold">Department Projects</h3>
@@ -70,7 +70,7 @@ export default function DepartmentProjects({ projects, onProjectClick }: Departm
                 key={project.id}
                 type="button"
                 onClick={() => onProjectClick(project.id)}
-                className={`w-full rounded-lg border p-4 text-left transition-all hover:shadow-md ${
+                className={`w-full rounded-lg border p-3 sm:p-4 text-left transition-all hover:shadow-md ${
                   isOverdue ? 'border-red-300 dark:border-red-800' : ''
                 }`}
               >

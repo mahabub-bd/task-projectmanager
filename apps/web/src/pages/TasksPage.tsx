@@ -189,7 +189,7 @@ export default function TasksPage() {
           Track work, monitor deadlines, and open any task for full details.
         </p>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           <StatsCard title="Total Tasks" value={stats.total} icon={FileText} />
           <StatsCard
             title="In Progress"
@@ -306,12 +306,12 @@ export default function TasksPage() {
           </>
         ) : (
           <Card>
-            <CardContent className="p-12 text-center">
-              <FileText className="mx-auto mb-4 h-14 w-14 text-muted-foreground/50" />
-              <h3 className="mb-2 text-lg font-semibold">
+            <CardContent className="p-8 text-center sm:p-12">
+              <FileText className="mx-auto mb-4 h-12 w-12 text-muted-foreground/50 sm:h-14 sm:w-14" />
+              <h3 className="mb-2 text-base font-semibold sm:text-lg">
                 No tasks found
               </h3>
-              <p className="text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 {totalTasks === 0
                   ? 'Tasks will appear here once they are created.'
                   : 'No tasks match your current filters.'}

@@ -56,9 +56,9 @@ export default function FilterBar({
 }: FilterBarProps) {
   return (
     <Card className={className}>
-      <CardContent className="space-y-6 p-6">
+      <CardContent className="space-y-4 p-4 sm:space-y-6 sm:p-6">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
-          <div className="relative lg:flex-1">
+          <div className="relative w-full lg:flex-1">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               value={searchValue}
@@ -98,7 +98,7 @@ export default function FilterBar({
             </Select>
           )}
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {viewMode && (
               <div className="inline-flex h-10 rounded-md border bg-background p-1">
                 <Button
@@ -106,34 +106,36 @@ export default function FilterBar({
                   variant={viewMode.value === 'list' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => viewMode.onChange('list')}
-                  className="h-full gap-2"
+                  className="h-full gap-2 px-2 sm:gap-2 sm:px-3"
                 >
                   <List className="h-4 w-4" />
-                  List
+                  <span className="hidden sm:inline">List</span>
                 </Button>
                 <Button
                   type="button"
                   variant={viewMode.value === 'grid' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => viewMode.onChange('grid')}
-                  className="h-full gap-2"
+                  className="h-full gap-2 px-2 sm:gap-2 sm:px-3"
                 >
                   <LayoutGrid className="h-4 w-4" />
-                  Grid
+                  <span className="hidden sm:inline">Grid</span>
                 </Button>
               </div>
             )}
 
             {onRefresh && (
-              <Button onClick={onRefresh} variant="outline" className="h-10">
-                Refresh
+              <Button onClick={onRefresh} variant="outline" className="h-10 px-2 sm:px-4">
+                <span className="hidden sm:inline">Refresh</span>
+                <span className="sm:hidden">↻</span>
               </Button>
             )}
 
             {addButton && (
-              <Button onClick={addButton.onClick} className="h-10">
+              <Button onClick={addButton.onClick} className="h-10 px-3 sm:px-4">
                 <Plus className="mr-2 h-4 w-4" />
-                {addButton.label}
+                <span className="hidden sm:inline">{addButton.label}</span>
+                <span className="sm:hidden">New</span>
               </Button>
             )}
 

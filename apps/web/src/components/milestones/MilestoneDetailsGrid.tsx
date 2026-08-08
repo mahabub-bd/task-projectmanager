@@ -32,16 +32,16 @@ export default function MilestoneDetailsGrid({
 
   return (
     <section className="overflow-hidden rounded-xl border bg-card shadow-sm">
-      <div className="flex items-center justify-between border-b px-4 py-3 sm:px-5">
+      <div className="flex items-center justify-between border-b px-3 py-3 sm:px-4 sm:py-3 lg:px-5">
         <div>
-          <h2 className="text-base font-semibold">Milestone Details</h2>
+          <h2 className="text-sm font-semibold sm:text-base">Milestone Details</h2>
           <p className="text-xs text-muted-foreground">Progress, schedule, and project context</p>
         </div>
         {isOverdue && <span className="rounded-full bg-destructive px-2 py-0.5 text-xs font-medium text-destructive-foreground">Overdue</span>}
       </div>
-      <div className="grid gap-px bg-border sm:grid-cols-6">
+      <div className="grid gap-px bg-border sm:grid-cols-2 lg:grid-cols-4">
         {/* Status */}
-        <div className="bg-card p-4">
+        <div className="bg-card p-3 sm:p-4">
           <label className="text-xs font-medium text-muted-foreground block mb-1">Status</label>
           <select
             value={milestone.status}
@@ -57,7 +57,7 @@ export default function MilestoneDetailsGrid({
         </div>
 
         {/* Progress */}
-        <div className="bg-card p-4">
+        <div className="bg-card p-3 sm:p-4">
           <label className="text-xs font-medium text-muted-foreground block mb-1">Progress</label>
           <select
             value={String(milestone.progress || 0)}
@@ -73,46 +73,46 @@ export default function MilestoneDetailsGrid({
         </div>
 
         {/* Start Date */}
-        <div className="bg-card p-4">
+        <div className="bg-card p-3 sm:p-4">
           <label className="text-xs font-medium text-muted-foreground block mb-1">Start Date</label>
           <p className="text-sm font-medium inline-flex items-center gap-1">
-            <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
-            {safeFormatDate(milestone.start_date)}
+            <Calendar className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+            <span className="truncate">{safeFormatDate(milestone.start_date)}</span>
           </p>
         </div>
 
         {/* Due Date */}
-        <div className={`p-4 ${isOverdue ? 'bg-red-50/70 dark:bg-red-950/20' : 'bg-card'}`}>
+        <div className={`p-3 sm:p-4 ${isOverdue ? 'bg-red-50/70 dark:bg-red-950/20' : 'bg-card'}`}>
           <label className="text-xs font-medium text-muted-foreground block mb-1">Due Date</label>
-          <p className={`text-sm font-medium inline-flex items-center gap-1 ${isOverdue ? 'text-red-600' : ''
+          <p className={`text-sm font-medium inline-flex items-center gap-1 truncate ${isOverdue ? 'text-red-600' : ''
             }`}>
-            <Clock className="h-3.5 w-3.5 text-muted-foreground" />
-            {safeFormatDate(milestone.due_date)}
+            <Clock className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+            <span>{safeFormatDate(milestone.due_date)}</span>
           </p>
         </div>
 
         {/* End Date */}
-        <div className="bg-card p-4">
+        <div className="bg-card p-3 sm:p-4">
           <label className="text-xs font-medium text-muted-foreground block mb-1">End Date</label>
           <p className="text-sm font-medium inline-flex items-center gap-1">
-            <Target className="h-3.5 w-3.5 text-muted-foreground" />
-            {safeFormatDate(milestone.end_date)}
+            <Target className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+            <span className="truncate">{safeFormatDate(milestone.end_date)}</span>
           </p>
         </div>
 
         {/* Project */}
-        <div className="bg-card p-4">
+        <div className="bg-card p-3 sm:p-4">
           <label className="text-xs font-medium text-muted-foreground block mb-1">Project</label>
           {milestone.project ? (
             onProjectClick ? (
               <button
                 onClick={() => onProjectClick(milestone.project.id)}
-                className="text-sm font-medium text-primary hover:underline text-left"
+                className="text-sm font-medium text-primary hover:underline text-left truncate"
               >
                 {milestone.project.name}
               </button>
             ) : (
-              <p className="text-sm font-medium">{milestone.project.name}</p>
+              <p className="text-sm font-medium truncate">{milestone.project.name}</p>
             )
           ) : (
             <p className="text-sm text-muted-foreground">Not assigned</p>
@@ -120,26 +120,26 @@ export default function MilestoneDetailsGrid({
         </div>
 
         {/* Color */}
-        <div className="bg-card p-4">
+        <div className="bg-card p-3 sm:p-4">
           <label className="text-xs font-medium text-muted-foreground block mb-1">Color</label>
           <div className="flex items-center gap-2">
             {milestone.color && (
               <div
-                className="h-4 w-4 rounded-full shadow-sm"
+                className="h-4 w-4 rounded-full shadow-sm shrink-0"
                 style={{ backgroundColor: milestone.color }}
               />
             )}
-            <span className="text-sm font-medium">
+            <span className="text-sm font-medium truncate">
               {milestone.color || 'Default'}
             </span>
           </div>
         </div>
 
         {/* Running Days */}
-        <div className="bg-card p-4">
+        <div className="bg-card p-3 sm:p-4">
           <label className="text-xs font-medium text-muted-foreground block mb-1">Running</label>
           <p className="text-sm font-medium inline-flex items-center gap-1">
-            <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+            <Clock className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
             {(() => {
               if (!milestone.created_at) return 'Just started';
               const runningDays = Math.floor((new Date().getTime() - new Date(milestone.created_at).getTime()) / (1000 * 60 * 60 * 24));

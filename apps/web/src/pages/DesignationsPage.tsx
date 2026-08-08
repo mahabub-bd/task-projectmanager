@@ -116,7 +116,7 @@ export default function DesignationsPage() {
     <div className="space-y-6">
       <p className="text-muted-foreground">Manage designations and job titles</p>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-3">
         <StatsCard title="Total Designations" value={totalDesignations} icon={Briefcase} />
         <StatsCard
           title="With Department"
@@ -173,7 +173,7 @@ export default function DesignationsPage() {
         </>
       ) : (
         <Card>
-          <CardContent className="p-12 text-center">
+          <CardContent className="p-8 sm:p-12 text-center">
             <Briefcase className="mx-auto mb-4 h-16 w-16 text-muted-foreground/50" />
             <h3 className="mb-2 text-lg font-semibold">No designations found</h3>
             <p className="mb-6 text-muted-foreground">

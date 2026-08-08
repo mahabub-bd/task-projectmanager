@@ -26,59 +26,61 @@ export default function DepartmentDetailsGrid({
   membersCount,
 }: DepartmentDetailsGridProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
       {/* Organization */}
-      <div className="rounded-lg border bg-card p-4">
+      <div className="rounded-lg border bg-card p-3 sm:p-4 col-span-2 sm:col-span-1">
         <div className="flex items-center gap-2 text-sm font-medium mb-2">
-          <Building className="h-4 w-4" />
-          Organization
+          <Building className="h-4 w-4 shrink-0" />
+          <span className="truncate">Organization</span>
         </div>
-        <p className="text-sm">{department.organization?.name || 'Not assigned'}</p>
-      </div>
-
-      {/* Parent Department */}
-      <div className="rounded-lg border bg-card p-4">
-        <div className="flex items-center gap-2 text-sm font-medium mb-2">
-          <Building2 className="h-4 w-4" />
-          Parent Department
-        </div>
-        <p className="text-sm">{department.parent?.name || 'Root department'}</p>
-      </div>
-
-      {/* Created Date */}
-      <div className="rounded-lg border bg-card p-4">
-        <div className="flex items-center gap-2 text-sm font-medium mb-2">
-          <CalendarIcon className="h-4 w-4" />
-          Created Date
-        </div>
-        <p className="inline-flex items-center gap-2 text-sm">
-          <span>{safeFormatDate(department.created_at)}</span>
+        <p className="text-sm truncate" title={department.organization?.name || 'Not assigned'}>
+          {department.organization?.name || 'Not assigned'}
         </p>
       </div>
 
-      {/* Members Count */}
-      <div className="rounded-lg border bg-card p-4">
+      {/* Parent Department */}
+      <div className="rounded-lg border bg-card p-3 sm:p-4 col-span-2 sm:col-span-1">
         <div className="flex items-center gap-2 text-sm font-medium mb-2">
-          <Users className="h-4 w-4" />
-          Members
+          <Building2 className="h-4 w-4 shrink-0" />
+          <span className="truncate">Parent</span>
+        </div>
+        <p className="text-sm truncate" title={department.parent?.name || 'Root department'}>
+          {department.parent?.name || 'Root department'}
+        </p>
+      </div>
+
+      {/* Created Date */}
+      <div className="rounded-lg border bg-card p-3 sm:p-4 col-span-2 sm:col-span-1">
+        <div className="flex items-center gap-2 text-sm font-medium mb-2">
+          <CalendarIcon className="h-4 w-4 shrink-0" />
+          <span>Created</span>
+        </div>
+        <p className="text-sm truncate">{safeFormatDate(department.created_at)}</p>
+      </div>
+
+      {/* Members Count */}
+      <div className="rounded-lg border bg-card p-3 sm:p-4 col-span-2 sm:col-span-1">
+        <div className="flex items-center gap-2 text-sm font-medium mb-2">
+          <Users className="h-4 w-4 shrink-0" />
+          <span>Members</span>
         </div>
         <p className="text-sm">{membersCount > 0 ? `${membersCount} members` : 'No members'}</p>
       </div>
 
       {/* Projects Count */}
-      <div className="rounded-lg border bg-card p-4">
+      <div className="rounded-lg border bg-card p-3 sm:p-4 col-span-2 sm:col-span-1">
         <div className="flex items-center gap-2 text-sm font-medium mb-2">
-          <CalendarIcon className="h-4 w-4" />
-          Projects
+          <CalendarIcon className="h-4 w-4 shrink-0" />
+          <span>Projects</span>
         </div>
         <p className="text-sm">{projectsCount > 0 ? `${projectsCount} projects` : 'No projects'}</p>
       </div>
 
       {/* Tasks Count */}
-      <div className="rounded-lg border bg-card p-4">
+      <div className="rounded-lg border bg-card p-3 sm:p-4 col-span-2 sm:col-span-1">
         <div className="flex items-center gap-2 text-sm font-medium mb-2">
-          <CalendarIcon className="h-4 w-4" />
-          Tasks
+          <CalendarIcon className="h-4 w-4 shrink-0" />
+          <span>Tasks</span>
         </div>
         <p className="text-sm">{tasksCount > 0 ? `${tasksCount} tasks` : 'No tasks'}</p>
       </div>

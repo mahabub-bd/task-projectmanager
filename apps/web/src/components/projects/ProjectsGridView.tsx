@@ -26,7 +26,7 @@ export default function ProjectsGridView({
   onUpdateProgress,
 }: ProjectsGridViewProps) {
   return (
-    <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
       {projects.map((project: any) => {
         const isOverdue = isProjectOverdue(project);
 
@@ -36,11 +36,11 @@ export default function ProjectsGridView({
             className="cursor-pointer transition-all hover:shadow-lg"
             onClick={() => onOpenProject(project.id)}
           >
-            <CardContent className="space-y-4 p-6">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
+            <CardContent className="space-y-4 p-4 sm:p-6">
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex-1 min-w-0">
                   <div className="mb-2 flex items-center gap-2">
-                    <h3 className="line-clamp-1 text-lg font-semibold">{project.name}</h3>
+                    <h3 className="line-clamp-1 text-base sm:text-lg font-semibold">{project.name}</h3>
                     {project.color && (
                       <div
                         className="h-3 w-3 shrink-0 rounded-full"
@@ -79,18 +79,18 @@ export default function ProjectsGridView({
               <div className="grid gap-2 text-sm text-muted-foreground">
                 {project.manager && (
                   <div className="flex items-center gap-2">
-                    <Users className="h-3.5 w-3.5" />
-                    <span>Project Manager: {project.manager.name}</span>
+                    <Users className="h-3.5 w-3.5 shrink-0" />
+                    <span className="truncate">Project Manager: {project.manager.name}</span>
                   </div>
                 )}
-                <div className='flex gap-4'>
+                <div className='flex flex-col sm:flex-row sm:gap-4 gap-2'>
                   <div className={`flex items-center gap-2 ${isOverdue ? 'text-red-600 dark:text-red-400' : ''}`}>
-                    <CalendarIcon className="h-3.5 w-3.5" />
-                    <span>Start: {safeFormatProjectDate(project.start_date)}</span>
+                    <CalendarIcon className="h-3.5 w-3.5 shrink-0" />
+                    <span className="truncate">Start: {safeFormatProjectDate(project.start_date)}</span>
                   </div>
                   <div className={`flex items-center gap-2 ${isOverdue ? 'text-red-600 dark:text-red-400' : ''}`}>
-                    <CalendarIcon className="h-3.5 w-3.5" />
-                    <span>Due: {safeFormatProjectDate(project.due_date)}</span>
+                    <CalendarIcon className="h-3.5 w-3.5 shrink-0" />
+                    <span className="truncate">Due: {safeFormatProjectDate(project.due_date)}</span>
                   </div>
                 </div>
 

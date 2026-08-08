@@ -13,7 +13,13 @@ interface LayoutProps {
 }
 
 export default function Layout({ children }: LayoutProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  // Initialize sidebar state based on screen size - closed on mobile, open on desktop
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth >= 1024; // lg breakpoint
+    }
+    return false; // Default to closed for SSR
+  });
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
   const location = useLocation();
   const { actions } = usePageActions();
@@ -58,7 +64,7 @@ export default function Layout({ children }: LayoutProps) {
       />
 
       {/* Main content */}
-      <div className={cn('flex-1 transition-all duration-300', sidebarOpen && 'lg:ml-72 xl:ml-64')}>
+      <div className={cn('flex-1 transition-all duration-300', sidebarOpen && 'lg:ml-[280px] xl:ml-64')}>
         {/* Header */}
         <Header
           onMenuOpen={() => setSidebarOpen(true)}

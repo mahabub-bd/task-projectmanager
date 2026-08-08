@@ -165,7 +165,7 @@ export default function ProjectDetailsPage() {
           projectId={projectId}
         />
 
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
           <ProjectTasksList tasks={projectTasks} onTaskClick={(taskId) => navigate(`/tasks/${taskId}`)} />
           <ProjectMilestonesList milestones={projectMilestones} />
         </div>

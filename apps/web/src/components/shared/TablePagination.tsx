@@ -34,13 +34,16 @@ export function TablePagination({
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       {/* Stats */}
       {showStats && (
         <div className="text-sm text-muted-foreground">
-          Showing <span className="font-semibold text-foreground">{startItem}</span> to{' '}
-          <span className="font-semibold text-foreground">{endItem}</span> of{' '}
-          <span className="font-semibold text-foreground">{totalItems}</span> results
+          <span className="font-semibold text-foreground">{startItem}</span> -{' '}
+          <span className="font-semibold text-foreground">{endItem}</span>
+          <span className="hidden sm:inline"> of </span>
+          <span className="sm:hidden">/</span>
+          <span className="font-semibold text-foreground">{totalItems}</span>
+          <span className="hidden sm:inline"> results</span>
         </div>
       )}
 
@@ -51,30 +54,10 @@ export function TablePagination({
         </div>
       )}
 
-      <div className="flex items-center gap-4">
-        {/* Rows per page selector */}
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">Item:</span>
-          <Select
-            value={itemsPerPage.toString()}
-            onValueChange={(value) => onItemsPerPageChange(Number(value))}
-          >
-            <SelectTrigger className="h-9 w-17.5">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {itemsPerPageOptions.map((option) => (
-                <SelectItem key={option} value={option.toString()}>
-                  {option}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
         {/* Pagination */}
         {totalPages > 1 && (
-          <Pagination>
+          <Pagination className="sm:justify-end">
             <PaginationContent>
               <PaginationItem>
                 <PaginationPrevious
@@ -114,6 +97,26 @@ export function TablePagination({
             </PaginationContent>
           </Pagination>
         )}
+
+        {/* Rows per page selector */}
+        <div className="flex items-center gap-2 sm:justify-end">
+          <span className="text-sm text-muted-foreground whitespace-nowrap">Per page:</span>
+          <Select
+            value={itemsPerPage.toString()}
+            onValueChange={(value) => onItemsPerPageChange(Number(value))}
+          >
+            <SelectTrigger className="h-9 w-full sm:w-20">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {itemsPerPageOptions.map((option) => (
+                <SelectItem key={option} value={option.toString()}>
+                  {option}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
     </div>
   );

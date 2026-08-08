@@ -216,7 +216,7 @@ export default function ProjectsPage() {
       <div className="space-y-6">
         <p className="text-muted-foreground">Manage projects, track milestones, and monitor progress.</p>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           <StatsCard title="Total Projects" value={stats.total} icon={FolderKanban} />
           <StatsCard
             title="Active"
@@ -314,12 +314,12 @@ export default function ProjectsPage() {
           </>
         ) : (
           <Card>
-            <CardContent className="p-12 text-center">
-              <FolderKanban className="mx-auto mb-4 h-14 w-14 text-muted-foreground/50" />
-              <h3 className="mb-2 text-lg font-semibold">
+            <CardContent className="p-8 text-center sm:p-12">
+              <FolderKanban className="mx-auto mb-4 h-12 w-12 sm:h-14 sm:w-14 text-muted-foreground/50" />
+              <h3 className="mb-2 text-base font-semibold sm:text-lg">
                 No projects found
               </h3>
-              <p className="text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 {totalProjects === 0
                   ? 'Create projects to organize your milestones and tasks.'
                   : 'No projects match your current filters.'}

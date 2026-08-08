@@ -40,7 +40,7 @@ export function Sidebar({ isOpen, onClose, navigation, collapsedGroups, onToggle
     <aside
       className={cn(
         'fixed left-0 top-0 z-40 h-screen border-r bg-card transition-all duration-300 flex flex-col',
-        'w-72 xl:w-64',
+        'w-[280px] sm:w-72 xl:w-64',
         !isOpen && '-translate-x-full'
       )}
     >

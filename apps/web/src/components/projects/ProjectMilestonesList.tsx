@@ -21,22 +21,22 @@ export default function ProjectMilestonesList({ milestones }: ProjectMilestonesL
   const milestoneCount = milestones.length;
 
   return (
-    <div className="rounded-lg border bg-card p-6">
-      <div className="mb-4 flex items-center justify-between">
+    <div className="rounded-lg border bg-card p-4 sm:p-6">
+      <div className="mb-3 sm:mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Flag className="h-4 w-4" />
-          <h3 className="font-semibold">Project Milestones</h3>
+          <h3 className="font-semibold text-sm sm:text-base">Project Milestones</h3>
         </div>
-        <div className="flex items-center gap-2 px-3 py-1 bg-primary/10 rounded-full">
-          <Flag className="h-4 w-4 text-primary" />
-          <span className="text-sm font-semibold text-primary">{milestoneCount}</span>
+        <div className="flex items-center gap-2 px-2 sm:px-3 py-1 bg-primary/10 rounded-full">
+          <Flag className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary" />
+          <span className="text-xs sm:text-sm font-semibold text-primary">{milestoneCount}</span>
         </div>
       </div>
       {milestoneCount > 0 ? (
-        <div className="space-y-3">
+        <div className="space-y-2 sm:space-y-3">
           {milestones.map((milestone: any) => (
-            <div key={milestone.id} className="rounded-lg border p-3">
-              <div className="flex items-start justify-between gap-3">
+            <div key={milestone.id} className="rounded-lg border p-2.5 sm:p-3">
+              <div className="flex items-start justify-between gap-2 sm:gap-3">
                 <div>
                   <p className="flex items-center gap-2 font-medium">
                     <Flag className="h-4 w-4 text-primary" />

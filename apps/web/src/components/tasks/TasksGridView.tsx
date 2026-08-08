@@ -19,7 +19,7 @@ interface TasksGridViewProps {
 
 export default function TasksGridView({ tasks, onOpenTask }: TasksGridViewProps) {
   return (
-    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
       {tasks.map((task: any) => {
         const runningDays = getRunningDays(task);
         const assignedUsers = getAssignedUsers(task);
@@ -32,10 +32,10 @@ export default function TasksGridView({ tasks, onOpenTask }: TasksGridViewProps)
             className="cursor-pointer transition-colors hover:border-primary/50"
             onClick={() => onOpenTask(task.id)}
           >
-            <CardContent className="space-y-4 p-5">
-              <div className="max-w-[320px] space-y-2">
-                <div className="flex items-start justify-between gap-3">
-                  <h3 className="line-clamp-2 text-lg font-semibold">{task.title}</h3>
+            <CardContent className="space-y-4 p-4 sm:p-5">
+              <div className="space-y-2">
+                <div className="flex items-start justify-between gap-2">
+                  <h3 className="line-clamp-2 flex-1 text-base font-semibold sm:text-lg">{task.title}</h3>
                   <Button
                     variant="ghost"
                     size="icon"
@@ -55,7 +55,7 @@ export default function TasksGridView({ tasks, onOpenTask }: TasksGridViewProps)
                 {task.project?.name && (
                   <p className="flex items-center gap-1 text-xs text-muted-foreground">
                     <FolderKanban className="h-3.5 w-3.5" />
-                    <span>
+                    <span className="truncate">
                       Project: <span className="font-semibold text-primary">{task.project.name}</span>
                     </span>
                   </p>
@@ -100,13 +100,13 @@ export default function TasksGridView({ tasks, onOpenTask }: TasksGridViewProps)
               <div className="grid gap-3 text-sm sm:grid-cols-2">
                 <div>
                   <p className="text-muted-foreground">Created by</p>
-                  <p className="font-medium">{task.created_by_user?.name || 'Unknown'}</p>
+                  <p className="font-medium truncate">{task.created_by_user?.name || 'Unknown'}</p>
                 </div>
                 <div>
                   <p className="text-muted-foreground">Assignee</p>
                   <div className="space-y-1 font-medium">
                     {assignedUsers.length > 0 ? (
-                      assignedUsers.map((user: any) => <p key={user.id}>{user.name}</p>)
+                      assignedUsers.map((user: any) => <p key={user.id} className="truncate">{user.name}</p>)
                     ) : (
                       <p>Unassigned</p>
                     )}
@@ -122,7 +122,7 @@ export default function TasksGridView({ tasks, onOpenTask }: TasksGridViewProps)
                     {runningDays === null ? 'N/A' : `${runningDays} day${runningDays === 1 ? '' : 's'}`}
                   </p>
                 </div>
-                <div>
+                <div className="sm:col-span-2">
                   <p className="text-muted-foreground">Due date</p>
                   <p
                     className={`inline-flex items-center gap-2 ${

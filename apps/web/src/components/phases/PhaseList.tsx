@@ -28,8 +28,8 @@ export default function PhaseList({ phases, onAddPhase }: PhaseListProps) {
   const phaseCount = phases.length;
 
   return (
-    <div className="rounded-lg border bg-card p-6">
-      <div className="mb-4 flex items-center justify-between">
+    <div className="rounded-lg border bg-card p-4 sm:p-6">
+      <div className="mb-3 sm:mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Layers className="h-4 w-4" />
           <h3 className="font-semibold">Phases</h3>
@@ -49,7 +49,7 @@ export default function PhaseList({ phases, onAddPhase }: PhaseListProps) {
       </div>
 
       {phaseCount > 0 ? (
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-2.5 sm:gap-3 sm:grid-cols-2">
           {phases.map((phase: any) => {
             const milestones = phase.milestones || [];
             const completedMilestones = milestones.filter((m: any) => m.status === 'completed').length;
@@ -64,8 +64,8 @@ export default function PhaseList({ phases, onAddPhase }: PhaseListProps) {
                 className="cursor-pointer hover:bg-accent/50 transition-colors"
                 onClick={() => navigate(`/phases/${phase.id}`)}
               >
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between gap-4">
+                <CardContent className="p-3 sm:p-4">
+                  <div className="flex items-start justify-between gap-3 sm:gap-4">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-2">
                         {phase.color && (

@@ -120,7 +120,7 @@ export default function DivisionsPage() {
     <div className="space-y-6">
       <p className="text-muted-foreground">Manage divisions and organizational structure</p>
 
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         <StatsCard title="Total Divisions" value={totalDivisions} icon={Building2} />
         <StatsCard
           title="Root"
@@ -185,7 +185,7 @@ export default function DivisionsPage() {
         </>
       ) : (
         <Card>
-          <CardContent className="p-12 text-center">
+          <CardContent className="p-8 sm:p-12 text-center">
             <Building2 className="mx-auto mb-4 h-16 w-16 text-muted-foreground/50" />
             <h3 className="mb-2 text-lg font-semibold">No divisions found</h3>
             <p className="mb-6 text-muted-foreground">

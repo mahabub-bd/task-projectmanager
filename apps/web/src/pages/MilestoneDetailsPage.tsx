@@ -169,27 +169,27 @@ export default function MilestoneDetailsPage() {
         {/* Project Information Card */}
         {milestone.project && (
           <Card>
-            <CardContent className="p-6">
-              <div className="flex items-start justify-between">
-                <div className="space-y-4 flex-1">
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div className="space-y-3 sm:space-y-4 flex-1">
                   <div>
-                    <h3 className="text-lg font-semibold mb-2">Project Information</h3>
+                    <h3 className="text-base font-semibold mb-1 sm:text-lg sm:mb-2">Project Information</h3>
                     <p className="text-sm text-muted-foreground">This milestone belongs to</p>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 flex-wrap">
                     {milestone.project.color && (
                       <div
-                        className="h-4 w-4 rounded-full shadow-sm"
+                        className="h-4 w-4 rounded-full shadow-sm shrink-0"
                         style={{ backgroundColor: milestone.project.color }}
                       />
                     )}
                     <button
                       onClick={() => navigate(`/projects/${milestone.project.id}`)}
-                      className="text-lg font-semibold text-primary hover:underline"
+                      className="text-base font-semibold text-primary hover:underline sm:text-lg"
                     >
                       {milestone.project.name}
                     </button>
-                    <Badge variant={`status-${milestone.project.status}` as any}>
+                    <Badge variant={`status-${milestone.project.status}` as any} className="text-xs">
                       {milestone.project.status?.replace('_', ' ')}
                     </Badge>
                   </div>
@@ -202,23 +202,23 @@ export default function MilestoneDetailsPage() {
 
                 {/* Project Tasks Stats */}
                 {projectTasksStats && (
-                  <div className="border-l pl-6 space-y-3">
+                  <div className="border-l pl-4 sm:pl-6 space-y-3">
                     <h4 className="text-sm font-semibold">Project Tasks</h4>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="grid grid-cols-2 gap-3 sm:gap-4 text-sm">
                       <div>
-                        <p className="text-muted-foreground">Total</p>
+                        <p className="text-muted-foreground text-xs">Total</p>
                         <p className="font-semibold text-lg">{projectTasksStats.total}</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground">Completed</p>
+                        <p className="text-muted-foreground text-xs">Completed</p>
                         <p className="font-semibold text-lg text-green-600">{projectTasksStats.completed}</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground">In Progress</p>
+                        <p className="text-muted-foreground text-xs">In Progress</p>
                         <p className="font-semibold text-lg text-blue-600">{projectTasksStats.inProgress}</p>
                       </div>
                       <div>
-                        <p className="text-muted-foreground">Overdue</p>
+                        <p className="text-muted-foreground text-xs">Overdue</p>
                         <p className="font-semibold text-lg text-red-600">{projectTasksStats.overdue}</p>
                       </div>
                     </div>

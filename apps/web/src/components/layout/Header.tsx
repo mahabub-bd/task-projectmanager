@@ -56,19 +56,19 @@ export function Header({ onMenuOpen, breadcrumbs }: HeaderProps) {
 
   return (
     <header className="sticky top-0 z-30 border-b bg-card/95 backdrop-blur supports-backdrop-filter:bg-card/60 dark:bg-card/90 dark:border-border/60">
-      <div className="flex h-16 items-center justify-between px-6">
-        <div className="flex items-center gap-4">
+      <div className="flex h-14 sm:h-16 items-center justify-between px-3 sm:px-4 lg:px-6">
+        <div className="flex items-center gap-2 sm:gap-4 min-w-0">
           {/* Mobile menu button */}
           <button
             onClick={onMenuOpen}
-            className="xl:hidden p-2 hover:bg-accent rounded-lg transition-colors"
+            className="xl:hidden p-2 hover:bg-accent rounded-lg transition-colors shrink-0"
             title="Open menu"
           >
             <Menu className="h-5 w-5" />
           </button>
 
-          {/* Breadcrumbs */}
-          <nav className="flex items-center">
+          {/* Breadcrumbs - Hidden on mobile, shown on tablet and above */}
+          <nav className="hidden sm:flex items-center min-w-0">
             <ol className="flex items-center gap-1.5 text-sm">
               {breadcrumbs.map((crumb, index) => (
                 <li key={crumb.href} className="flex items-center gap-1.5">
@@ -93,37 +93,37 @@ export function Header({ onMenuOpen, breadcrumbs }: HeaderProps) {
           </nav>
         </div>
 
-        <div className="flex items-center gap-1.5 sm:gap-2">
-          {/* Theme Toggle */}
+        <div className="flex items-center gap-1 sm:gap-1.5">
+          {/* Theme Toggle - Hide on very small screens if needed */}
           <Button
             variant="ghost"
             size="icon"
             onClick={toggleTheme}
-            className="h-9 w-9 hover:bg-accent/80 dark:hover:bg-accent/20"
+            className="h-8 w-8 sm:h-9 sm:w-9 hover:bg-accent/80 dark:hover:bg-accent/20"
             title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
           >
             {theme === 'light' ? (
-              <Moon className="h-4 w-4" />
+              <Moon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             ) : (
-              <Sun className="h-4 w-4" />
+              <Sun className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             )}
           </Button>
 
-          {/* Compact Mode Toggle */}
+          {/* Compact Mode Toggle - Hide on small mobile screens */}
           <Button
             variant="ghost"
             size="icon"
             onClick={toggleCompactMode}
             className={cn(
-              'h-9 w-9 hover:bg-accent/80 dark:hover:bg-accent/20',
+              'hidden sm:flex h-8 w-8 sm:h-9 sm:w-9 hover:bg-accent/80 dark:hover:bg-accent/20',
               compactMode && 'bg-accent/50 dark:bg-accent/30'
             )}
             title={compactMode ? 'Disable compact mode' : 'Enable compact mode'}
           >
             {compactMode ? (
-              <Maximize2 className="h-4 w-4" />
+              <Maximize2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             ) : (
-              <Minimize2 className="h-4 w-4" />
+              <Minimize2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             )}
           </Button>
 
@@ -136,24 +136,24 @@ export function Header({ onMenuOpen, breadcrumbs }: HeaderProps) {
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
-                  className="relative h-9 w-9 rounded-full hover:bg-accent/80 dark:hover:bg-accent/20 transition-colors"
+                  className="relative h-8 w-8 sm:h-9 sm:w-9 rounded-full hover:bg-accent/80 dark:hover:bg-accent/20 transition-colors p-0"
                   title="User menu"
                 >
-                  <Avatar className="h-8 w-8 border-2 border-border/50 dark:border-border/30">
+                  <Avatar className="h-7 w-7 sm:h-8 sm:w-8 border-2 border-border/50 dark:border-border/30">
                     <AvatarImage src={user.avatar} alt={user.name} />
-                    <AvatarFallback className="bg-gradient-to-br from-primary to-primary/70 text-primary-foreground text-xs font-semibold">
+                    <AvatarFallback className="bg-gradient-to-br from-primary to-primary/70 text-primary-foreground text-[10px] sm:text-xs font-semibold">
                       {getInitials(user.name)}
                     </AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
+              <DropdownMenuContent className="w-52 sm:w-56" align="end" forceMount>
                 {/* User Info Section */}
-                <div className="px-2.5 py-3 border-b border-border/60 dark:border-border/40">
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-10 w-10 border-2 border-border/50 dark:border-border/30">
+                <div className="px-2 sm:px-2.5 py-2.5 sm:py-3 border-b border-border/60 dark:border-border/40">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <Avatar className="h-8 w-8 sm:h-10 sm:w-10 border-2 border-border/50 dark:border-border/30">
                       <AvatarImage src={user.avatar} alt={user.name} />
-                      <AvatarFallback className="bg-gradient-to-br from-primary to-primary/70 text-primary-foreground text-sm font-semibold">
+                      <AvatarFallback className="bg-gradient-to-br from-primary to-primary/70 text-primary-foreground text-xs sm:text-sm font-semibold">
                         {getInitials(user.name)}
                       </AvatarFallback>
                     </Avatar>
