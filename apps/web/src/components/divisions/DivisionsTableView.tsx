@@ -50,71 +50,69 @@ function MobileDivisionCard({
   onDivisionClick?: (divisionId: number) => void;
 }) {
   return (
-    <Card className="cursor-pointer transition-colors hover:bg-muted/30" onClick={() => onDivisionClick?.(division.id)}>
-      <CardContent className="p-4">
-        <div className="flex items-start justify-between gap-3 mb-3">
-          <div className="flex items-center gap-3 min-w-0 flex-1">
-            <div
-              className={`flex h-12 w-12 items-center justify-center rounded-full text-sm font-semibold text-white shadow-md shrink-0 ${getDivisionAvatarColor(division.name)}`}
-            >
-              {getDivisionInitials(division.name)}
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="font-semibold truncate">{division.name}</p>
-              {division.description && (
-                <p className="text-sm text-muted-foreground line-clamp-2 mt-1">{division.description}</p>
-              )}
-            </div>
+    <Card className="overflow-hidden">
+      <CardContent className="p-3 sm:p-4">
+        {/* Header with avatar and name */}
+        <div
+          className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3 cursor-pointer"
+          onClick={() => onDivisionClick?.(division.id)}
+        >
+          <div
+            className={`flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-full text-[10px] sm:text-sm font-semibold text-white shadow-md ${getDivisionAvatarColor(division.name)}`}
+          >
+            {getDivisionInitials(division.name)}
           </div>
-          <ChevronRight className="h-5 w-5 shrink-0 text-muted-foreground" />
+          <div className="min-w-0 flex-1">
+            <p className="font-semibold text-sm sm:text-base truncate">{division.name}</p>
+            {division.description && (
+              <p className="text-[10px] sm:text-xs text-muted-foreground line-clamp-1 sm:line-clamp-2 truncate">{division.description}</p>
+            )}
+          </div>
+          <ChevronRight className="h-4 w-4 sm:h-5 sm:w-5 shrink-0 text-muted-foreground" />
         </div>
 
-        <div className="space-y-2 mb-3">
+        {/* Parent/Root badge and counts */}
+        <div className="space-y-1.5 sm:space-y-2 mb-2 sm:mb-3">
           {division.parent ? (
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className="gap-1.5 text-xs">
-                <Building2 className="h-3 w-3" />
-                Parent: {division.parent.name}
-              </Badge>
-            </div>
+            <Badge variant="outline" className="gap-1 sm:gap-1.5 text-[10px] sm:text-xs px-2 sm:px-2 py-0.5">
+              <Building2 className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+              Parent: {division.parent.name}
+            </Badge>
           ) : (
-            <Badge variant="secondary" className="text-xs">Root Division</Badge>
+            <Badge variant="secondary" className="text-[10px] sm:text-xs px-2 sm:px-2 py-0.5">Root Division</Badge>
           )}
 
-          <div className="flex items-center gap-2 flex-wrap">
-            <Badge variant="outline" className="gap-1.5 text-xs">
-              <FolderKanban className="h-3 w-3" />
-              {division.departments?.length || 0} Departments
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+            <Badge variant="outline" className="gap-1 sm:gap-1.5 text-[10px] sm:text-xs px-2 sm:px-2 py-0.5">
+              <FolderKanban className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+              {division.departments?.length || 0} Dept{division.departments?.length !== 1 ? 's' : ''}
             </Badge>
-            <Badge variant="outline" className="gap-1.5 text-xs">
-              <Users className="h-3 w-3" />
-              {division.users_count || 0} Users
+            <Badge variant="outline" className="gap-1 sm:gap-1.5 text-[10px] sm:text-xs px-2 sm:px-2 py-0.5">
+              <Users className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+              {division.users_count || 0} User{division.users_count !== 1 ? 's' : ''}
             </Badge>
           </div>
         </div>
 
-        <div className="flex justify-end gap-2 pt-3 border-t">
+        {/* Action buttons */}
+        <div className="flex items-center gap-1.5 sm:gap-2 pt-2 sm:pt-3 border-t" onClick={(e) => e.stopPropagation()}>
           <Button
-            size="sm"
             variant="outline"
-            onClick={(e) => {
-              e.stopPropagation();
-              onEditDivision(division);
-            }}
+            size="sm"
+            onClick={() => onEditDivision(division)}
+            className="flex-1 h-7 sm:h-8 text-[10px] sm:text-xs gap-1 sm:gap-1.5"
           >
-            <Edit className="h-4 w-4 mr-1" />
-            Edit
+            <Edit className="h-2.5 w-2.5 sm:h-3.5 sm:w-3.5" />
+            <span className="hidden xs:inline">Edit</span>
           </Button>
           <Button
+            variant="outline"
             size="sm"
-            variant="ghost"
-            className="text-destructive"
-            onClick={(e) => {
-              e.stopPropagation();
-              onDeleteDivision(division.id, division.name);
-            }}
+            onClick={() => onDeleteDivision(division.id, division.name)}
+            className="flex-1 h-7 sm:h-8 text-[10px] sm:text-xs gap-1 sm:gap-1.5 text-destructive hover:text-destructive hover:bg-destructive/10"
           >
-            <Trash2 className="h-4 w-4" />
+            <Trash2 className="h-2.5 w-2.5 sm:h-3.5 sm:w-3.5" />
+            <span className="hidden xs:inline">Delete</span>
           </Button>
         </div>
       </CardContent>
@@ -131,7 +129,7 @@ export default function DivisionsTableView({
   return (
     <>
       {/* Mobile Card View */}
-      <div className="space-y-3 md:hidden">
+      <div className="space-y-2 sm:space-y-3 md:hidden">
         {divisions.map((division: any) => (
           <MobileDivisionCard
             key={division.id}
@@ -141,6 +139,16 @@ export default function DivisionsTableView({
             onDivisionClick={onDivisionClick}
           />
         ))}
+        {divisions.length === 0 && (
+          <Card>
+            <CardContent className="p-6 sm:p-12">
+              <div className="flex flex-col items-center gap-3 sm:gap-4">
+                <Building2 className="h-10 w-10 sm:h-16 sm:w-16 text-muted-foreground/50" />
+                <p className="text-sm text-muted-foreground">No divisions to display</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {/* Desktop Table View */}

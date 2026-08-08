@@ -30,77 +30,77 @@ function MobileUserCard({
 
   return (
     <Card className="overflow-hidden">
-      <CardContent className="p-4">
+      <CardContent className="p-3 sm:p-4">
         {/* Header with avatar, name, and actions */}
-        <div className="flex items-center justify-between gap-3 mb-4">
-          <div className="flex items-center gap-3 min-w-0 flex-1">
+        <div className="flex items-center justify-between gap-2 sm:gap-3 mb-3 sm:mb-4">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
             <div
-              className={`flex h-12 w-12 items-center justify-center rounded-full text-sm font-semibold text-white shadow-md shrink-0 ${getUserAvatarColor(user.name)}`}
+              className={`flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full text-xs sm:text-sm font-semibold text-white shadow-md shrink-0 ${getUserAvatarColor(user.name)}`}
             >
               {getUserInitials(user.name)}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="font-semibold truncate">{user.name}</p>
+              <p className="font-semibold text-sm sm:text-base truncate">{user.name}</p>
               <div className="flex items-center gap-1.5 mt-0.5">
-                <Badge variant={statusConfig.variant} className="gap-1 text-xs">
-                  <StatusIcon className="h-3 w-3" />
+                <Badge variant={statusConfig.variant} className="gap-1 text-[10px] sm:text-xs">
+                  <StatusIcon className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                   {statusConfig.label}
                 </Badge>
               </div>
             </div>
           </div>
           <div className="flex items-center gap-1">
-            <Button size="icon" variant="ghost" onClick={() => onEditUser(user)} title="Edit user" className="h-9 w-9">
-              <Edit className="h-4 w-4" />
+            <Button size="icon" variant="ghost" onClick={() => onEditUser(user)} title="Edit user" className="h-8 w-8 sm:h-9 sm:w-9">
+              <Edit className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </Button>
-            <Button size="icon" variant="ghost" onClick={() => onDeleteUser(user.id, user.name)} title="Delete user" className="h-9 w-9 text-red-600 hover:text-red-700 hover:bg-red-50">
-              <Trash2 className="h-4 w-4" />
+            <Button size="icon" variant="ghost" onClick={() => onDeleteUser(user.id, user.name)} title="Delete user" className="h-8 w-8 sm:h-9 sm:w-9 text-red-600 hover:text-red-700 hover:bg-red-50">
+              <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </Button>
           </div>
         </div>
 
         {/* Employee ID */}
         {user.employee_id && (
-          <div className="flex items-center gap-2 text-sm mb-3">
-            <IdCard className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+          <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm mb-2 sm:mb-3">
+            <IdCard className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0 text-muted-foreground" />
             <span className="font-mono text-muted-foreground">{user.employee_id}</span>
           </div>
         )}
 
         {/* Email */}
-        <div className="flex items-center gap-2 text-sm mb-3">
-          <Mail className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+        <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm mb-2 sm:mb-3">
+          <Mail className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0 text-muted-foreground" />
           <span className="truncate text-muted-foreground">{user.email}</span>
         </div>
 
         {/* Organization Info */}
-        <div className="space-y-2 mb-3">
+        <div className="space-y-1.5 sm:space-y-2 mb-2 sm:mb-3">
           {/* Division */}
           {user.department?.division && (
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className="gap-1.5 bg-blue-50 border-blue-200 text-blue-700 text-xs">
-                <Network className="h-3 w-3" />
-                {user.department.division.name}
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <Badge variant="outline" className="gap-1 sm:gap-1.5 bg-blue-50 border-blue-200 text-blue-700 text-[10px] sm:text-xs px-2 sm:px-2 py-0.5">
+                <Network className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                <span className="truncate max-w-24">{user.department.division.name}</span>
               </Badge>
             </div>
           )}
 
           {/* Department */}
           {user.department && (
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className="gap-1.5 bg-green-50 border-green-200 text-green-700 text-xs">
-                <Building2 className="h-3 w-3" />
-                {user.department.name}
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <Badge variant="outline" className="gap-1 sm:gap-1.5 bg-green-50 border-green-200 text-green-700 text-[10px] sm:text-xs px-2 sm:px-2 py-0.5">
+                <Building2 className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                <span className="truncate max-w-24">{user.department.name}</span>
               </Badge>
             </div>
           )}
 
           {/* Designation */}
           {user.designation && (
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className="gap-1.5 bg-purple-50 border-purple-200 text-purple-700 text-xs">
-                <Briefcase className="h-3 w-3" />
-                {user.designation.name}
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <Badge variant="outline" className="gap-1 sm:gap-1.5 bg-purple-50 border-purple-200 text-purple-700 text-[10px] sm:text-xs px-2 sm:px-2 py-0.5">
+                <Briefcase className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                <span className="truncate max-w-24">{user.designation.name}</span>
               </Badge>
             </div>
           )}
@@ -108,11 +108,11 @@ function MobileUserCard({
 
         {/* Roles */}
         {user.user_roles && user.user_roles.length > 0 && (
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-1 sm:gap-1.5">
             {user.user_roles.map((userRole: any) => (
-              <Badge key={userRole.role.id} variant="outline" className="gap-1 bg-amber-50 border-amber-200 text-amber-700 text-xs">
-                <Shield className="h-3 w-3" />
-                {userRole.role.name}
+              <Badge key={userRole.role.id} variant="outline" className="gap-1 bg-amber-50 border-amber-200 text-amber-700 text-[10px] sm:text-xs px-2 sm:px-2 py-0.5">
+                <Shield className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+                <span className="truncate max-w-20">{userRole.role.name}</span>
               </Badge>
             ))}
           </div>

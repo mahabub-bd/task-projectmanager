@@ -184,12 +184,22 @@ export default function TasksPage() {
 
   return (
     <>
-      <div className="space-y-6">
-        <p className="text-muted-foreground">
-          Track work, monitor deadlines, and open any task for full details.
-        </p>
+      <div className="space-y-3 sm:space-y-6">
+        <div className="flex flex-col gap-1.5 sm:gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div className="min-w-0">
+            <h1 className="text-xl sm:text-2xl font-semibold tracking-tight">Tasks</h1>
+            <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm text-muted-foreground">
+              Track work, monitor deadlines, and open any task for full details.
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap">
+              {totalTasks} {totalTasks === 1 ? 'task' : 'tasks'}
+            </span>
+          </div>
+        </div>
 
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
           <StatsCard title="Total Tasks" value={stats.total} icon={FileText} />
           <StatsCard
             title="In Progress"
@@ -277,8 +287,8 @@ export default function TasksPage() {
         {tasks.length > 0 ? (
           <>
             {viewMode === 'list' ? (
-              <Card>
-                <CardContent className="p-0">
+              <Card className="overflow-hidden">
+                <CardContent className="p-0 sm:p-0">
                   <TasksTableView tasks={tasks} onOpenTask={(taskId) => navigate(`/tasks/${taskId}`)} />
                 </CardContent>
               </Card>
@@ -288,7 +298,7 @@ export default function TasksPage() {
 
             {/* Pagination */}
             <Card>
-              <CardContent className="pt-6">
+              <CardContent className="p-2.5 sm:p-4">
                 <TablePagination
                   currentPage={currentPage}
                   totalPages={totalPages}
@@ -306,16 +316,18 @@ export default function TasksPage() {
           </>
         ) : (
           <Card>
-            <CardContent className="p-8 text-center sm:p-12">
-              <FileText className="mx-auto mb-4 h-12 w-12 text-muted-foreground/50 sm:h-14 sm:w-14" />
-              <h3 className="mb-2 text-base font-semibold sm:text-lg">
-                No tasks found
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                {totalTasks === 0
-                  ? 'Tasks will appear here once they are created.'
-                  : 'No tasks match your current filters.'}
-              </p>
+            <CardContent className="p-4 sm:p-12">
+              <div className="flex flex-col items-center gap-2.5 sm:gap-4">
+                <FileText className="h-9 w-9 sm:h-14 sm:w-14 text-muted-foreground/50" />
+                <h3 className="text-sm sm:text-lg font-semibold">
+                  No tasks found
+                </h3>
+                <p className="text-xs sm:text-sm text-muted-foreground text-center px-2 sm:px-0">
+                  {totalTasks === 0
+                    ? 'Tasks will appear here once they are created.'
+                    : 'No tasks match your current filters.'}
+                </p>
+              </div>
             </CardContent>
           </Card>
         )}

@@ -157,53 +157,54 @@ export default function AddressBookPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-            <Users className="h-5 w-5" />
+    <div className="space-y-4 sm:space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <Users className="h-4 w-4 sm:h-5 sm:w-5" />
           </div>
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">Address Book</h1>
-            <p className="text-sm text-muted-foreground">Organization directory with contact information</p>
+            <h1 className="text-xl sm:text-2xl font-semibold tracking-tight">Address Book</h1>
+            <p className="text-xs sm:text-sm text-muted-foreground hidden xs:block">Organization directory with contact information</p>
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-1.5 sm:gap-2">
           <Button
             variant="outline"
             size="sm"
             onClick={handleExportExcel}
             disabled={isExporting}
-            className="gap-2"
+            className="gap-1.5 sm:gap-2 px-2 sm:px-3 h-8 sm:h-9"
           >
-            <FileSpreadsheet className="h-4 w-4" />
-            Export Excel
+            <FileSpreadsheet className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <span className="hidden xs:inline">Excel</span>
           </Button>
           <Button
             variant="outline"
             size="sm"
             onClick={handleExportPdf}
             disabled={isExporting}
-            className="gap-2"
+            className="gap-1.5 sm:gap-2 px-2 sm:px-3 h-8 sm:h-9"
           >
-            <FileText className="h-4 w-4" />
-            Export PDF
+            <FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            <span className="hidden xs:inline">PDF</span>
           </Button>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col gap-4 rounded-lg border p-4 bg-muted/20">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="flex flex-col gap-3 sm:gap-4 rounded-lg border p-3 sm:p-4 bg-muted/20">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {/* Search */}
-          <div className="space-y-2">
-            <Label htmlFor="search">Search</Label>
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label htmlFor="search" className="text-xs sm:text-sm">Search</Label>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 id="search"
                 placeholder="Search by name, email, phone..."
-                className="pl-10"
+                className="pl-10 h-9 sm:h-10 text-sm"
                 value={search}
                 onChange={(e) => handleSearch(e.target.value)}
               />
@@ -211,10 +212,10 @@ export default function AddressBookPage() {
           </div>
 
           {/* Department Filter */}
-          <div className="space-y-2">
-            <Label htmlFor="department">Department</Label>
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label htmlFor="department" className="text-xs sm:text-sm">Department</Label>
             <Select value={departmentFilter} onValueChange={handleDepartmentFilter}>
-              <SelectTrigger id="department">
+              <SelectTrigger id="department" className="h-9 sm:h-10 text-sm">
                 <SelectValue placeholder="All departments" />
               </SelectTrigger>
               <SelectContent>
@@ -229,10 +230,10 @@ export default function AddressBookPage() {
           </div>
 
           {/* Designation Filter */}
-          <div className="space-y-2">
-            <Label htmlFor="designation">Designation</Label>
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label htmlFor="designation" className="text-xs sm:text-sm">Designation</Label>
             <Select value={designationFilter} onValueChange={handleDesignationFilter}>
-              <SelectTrigger id="designation">
+              <SelectTrigger id="designation" className="h-9 sm:h-10 text-sm">
                 <SelectValue placeholder="All designations" />
               </SelectTrigger>
               <SelectContent>
@@ -247,10 +248,10 @@ export default function AddressBookPage() {
           </div>
 
           {/* Division Filter */}
-          <div className="space-y-2">
-            <Label htmlFor="division">Division</Label>
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label htmlFor="division" className="text-xs sm:text-sm">Division</Label>
             <Select value={divisionFilter} onValueChange={handleDivisionFilter}>
-              <SelectTrigger id="division">
+              <SelectTrigger id="division" className="h-9 sm:h-10 text-sm">
                 <SelectValue placeholder="All divisions" />
               </SelectTrigger>
               <SelectContent>
@@ -267,10 +268,10 @@ export default function AddressBookPage() {
 
         {hasActiveFilters && (
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={clearFilters}>
+            <Button variant="ghost" size="sm" onClick={clearFilters} className="h-8 sm:h-9 text-xs sm:text-sm">
               Clear all filters
             </Button>
-            <span className="text-sm text-muted-foreground">
+            <span className="text-xs sm:text-sm text-muted-foreground">
               {total} result{total !== 1 ? 's' : ''} found
             </span>
           </div>
@@ -280,14 +281,14 @@ export default function AddressBookPage() {
       {/* Results */}
       <div className="rounded-lg border bg-card">
         {isLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <p className="text-muted-foreground">Loading directory...</p>
+          <div className="flex items-center justify-center py-8 sm:py-12">
+            <p className="text-xs sm:text-sm text-muted-foreground">Loading directory...</p>
           </div>
         ) : users.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <Users className="h-12 w-12 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold">No contacts found</h3>
-            <p className="text-sm text-muted-foreground max-w-md">
+          <div className="flex flex-col items-center justify-center py-8 sm:py-12 text-center px-4">
+            <Users className="h-10 w-10 sm:h-12 sm:w-12 text-mutedforeground mb-3 sm:mb-4" />
+            <h3 className="text-sm sm:text-lg font-semibold">No contacts found</h3>
+            <p className="text-xs sm:text-sm text-muted-foreground max-w-md">
               {hasActiveFilters
                 ? 'Try adjusting your filters to find what you\'re looking for.'
                 : 'No users found in the organization directory.'}
@@ -297,16 +298,17 @@ export default function AddressBookPage() {
           <>
             <AddressBookTableView users={users} />
             {totalPages > 1 && (
-              <div className="flex items-center justify-between px-4 py-3 border-t">
-                <p className="text-sm text-muted-foreground">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 px-3 sm:px-4 py-3 sm:py-3 border-t">
+                <p className="text-xs sm:text-sm text-muted-foreground text-center sm:text-left">
                   Showing {((page - 1) * 20) + 1} to {Math.min(page * 20, total)} of {total} results
                 </p>
-                <div className="flex gap-2">
+                <div className="flex gap-2 justify-center sm:justify-end">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={page === 1}
+                    className="h-8 sm:h-9 text-xs sm:text-sm"
                   >
                     Previous
                   </Button>
@@ -315,6 +317,7 @@ export default function AddressBookPage() {
                     size="sm"
                     onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                     disabled={page === totalPages}
+                    className="h-8 sm:h-9 text-xs sm:text-sm"
                   >
                     Next
                   </Button>

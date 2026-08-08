@@ -59,30 +59,30 @@ interface QuickActionsProps {
 
 export default function QuickActions({ onNavigate }: QuickActionsProps) {
   return (
-    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+    <div className="grid gap-2 sm:gap-3 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
       {quickActions.map((action) => (
         <button
           key={action.title}
           onClick={() => onNavigate(action.onClick())}
-          className="group relative overflow-hidden rounded-xl cursor-pointer border-2 bg-card p-4 text-left transition-all duration-300 hover:shadow-lg hover:border-primary/50"
+          className="group relative overflow-hidden rounded-xl cursor-pointer border-2 bg-card p-3 sm:p-4 text-left transition-all duration-300 hover:shadow-lg hover:border-primary/50"
         >
           {/* Background gradient decoration */}
           <div className={`absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-5 ${action.color}`} />
 
-          <div className="relative flex items-center gap-3">
-            <div className={`rounded-lg p-2.5 text-white shadow-md transition-all duration-300 group-hover:scale-110 ${action.color}`}>
-              <action.icon className="h-4 w-4" />
+          <div className="relative flex items-center gap-2 sm:gap-3">
+            <div className={`rounded-lg p-2 sm:p-2.5 text-white shadow-md transition-all duration-300 group-hover:scale-110 shrink-0 ${action.color}`}>
+              <action.icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="text-sm font-semibold transition-colors group-hover:text-primary">
+              <h3 className="text-xs sm:text-sm font-semibold transition-colors group-hover:text-primary truncate">
                 {action.title}
               </h3>
-              <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{action.description}</p>
+              <p className="text-[10px] sm:text-xs text-muted-foreground line-clamp-1 mt-0.5">{action.description}</p>
             </div>
           </div>
 
-          {/* Arrow indicator on hover */}
-          <ArrowRight className="absolute top-4 right-4 h-4 w-4 text-muted-foreground opacity-0 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-1" />
+          {/* Arrow indicator on hover - hidden on mobile */}
+          <ArrowRight className="absolute top-3 sm:top-4 right-3 sm:right-4 h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground opacity-0 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-1" />
         </button>
       ))}
     </div>

@@ -183,81 +183,83 @@ export default function UserFormModal({ open, onClose, editingUser }: UserFormMo
         </>
       }
     >
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <div className="grid grid-cols-2 gap-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           {/* Name Field */}
-          <div className="space-y-2">
-            <Label htmlFor="name">Name *</Label>
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label htmlFor="name" className="text-xs sm:text-sm">Name *</Label>
             <Input
               {...register('name')}
               placeholder="John Doe"
+              className="h-9 sm:h-10 text-sm"
             />
             {errors.name && (
-              <p className="text-sm text-destructive">{errors.name.message}</p>
+              <p className="text-xs sm:text-sm text-destructive">{errors.name.message}</p>
             )}
           </div>
 
           {/* Employee ID Field */}
-          <div className="space-y-2">
-            <Label htmlFor="employee_id">Employee ID</Label>
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label htmlFor="employee_id" className="text-xs sm:text-sm">Employee ID</Label>
             <div className="relative">
               <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 {...register('employee_id')}
-                className="pl-10"
+                className="pl-10 h-9 sm:h-10 text-sm"
                 placeholder="EMP001"
               />
             </div>
             {errors.employee_id && (
-              <p className="text-sm text-destructive">{errors.employee_id.message}</p>
+              <p className="text-xs sm:text-sm text-destructive">{errors.employee_id.message}</p>
             )}
           </div>
 
           {/* Email Field */}
-          <div className="space-y-2">
-            <Label htmlFor="email">Email *</Label>
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label htmlFor="email" className="text-xs sm:text-sm">Email *</Label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 {...register('email')}
                 type="email"
-                className="pl-10"
+                className="pl-10 h-9 sm:h-10 text-sm"
                 placeholder="user@example.com"
               />
             </div>
             {errors.email && (
-              <p className="text-sm text-destructive">{errors.email.message}</p>
+              <p className="text-xs sm:text-sm text-destructive">{errors.email.message}</p>
             )}
           </div>
 
           {/* Password Field */}
-          <div className="space-y-2">
-            <Label htmlFor="password">
-              {editingUser ? 'New Password (leave blank to keep current)' : 'Password *'}
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label htmlFor="password" className="text-xs sm:text-sm">
+              {editingUser ? 'New Password' : 'Password *'}
             </Label>
             <Input
               {...register('password')}
               type="password"
+              className="h-9 sm:h-10 text-sm"
               placeholder={editingUser ? '••••••••' : '••••••••'}
             />
             {errors.password && (
-              <p className="text-sm text-destructive">{errors.password.message}</p>
+              <p className="text-xs sm:text-sm text-destructive">{errors.password.message}</p>
             )}
             {editingUser && (
-              <p className="text-xs text-muted-foreground">
-                Only enter a new password if you want to change it
+              <p className="text-[10px] sm:text-xs text-muted-foreground">
+                Leave blank to keep current
               </p>
             )}
           </div>
 
           {/* Department Field */}
-          <div className="space-y-2">
-            <Label htmlFor="department_id">Department</Label>
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label htmlFor="department_id" className="text-xs sm:text-sm">Department</Label>
             <div className="relative">
               <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
               <select
                 {...register('department_id', { valueAsNumber: true })}
-                className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 pl-10 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                className="flex h-9 sm:h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 pl-10 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
               >
                 <option value="">No Department</option>
                 {departmentsData?.map((dept: any) => (
@@ -268,18 +270,18 @@ export default function UserFormModal({ open, onClose, editingUser }: UserFormMo
               </select>
             </div>
             {errors.department_id && (
-              <p className="text-sm text-destructive">{errors.department_id.message}</p>
+              <p className="text-xs sm:text-sm text-destructive">{errors.department_id.message}</p>
             )}
           </div>
 
           {/* Designation Field */}
-          <div className="space-y-2">
-            <Label htmlFor="designation_id">Designation</Label>
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label htmlFor="designation_id" className="text-xs sm:text-sm">Designation</Label>
             <div className="relative">
               <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
               <select
                 {...register('designation_id', { valueAsNumber: true })}
-                className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 pl-10 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                className="flex h-9 sm:h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 pl-10 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
               >
                 <option value="">No Designation</option>
                 {designationsData?.map((designation: any) => (
@@ -290,28 +292,29 @@ export default function UserFormModal({ open, onClose, editingUser }: UserFormMo
               </select>
             </div>
             {errors.designation_id && (
-              <p className="text-sm text-destructive">{errors.designation_id.message}</p>
+              <p className="text-xs sm:text-sm text-destructive">{errors.designation_id.message}</p>
             )}
           </div>
 
           {/* Address Field */}
-          <div className="space-y-2 col-span-2">
-            <Label htmlFor="address">Address</Label>
+          <div className="space-y-1.5 sm:space-y-2 sm:col-span-2">
+            <Label htmlFor="address" className="text-xs sm:text-sm">Address</Label>
             <Input
               {...register('address')}
               placeholder="123 Main St, City, Country"
+              className="h-9 sm:h-10 text-sm"
             />
             {errors.address && (
-              <p className="text-sm text-destructive">{errors.address.message}</p>
+              <p className="text-xs sm:text-sm text-destructive">{errors.address.message}</p>
             )}
           </div>
 
           {/* Status Field */}
-          <div className="space-y-2">
-            <Label htmlFor="status">Status</Label>
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label htmlFor="status" className="text-xs sm:text-sm">Status</Label>
             <select
               {...register('status')}
-              className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              className="flex h-9 sm:h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
             >
               <option value="pending">Pending</option>
               <option value="active">Active</option>
@@ -319,15 +322,15 @@ export default function UserFormModal({ open, onClose, editingUser }: UserFormMo
               <option value="suspended">Suspended</option>
             </select>
             {errors.status && (
-              <p className="text-sm text-destructive">{errors.status.message}</p>
+              <p className="text-xs sm:text-sm text-destructive">{errors.status.message}</p>
             )}
           </div>
 
           {/* Roles Field */}
           {rolesData && (Array.isArray(rolesData) ? rolesData : rolesData.data)?.length > 0 ? (
-            <div className="space-y-2">
-              <Label>Roles</Label>
-              <div className="grid grid-cols-2 gap-2">
+            <div className="space-y-1.5 sm:space-y-2 sm:col-span-2">
+              <Label className="text-xs sm:text-sm">Roles</Label>
+              <div className="grid grid-cols-2 sm:grid-cols-2 gap-2">
                 {(Array.isArray(rolesData) ? rolesData : rolesData.data).map((role: any) => {
                   const isSelected = formSelectedRoles.includes(role.id);
                   return (
@@ -335,26 +338,26 @@ export default function UserFormModal({ open, onClose, editingUser }: UserFormMo
                       key={role.id}
                       type="button"
                       onClick={() => toggleRole(role.id)}
-                      className={`inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-all ${
+                      className={`inline-flex items-center justify-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 sm:py-2 rounded-md text-xs sm:text-sm font-medium transition-all ${
                         isSelected
                           ? 'bg-primary text-primary-foreground shadow-sm'
                           : 'bg-muted text-muted-foreground hover:bg-muted/80 border border-transparent hover:border-border'
                       }`}
                     >
-                      <Shield className="h-3.5 w-3.5 flex-shrink-0" />
-                      {role.name}
+                      <Shield className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0" />
+                      <span className="truncate">{role.name}</span>
                     </button>
                   );
                 })}
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-[10px] sm:text-xs text-muted-foreground">
                 {formSelectedRoles.length} role{formSelectedRoles.length !== 1 ? 's' : ''} selected
               </p>
             </div>
           ) : (
-            <div className="space-y-2">
-              <Label>Roles</Label>
-              <p className="text-sm text-muted-foreground p-3 border rounded-md bg-muted/20">
+            <div className="space-y-1.5 sm:space-y-2 sm:col-span-2">
+              <Label className="text-xs sm:text-sm">Roles</Label>
+              <p className="text-xs sm:text-sm text-muted-foreground p-2 sm:p-3 border rounded-md bg-muted/20">
                 No roles available. Create roles first to assign them to users.
               </p>
             </div>
@@ -363,8 +366,8 @@ export default function UserFormModal({ open, onClose, editingUser }: UserFormMo
 
         {/* Form Errors */}
         {errors.root && (
-          <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-md">
-            <p className="text-sm text-destructive">{errors.root.message}</p>
+          <div className="p-2 sm:p-3 bg-destructive/10 border border-destructive/20 rounded-md">
+            <p className="text-xs sm:text-sm text-destructive">{errors.root.message}</p>
           </div>
         )}
       </form>

@@ -73,14 +73,22 @@ export default function OrganizationsPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-muted-foreground">Manage your organizations and their details</p>
+    <div className="space-y-3 sm:space-y-6">
+      <div className="flex flex-col gap-1.5 sm:gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div className="min-w-0">
+          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight">Organizations</h1>
+          <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm text-muted-foreground">
+            Manage your organizations and their details
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap">
+            {filteredOrganizations.length} {filteredOrganizations.length === 1 ? 'organization' : 'organizations'}
+          </span>
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4">
         <StatsCard title="Total" value={stats.total} icon={Building2} subtext="Organizations" />
         <StatsCard title="With Email" value={stats.withEmail} icon={Mail} iconClassName="text-blue-500" subtext="Organizations" />
         <StatsCard title="With Phone" value={stats.withPhone} icon={Phone} iconClassName="text-green-500" subtext="Organizations" />
@@ -101,8 +109,8 @@ export default function OrganizationsPage() {
       {isLoading ? (
         <PageLoadingState message="Loading organizations..." />
       ) : filteredOrganizations.length > 0 ? (
-        <Card>
-          <CardContent className="p-0">
+        <Card className="overflow-hidden">
+          <CardContent className="p-0 sm:p-0">
             <OrganizationsTableView
               organizations={filteredOrganizations}
               onEditOrganization={handleEdit}
@@ -113,16 +121,16 @@ export default function OrganizationsPage() {
         </Card>
       ) : (
         <Card>
-          <CardContent className="p-12">
-            <div className="flex flex-col items-center gap-4">
-              <Building2 className="h-16 w-16 text-muted-foreground/50" />
-              <h3 className="text-lg font-semibold">No organizations found</h3>
-              <p className="text-muted-foreground">
+          <CardContent className="p-4 sm:p-12">
+            <div className="flex flex-col items-center gap-2.5 sm:gap-4">
+              <Building2 className="h-9 w-9 sm:h-16 sm:w-16 text-muted-foreground/50" />
+              <h3 className="text-sm sm:text-lg font-semibold">No organizations found</h3>
+              <p className="text-xs sm:text-sm text-muted-foreground text-center px-2 sm:px-0">
                 {searchQuery ? 'Try adjusting your search query' : 'Get started by adding your first organization'}
               </p>
               {!searchQuery && (
-                <Button onClick={handleAddNew}>
-                  <Plus className="mr-2 h-4 w-4" />
+                <Button onClick={handleAddNew} size="sm" className="h-8 sm:h-9 text-xs sm:text-sm mt-1 sm:mt-0">
+                  <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                   Add Organization
                 </Button>
               )}

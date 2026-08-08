@@ -213,10 +213,22 @@ export default function ProjectsPage() {
 
   return (
     <>
-      <div className="space-y-6">
-        <p className="text-muted-foreground">Manage projects, track milestones, and monitor progress.</p>
+      <div className="space-y-3 sm:space-y-6">
+        <div className="flex flex-col gap-1.5 sm:gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div className="min-w-0">
+            <h1 className="text-xl sm:text-2xl font-semibold tracking-tight">Projects</h1>
+            <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm text-muted-foreground">
+              Manage projects, track milestones, and monitor progress.
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap">
+              {totalProjects} {totalProjects === 1 ? 'project' : 'projects'}
+            </span>
+          </div>
+        </div>
 
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
           <StatsCard title="Total Projects" value={stats.total} icon={FolderKanban} />
           <StatsCard
             title="Active"
@@ -274,8 +286,8 @@ export default function ProjectsPage() {
         {projects.length > 0 ? (
           <>
             {viewMode === 'list' ? (
-              <Card>
-                <CardContent className="p-0">
+              <Card className="overflow-hidden">
+                <CardContent className="p-0 sm:p-0">
                   <ProjectsTableView
                     projects={projects}
                     getStatusBadge={getStatusBadge}
@@ -296,7 +308,7 @@ export default function ProjectsPage() {
 
             {/* Pagination */}
             <Card>
-              <CardContent className="pt-6">
+              <CardContent className="p-2.5 sm:p-4">
                 <TablePagination
                   currentPage={currentPage}
                   totalPages={totalPages}
@@ -314,16 +326,18 @@ export default function ProjectsPage() {
           </>
         ) : (
           <Card>
-            <CardContent className="p-8 text-center sm:p-12">
-              <FolderKanban className="mx-auto mb-4 h-12 w-12 sm:h-14 sm:w-14 text-muted-foreground/50" />
-              <h3 className="mb-2 text-base font-semibold sm:text-lg">
-                No projects found
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                {totalProjects === 0
-                  ? 'Create projects to organize your milestones and tasks.'
-                  : 'No projects match your current filters.'}
-              </p>
+            <CardContent className="p-4 sm:p-12">
+              <div className="flex flex-col items-center gap-2.5 sm:gap-4">
+                <FolderKanban className="h-9 w-9 sm:h-14 sm:w-14 text-muted-foreground/50" />
+                <h3 className="text-sm sm:text-lg font-semibold">
+                  No projects found
+                </h3>
+                <p className="text-xs sm:text-sm text-muted-foreground text-center px-2 sm:px-0">
+                  {totalProjects === 0
+                    ? 'Create projects to organize your milestones and tasks.'
+                    : 'No projects match your current filters.'}
+                </p>
+              </div>
             </CardContent>
           </Card>
         )}

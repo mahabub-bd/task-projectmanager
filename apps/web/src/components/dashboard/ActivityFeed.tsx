@@ -62,72 +62,74 @@ export default function ActivityFeed({ activities = defaultActivities, limit = 5
 
   return (
     <Card className="h-full border-2">
-      <CardContent className="p-4 h-full flex flex-col">
-        <div className="mb-4">
-          <div className="flex items-center gap-2">
-            <div className="rounded-lg bg-primary/10 p-1.5">
-              <Activity className="h-4 w-4 text-primary" />
+      <CardContent className="p-3 sm:p-4 h-full flex flex-col">
+        <div className="mb-3 sm:mb-4">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <div className="rounded-lg bg-primary/10 p-1 sm:p-1.5">
+              <Activity className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary" />
             </div>
             <div>
-              <h3 className="text-base font-bold">Recent Activity</h3>
-              <p className="text-xs text-muted-foreground">Latest updates from your team</p>
+              <h3 className="text-sm sm:text-base font-bold">Recent Activity</h3>
+              <p className="text-[10px] sm:text-xs text-muted-foreground hidden xs:block">Latest updates from your team</p>
             </div>
           </div>
         </div>
 
         {displayActivities.length === 0 ? (
           <div className="flex-1 flex items-center justify-center">
-            <div className="text-center p-4">
-              <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-muted">
-                <Clock className="h-5 w-5 text-muted-foreground/50" />
+            <div className="text-center p-3 sm:p-4">
+              <div className="mx-auto mb-2 flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-muted">
+                <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground/50" />
               </div>
-              <p className="text-xs text-muted-foreground">No recent activity</p>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">No recent activity</p>
             </div>
           </div>
         ) : (
-          <div className="flex-1 overflow-y-auto -mx-1 space-y-2">
+          <div className="flex-1 overflow-y-auto -mx-1 space-y-1.5 sm:space-y-2">
             {displayActivities.map((activity) => {
               const { icon: Icon, className } = getActivityIcon(activity.type);
 
               return (
                 <div
                   key={activity.id}
-                  className="flex gap-2.5 group rounded-lg p-2 hover:bg-accent/50 transition-colors cursor-pointer"
+                  className="flex gap-2 sm:gap-2.5 group rounded-lg p-2 hover:bg-accent/50 transition-colors cursor-pointer"
                 >
                   {/* Icon with subtle shadow */}
-                  <div className={`relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full shadow-sm ${className}`}>
-                    <Icon className="h-4 w-4" />
+                  <div className={`relative flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-full shadow-sm ${className}`}>
+                    <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   </div>
 
                   {/* Content - improved spacing */}
-                  <div className="flex-1 min-w-0 space-y-1">
+                  <div className="flex-1 min-w-0 space-y-0.5 sm:space-y-1">
                     {/* Line 1: Title */}
                     <div className="flex items-start justify-between gap-2">
-                      <p className="text-xs font-semibold truncate flex-1 leading-tight">{activity.title}</p>
+                      <p className="text-[11px] sm:text-xs font-semibold truncate flex-1 leading-tight">{activity.title}</p>
                       {activity.user && (
-                        <div className="flex items-center gap-1 shrink-0 rounded-full bg-primary/5 px-1.5 py-0.5">
-                          <div className="h-4 w-4 rounded-full bg-linear-to-br from-primary to-primary/70 flex items-center justify-center text-[10px] font-semibold text-white shadow-xs">
+                        <div className="flex items-center gap-1 shrink-0 rounded-full bg-primary/5 px-1 sm:px-1.5 py-0.5">
+                          <div className="h-3 w-3 sm:h-4 sm:w-4 rounded-full bg-linear-to-br from-primary to-primary/70 flex items-center justify-center text-[9px] sm:text-[10px] font-semibold text-white shadow-xs">
                             {activity.user.name.charAt(0).toUpperCase()}
                           </div>
-                          <span className="text-[11px] font-medium text-foreground">{activity.user.name.split(' ')[0]}</span>
+                          <span className="text-[9px] sm:text-[11px] font-medium text-foreground truncate max-w-10 sm:max-w-none">
+                            {activity.user.name.split(' ')[0]}
+                          </span>
                         </div>
                       )}
                     </div>
 
                     {/* Line 2: Metadata row */}
-                    <div className="flex items-center gap-2 flex-wrap">
+                    <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
                       {activity.metadata?.projectName && (
-                        <Badge variant="secondary" className="text-[10px] px-1.5 py-0 font-medium">
+                        <Badge variant="secondary" className="text-[9px] sm:text-[10px] px-1 sm:px-1.5 py-0 font-medium">
                           {activity.metadata.projectName}
                         </Badge>
                       )}
                       {activity.description && (
-                        <span className="text-[11px] text-muted-foreground truncate max-w-50">
+                        <span className="text-[10px] sm:text-[11px] text-muted-foreground truncate max-w-30 sm:max-w-50 hidden xs:block">
                           {activity.description}
                         </span>
                       )}
-                      <span className="text-[10px] text-muted-foreground/70 ml-auto shrink-0 flex items-center gap-1">
-                        <Clock className="h-2.5 w-2.5" />
+                      <span className="text-[9px] sm:text-[10px] text-muted-foreground/70 ml-auto shrink-0 flex items-center gap-0.5 sm:gap-1">
+                        <Clock className="h-2 w-2 sm:h-2.5 sm:w-2.5" />
                         {timeAgo(activity.timestamp)}
                       </span>
                     </div>

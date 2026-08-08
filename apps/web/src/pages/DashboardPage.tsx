@@ -354,15 +354,15 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-4 sm:space-y-6 lg:space-y-8">
       {/* Header Section */}
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-4 sm:gap-6">
         <WelcomeHeader />
         <QuickActions onNavigate={handleNavigate} />
       </div>
 
       {/* Stats Overview */}
-      <section className="w-full overflow-x-auto">
+      <section className="w-full">
         <EnhancedStatsOverview
           stats={{
             totalTasks: taskStats.total,
@@ -383,57 +383,51 @@ export default function DashboardPage() {
         />
       </section>
 
-      {/* Main Content Grid - Only grid layout on 1920px+ screens */}
-      <div className="grid grid-cols-1 gap-6 grid-layout-1920">
-        {/* All sections in single column for screens < 1920px */}
-        <div className="space-y-6">
-          {/* Project Spotlight */}
-          <section>
-            <ProjectSpotlight
-              projects={featuredProjects}
-              isLoading={false}
-              onNavigate={handleNavigate}
-            />
-          </section>
+      {/* Main Content Grid - Responsive grid for all screens */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+        {/* Project Spotlight - Full width on mobile, spans 2 cols on large screens */}
+        <section className="lg:col-span-2 xl:col-span-2">
+          <ProjectSpotlight
+            projects={featuredProjects}
+            isLoading={false}
+            onNavigate={handleNavigate}
+          />
+        </section>
 
-          {/* Recent Tasks */}
-          <section>
-            <RecentTasks
-              tasks={recentTasks}
-              isLoading={false}
-              onNavigate={handleNavigate}
-            />
-          </section>
+        {/* Performance Overview - 1 col on mobile, 1 col on desktop */}
+        <section className="lg:col-span-1 xl:col-span-1">
+          <PerformanceOverview metrics={performanceMetrics} />
+        </section>
 
-          {/* Activity Feed */}
-          <section>
-            <ActivityFeed activities={activities} limit={5} />
-          </section>
-        </div>
+        {/* Recent Tasks - 1 col on mobile, 1 col on desktop */}
+        <section>
+          <RecentTasks
+            tasks={recentTasks}
+            isLoading={false}
+            onNavigate={handleNavigate}
+          />
+        </section>
 
-        {/* Right Column - Analytics & Team (1/3 width on 1920px+) */}
-        <div className="space-y-6">
-          {/* Performance Overview */}
-          <section>
-            <PerformanceOverview metrics={performanceMetrics} />
-          </section>
+        {/* Activity Feed - 1 col on mobile, 1 col on desktop */}
+        <section>
+          <ActivityFeed activities={activities} limit={5} />
+        </section>
 
-          {/* Department Overview */}
-          <section>
-            <DepartmentOverview
-              departmentStats={departmentStats}
-              onNavigate={handleNavigate}
-            />
-          </section>
+        {/* Department Overview - 1 col on mobile, 1 col on desktop */}
+        <section className="hidden xl:block">
+          <DepartmentOverview
+            departmentStats={departmentStats}
+            onNavigate={handleNavigate}
+          />
+        </section>
 
-          {/* Team Overview */}
-          <section>
-            <TeamOverview
-              teamMembers={teamMembers}
-              onNavigate={handleNavigate}
-            />
-          </section>
-        </div>
+        {/* Team Overview - 1 col on mobile, 1 col on desktop */}
+        <section className="hidden lg:block">
+          <TeamOverview
+            teamMembers={teamMembers}
+            onNavigate={handleNavigate}
+          />
+        </section>
       </div>
 
       {/* Footer */}

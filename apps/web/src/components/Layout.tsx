@@ -72,7 +72,7 @@ export default function Layout({ children }: LayoutProps) {
         />
 
         {/* Page content */}
-        <main className="p-6">
+        <main className="md:p-6 p-2 lg:p-8 xl:p-10">
           {children}
         </main>
       </div>

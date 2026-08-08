@@ -182,19 +182,19 @@ export default function PermissionsByRolePage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold">Permissions by Role</h1>
-          <p className="text-muted-foreground mt-2">
+          <h1 className="text-xl sm:text-2xl font-bold">Permissions by Role</h1>
+          <p className="text-muted-foreground mt-1 sm:mt-2 text-xs sm:text-sm">
             View and compare permissions assigned to different roles
           </p>
         </div>
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-2 sm:gap-4 grid-cols-2 sm:grid-cols-2 md:grid-cols-4">
         <StatsCard
           title="Total Roles"
           value={stats.totalRoles}
@@ -227,18 +227,18 @@ export default function PermissionsByRolePage() {
 
       {/* Filter Controls */}
       <Card>
-        <CardHeader className="py-3 px-4">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-base">Filter & Compare</CardTitle>
-            <div className="flex items-center gap-2">
+        <CardHeader className="py-2 sm:py-3 px-3 sm:px-4">
+          <div className="flex items-center justify-between gap-2">
+            <CardTitle className="text-sm sm:text-base">Filter & Compare</CardTitle>
+            <div className="flex items-center gap-1.5 sm:gap-2">
               {selectedRoleIds.length > 0 && (
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => setSelectedRoleIds([])}
-                  className="text-sm"
+                  className="text-xs sm:text-sm h-7 sm:h-8 px-2"
                 >
-                  Clear Selection
+                  Clear
                 </Button>
               )}
               {selectedRoleIds.length === 2 && (
@@ -246,17 +246,19 @@ export default function PermissionsByRolePage() {
                   variant={showOnlyDifferences ? "default" : "outline"}
                   size="sm"
                   onClick={() => setShowOnlyDifferences(!showOnlyDifferences)}
-                  className="text-sm gap-1"
+                  className="text-xs sm:text-sm h-7 sm:h-8 gap-1 px-2"
                 >
                   <Filter className="h-3 w-3" />
-                  {showOnlyDifferences ? 'Showing Differences' : 'Show Differences'}
+                  <span className="hidden sm:inline">
+                    {showOnlyDifferences ? 'Differences Only' : 'Show Differences'}
+                  </span>
                 </Button>
               )}
             </div>
           </div>
         </CardHeader>
-        <CardContent className="p-4">
-          <div className="flex flex-wrap gap-2">
+        <CardContent className="p-3 sm:p-4">
+          <div className="flex flex-wrap gap-1.5 sm:gap-2">
             {roles.map((role: any) => {
               const isSelected = selectedRoleIds.includes(role.id);
               const permissionCount = permissionsByRole[role.id]?.length || 0;
@@ -266,11 +268,11 @@ export default function PermissionsByRolePage() {
                   variant={isSelected ? "default" : "outline"}
                   size="sm"
                   onClick={() => toggleRoleSelection(role.id)}
-                  className="gap-2"
+                  className="gap-1.5 sm:gap-2 h-8 sm:h-9 text-xs sm:text-sm px-2 sm:px-3"
                 >
-                  <Shield className="h-3.5 w-3.5" />
-                  <span className="text-sm font-medium">{role.name}</span>
-                  <Badge variant={isSelected ? "secondary" : "outline"} className="text-sm h-5 px-1.5">
+                  <Shield className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                  <span className="font-medium truncate max-w-16 sm:max-w-none">{role.name}</span>
+                  <Badge variant={isSelected ? "secondary" : "outline"} className="text-[10px] sm:text-sm h-4 sm:h-5 px-1 sm:px-1.5">
                     {permissionCount}
                   </Badge>
                 </Button>
@@ -278,7 +280,7 @@ export default function PermissionsByRolePage() {
             })}
           </div>
           {selectedRoleIds.length > 0 && (
-            <p className="text-sm text-muted-foreground mt-2">
+            <p className="text-xs sm:text-sm text-muted-foreground mt-2">
               {selectedRoleIds.length === 2 && showOnlyDifferences
                 ? 'Showing permissions that differ between selected roles'
                 : `${selectedRoleIds.length} role(s) selected`}
@@ -288,14 +290,14 @@ export default function PermissionsByRolePage() {
       </Card>
 
       {/* Roles and Permissions */}
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         {filteredRoles.length === 0 ? (
           <Card>
-            <CardContent className="p-12">
-              <div className="flex flex-col items-center gap-4">
-                <EyeOff className="h-16 w-16 text-muted-foreground/50" />
-                <h3 className="text-lg font-semibold">No roles to display</h3>
-                <p className="text-muted-foreground">
+            <CardContent className="p-8 sm:p-12">
+              <div className="flex flex-col items-center gap-3 sm:gap-4">
+                <EyeOff className="h-12 w-12 sm:h-16 sm:w-16 text-muted-foreground/50" />
+                <h3 className="text-sm sm:text-lg font-semibold">No roles to display</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground">
                   Select roles from the filter above to view their permissions.
                 </p>
               </div>
@@ -313,37 +315,33 @@ export default function PermissionsByRolePage() {
             return (
               <Card key={role.id}>
                 <CardHeader
-                  className="py-3 px-4 cursor-pointer hover:bg-accent/50 transition-colors"
+                  className="py-2 sm:py-3 px-3 sm:px-4 cursor-pointer hover:bg-accent/50 transition-colors"
                   onClick={() => toggleRoleCollapse(role.id)}
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3 ">
-                      <div className="flex flex-col items-center justify-center h-8 w-8 rounded-lg bg-linear-to-br from-purple-500 to-indigo-600 text-white">
-                        <Shield className="h-4 w-4" />
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                      <div className="flex flex-col items-center justify-center h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-linear-to-br from-purple-500 to-indigo-600 text-white shrink-0">
+                        <Shield className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                       </div>
-                      <div>
-                        <CardTitle className="text-sm">{role.name}</CardTitle>
-                        <p className="text-sm text-muted-foreground mt-0.5 line-clamp-1">
+                      <div className="min-w-0 flex-1">
+                        <CardTitle className="text-xs sm:text-sm truncate">{role.name}</CardTitle>
+                        <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 line-clamp-1 hidden xs:block">
                           {role.description || 'No description'}
                         </p>
                       </div>
 
                     </div>
-                    <div className="flex items-center gap-4">
-                      <div>
-                        <Badge variant="secondary" className="text-sm h-6 px-2">
-                          {rolePermissions?.length || 0} permissions
-                        </Badge>
-                      </div>
-                      <div>
-                        <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
-                          {isCollapsed ? (
-                            <ChevronRight className="h-4 w-4" />
-                          ) : (
-                            <ChevronDown className="h-4 w-4" />
-                          )}
-                        </Button>
-                      </div>
+                    <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+                      <Badge variant="secondary" className="text-[10px] sm:text-sm h-5 sm:h-6 px-1.5 sm:px-2 whitespace-nowrap">
+                        {rolePermissions?.length || 0}
+                      </Badge>
+                      <Button variant="ghost" size="sm" className="h-6 w-6 sm:h-7 sm:w-7 p-0 shrink-0">
+                        {isCollapsed ? (
+                          <ChevronRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                        ) : (
+                          <ChevronDown className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                        )}
+                      </Button>
                     </div>
 
                   </div>
@@ -351,42 +349,42 @@ export default function PermissionsByRolePage() {
                 {!isCollapsed && (
                   <CardContent className="p-0">
                     {(!rolePermissions || rolePermissions.length === 0) ? (
-                      <div className="p-8 text-center text-muted-foreground text-sm">
+                      <div className="p-6 sm:p-8 text-center text-muted-foreground text-xs sm:text-sm">
                         No permissions assigned to this role
                       </div>
                     ) : (
                       <div className="divide-y">
                         {(Object.entries(groupedPermissions) as Array<[string, any[]]>).map(([resource, perms]) => (
-                          <div key={resource} className="p-4">
-                            <div className="flex items-center gap-2 mb-3">
-                              <div className={`h-6 w-6 rounded flex items-center justify-center ${getAvatarColor(resource)} text-white`}>
-                                <Key className="h-3 w-3" />
+                          <div key={resource} className="p-3 sm:p-4">
+                            <div className="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
+                              <div className={`h-5 w-5 sm:h-6 sm:w-6 rounded flex items-center justify-center ${getAvatarColor(resource)} text-white shrink-0`}>
+                                <Key className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                               </div>
-                              <h3 className="text-sm font-semibold">
+                              <h3 className="text-xs sm:text-sm font-semibold">
                                 {resource.charAt(0).toUpperCase() + resource.slice(1)}
                               </h3>
-                              <Badge variant="outline" className="text-sm h-6 px-2">
-                                {perms.length} {perms.length === 1 ? 'permission' : 'permissions'}
+                              <Badge variant="outline" className="text-[10px] sm:text-sm h-5 sm:h-6 px-1.5 sm:px-2 whitespace-nowrap">
+                                {perms.length}
                               </Badge>
                             </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1.5 sm:gap-2">
                               {perms.map((permission: any) => (
                                 <div
                                   key={permission.id}
-                                  className="flex items-center gap-2 p-2 rounded border bg-card hover:bg-accent/50 transition-colors"
+                                  className="flex items-center gap-1.5 sm:gap-2 p-2 rounded border bg-card hover:bg-accent/50 transition-colors"
                                 >
-                                  <CheckCircle className="h-3.5 w-3.5 text-green-500 shrink-0" />
+                                  <CheckCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-green-500 shrink-0" />
                                   <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-medium truncate leading-tight">
+                                    <p className="text-xs sm:text-sm font-medium truncate leading-tight">
                                       {permission.name}
                                     </p>
-                                    <p className="text-sm text-muted-foreground truncate">
+                                    <p className="text-[10px] sm:text-sm text-muted-foreground truncate hidden xs:block">
                                       {permission.description}
                                     </p>
                                   </div>
                                   <Badge
                                     variant="outline"
-                                    className={`text-sm h-5 px-1.5 border ${getActionBadgeColor(permission.action)}`}
+                                    className={`text-[9px] sm:text-xs h-4 sm:h-5 px-1 sm:px-1.5 border shrink-0 ${getActionBadgeColor(permission.action)}`}
                                   >
                                     {permission.action}
                                   </Badge>

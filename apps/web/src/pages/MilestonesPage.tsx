@@ -183,10 +183,22 @@ export default function MilestonesPage() {
 
   return (
     <>
-      <div className="space-y-6">
-        <p className="text-muted-foreground">Track project milestones, deadlines, and progress.</p>
+      <div className="space-y-3 sm:space-y-6">
+        <div className="flex flex-col gap-1.5 sm:gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div className="min-w-0">
+            <h1 className="text-xl sm:text-2xl font-semibold tracking-tight">Milestones</h1>
+            <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm text-muted-foreground">
+              Track project milestones, deadlines, and progress.
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap">
+              {totalMilestones} {totalMilestones === 1 ? 'milestone' : 'milestones'}
+            </span>
+          </div>
+        </div>
 
-        <div className="grid gap-4 md:grid-cols-5">
+        <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
           <StatsCard title="Total Milestones" value={stats.total} icon={Flag} />
           <StatsCard
             title="In Progress"
@@ -244,8 +256,8 @@ export default function MilestonesPage() {
         {milestones.length > 0 ? (
           <>
             {viewMode === 'list' ? (
-              <Card>
-                <CardContent className="p-0">
+              <Card className="overflow-hidden">
+                <CardContent className="p-0 sm:p-0">
                   <MilestonesTableView
                     milestones={milestones}
                     onMilestoneClick={handleMilestoneClick}
@@ -265,7 +277,7 @@ export default function MilestonesPage() {
 
             {/* Pagination */}
             <Card>
-              <CardContent className="pt-6">
+              <CardContent className="p-2.5 sm:p-4">
                 <TablePagination
                   currentPage={currentPage}
                   totalPages={totalPages}
@@ -283,16 +295,18 @@ export default function MilestonesPage() {
           </>
         ) : (
           <Card>
-            <CardContent className="p-12 text-center">
-              <Flag className="mx-auto mb-4 h-14 w-14 text-muted-foreground/50" />
-              <h3 className="mb-2 text-lg font-semibold">
-                No milestones found
-              </h3>
-              <p className="text-muted-foreground">
-                {totalMilestones === 0
-                  ? 'Create milestones to track your project progress and deadlines.'
-                  : 'No milestones match your current filters.'}
-              </p>
+            <CardContent className="p-4 sm:p-12">
+              <div className="flex flex-col items-center gap-2.5 sm:gap-4">
+                <Flag className="h-9 w-9 sm:h-14 sm:w-14 text-muted-foreground/50" />
+                <h3 className="text-sm sm:text-lg font-semibold">
+                  No milestones found
+                </h3>
+                <p className="text-xs sm:text-sm text-muted-foreground text-center px-2 sm:px-0">
+                  {totalMilestones === 0
+                    ? 'Create milestones to track your project progress and deadlines.'
+                    : 'No milestones match your current filters.'}
+                </p>
+              </div>
             </CardContent>
           </Card>
         )}

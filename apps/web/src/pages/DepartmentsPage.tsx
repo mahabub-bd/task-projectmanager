@@ -115,10 +115,22 @@ export default function DepartmentsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <p className="text-muted-foreground">Manage departments and organizational structure</p>
+    <div className="space-y-3 sm:space-y-6">
+      <div className="flex flex-col gap-1.5 sm:gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div className="min-w-0">
+          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight">Departments</h1>
+          <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm text-muted-foreground">
+            Manage departments and organizational structure
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap">
+            {totalDepartments} {totalDepartments === 1 ? 'department' : 'departments'}
+          </span>
+        </div>
+      </div>
 
-      <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-3">
+      <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-2 md:grid-cols-3">
         <StatsCard title="Total Departments" value={totalDepartments} icon={Building2} />
         <StatsCard
           title="With Division"
@@ -151,8 +163,8 @@ export default function DepartmentsPage() {
 
       {departments.length > 0 ? (
         <>
-          <Card>
-            <CardContent className="p-0">
+          <Card className="overflow-hidden">
+            <CardContent className="p-0 sm:p-0">
               <DepartmentsTableView
                 departments={departments}
                 onEditDepartment={openEditForm}
@@ -164,7 +176,7 @@ export default function DepartmentsPage() {
 
           {/* Pagination */}
           <Card>
-            <CardContent className="pt-6">
+            <CardContent className="p-2.5 sm:p-4">
               <TablePagination
                 currentPage={currentPage}
                 totalPages={totalPages}
@@ -182,20 +194,22 @@ export default function DepartmentsPage() {
         </>
       ) : (
         <Card>
-          <CardContent className="p-8 sm:p-12 text-center">
-            <Building2 className="mx-auto mb-4 h-16 w-16 text-muted-foreground/50" />
-            <h3 className="mb-2 text-lg font-semibold">No departments found</h3>
-            <p className="mb-6 text-muted-foreground">
-              {searchQuery
-                ? `No departments match "${searchQuery}"`
-                : 'Create your first department to get started!'}
-            </p>
-            {!searchQuery && (
-              <Button onClick={openCreateForm}>
-                <Plus className="h-4 w-4" />
-                Create First Department
-              </Button>
-            )}
+          <CardContent className="p-4 sm:p-12">
+            <div className="flex flex-col items-center gap-2.5 sm:gap-4">
+              <Building2 className="h-9 w-9 sm:h-16 sm:w-16 text-muted-foreground/50" />
+              <h3 className="text-sm sm:text-lg font-semibold">No departments found</h3>
+              <p className="text-xs sm:text-sm text-muted-foreground text-center px-2 sm:px-0">
+                {searchQuery
+                  ? `No departments match "${searchQuery}"`
+                  : 'Create your first department to get started!'}
+              </p>
+              {!searchQuery && (
+                <Button onClick={openCreateForm} size="sm" className="h-8 sm:h-9 text-xs sm:text-sm mt-1 sm:mt-0">
+                  <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                  Create Department
+                </Button>
+              )}
+            </div>
           </CardContent>
         </Card>
       )}

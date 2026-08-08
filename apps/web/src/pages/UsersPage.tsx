@@ -108,10 +108,10 @@ export default function UsersPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <p className="text-muted-foreground">Manage users and their permissions</p>
+    <div className="space-y-4 sm:space-y-6">
+      <p className="text-xs sm:text-sm text-muted-foreground">Manage users and their permissions</p>
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-2 sm:gap-3 grid-cols-2 sm:grid-cols-2 lg:grid-cols-4">
         <StatsCard title="Total Users" value={stats.total} icon={UsersIcon} />
         <StatsCard
           title="Active"
@@ -154,7 +154,7 @@ export default function UsersPage() {
 
           {/* Pagination */}
           <Card>
-            <CardContent className="pt-6">
+            <CardContent className="p-3 sm:p-4 pt-3 sm:pt-4">
               <TablePagination
                 currentPage={currentPage}
                 totalPages={totalPages}
@@ -172,19 +172,18 @@ export default function UsersPage() {
         </>
       ) : (
         <Card>
-          <CardContent className="p-8 text-center sm:p-12">
-            <UsersIcon className="mx-auto mb-4 h-12 w-12 text-muted-foreground/50 sm:h-16 sm:w-16" />
-            <h3 className="mb-2 text-base font-semibold sm:text-lg">No users found</h3>
-            <p className="mb-6 text-sm text-muted-foreground">
+          <CardContent className="p-6 text-center sm:p-12">
+            <UsersIcon className="mx-auto mb-3 sm:mb-4 h-10 w-10 text-muted-foreground/50 sm:h-16 sm:w-16" />
+            <h3 className="mb-2 text-sm sm:text-lg font-semibold">No users found</h3>
+            <p className="mb-4 sm:mb-6 text-xs sm:text-sm text-muted-foreground">
               {searchQuery
                 ? `No users match "${searchQuery}"`
                 : 'Create your first user to get started!'}
             </p>
             {!searchQuery && (
-              <Button onClick={openCreateForm}>
-                <UserPlus className="h-4 w-4" />
-                <span className="hidden sm:inline">Create First User</span>
-                <span className="sm:hidden">Create User</span>
+              <Button onClick={openCreateForm} size="sm" className="h-8 sm:h-9 text-xs sm:text-sm">
+                <UserPlus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <span className="ml-2">Create User</span>
               </Button>
             )}
           </CardContent>

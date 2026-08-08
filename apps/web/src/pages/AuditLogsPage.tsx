@@ -88,24 +88,25 @@ export default function AuditLogsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Audit Logs</h1>
-          <p className="text-muted-foreground mt-1">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+        <div className="min-w-0">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Audit Logs</h1>
+          <p className="text-muted-foreground mt-1 text-sm sm:text-base">
             Track all system activities and changes
           </p>
         </div>
-        <Button onClick={handleExport} variant="outline" size="default">
-          <Download className="h-4 w-4 mr-2" />
-          Export Logs
+        <Button onClick={handleExport} variant="outline" size="sm" className="sm:size-default w-full sm:w-auto shrink-0">
+          <Download className="h-4 w-4 sm:mr-2" />
+          <span className="hidden sm:inline">Export Logs</span>
+          <span className="sm:hidden">Export</span>
         </Button>
       </div>
 
       {/* Filters Card */}
       <Card>
-        <CardContent className="pt-6">
+        <CardContent className="p-4 sm:p-6 pt-4 sm:pt-6">
           <AuditLogsFilters
             searchQuery={searchQuery}
             actionFilter={actionFilter}
@@ -122,10 +123,10 @@ export default function AuditLogsPage() {
       {/* Audit Logs Table */}
       {isLoading ? (
         <Card>
-          <CardContent className="p-12">
+          <CardContent className="p-8 sm:p-12">
             <div className="flex flex-col items-center gap-4">
-              <div className="h-12 w-12 animate-pulse rounded-full bg-muted"></div>
-              <p className="text-muted-foreground">Loading audit logs...</p>
+              <div className="h-10 w-10 sm:h-12 sm:w-12 animate-pulse rounded-full bg-muted"></div>
+              <p className="text-muted-foreground text-sm sm:text-base">Loading audit logs...</p>
             </div>
           </CardContent>
         </Card>
@@ -135,7 +136,7 @@ export default function AuditLogsPage() {
 
           {/* Pagination */}
           <Card>
-            <CardContent className="pt-6">
+            <CardContent className="p-4 sm:p-6 pt-4 sm:pt-6">
               <TablePagination
                 currentPage={currentPage}
                 totalPages={totalPages}
@@ -153,14 +154,14 @@ export default function AuditLogsPage() {
         </>
       ) : (
         <Card>
-          <CardContent className="p-12">
+          <CardContent className="p-8 sm:p-12">
             <div className="flex flex-col items-center gap-4">
-              <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center">
-                <FileText className="h-8 w-8 text-muted-foreground opacity-50" />
+              <div className="h-14 w-14 sm:h-16 sm:w-16 rounded-full bg-muted flex items-center justify-center">
+                <FileText className="h-7 w-7 sm:h-8 sm:w-8 text-muted-foreground opacity-50" />
               </div>
-              <div className="text-center">
+              <div className="text-center px-4">
                 <h3 className="text-lg font-semibold">No audit logs found</h3>
-                <p className="text-muted-foreground mt-1">
+                <p className="text-muted-foreground mt-1 text-sm sm:text-base">
                   {searchQuery || actionFilter || entityFilter
                     ? 'Try adjusting your filters to find what you\'re looking for'
                     : 'No system activities have been recorded yet'}

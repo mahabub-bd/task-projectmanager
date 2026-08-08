@@ -24,20 +24,20 @@ export default function SearchBar({
   if (button) {
     // Layout with button included (like UsersPage)
     return (
-      <div className={`flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 ${className}`}>
-        <div className="relative flex-1 w-full">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+      <div className={`flex flex-row justify-between items-stretch sm:items-center gap-2 ${className}`}>
+        <div className="relative flex-1 w-full min-w-0">
+          <Search className="absolute left-2.5 sm:left-3 top-1/2 h-3.5 sm:h-4 w-3.5 sm:w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             type="text"
             placeholder={placeholder}
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            className="pl-10 h-10"
+            className="pl-8 sm:pl-10 h-9 sm:h-10 text-xs sm:text-sm"
           />
         </div>
-        <Button onClick={button.onClick} size="default" className="w-full sm:w-auto">
-          {button.icon && <button.icon className="h-4 w-4" />}
-          {button.label}
+        <Button onClick={button.onClick} size="sm" className="sm:size-default shrink-0 h-9 sm:h-10 text-xs sm:text-sm whitespace-nowrap">
+          {button.icon && <button.icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
+          <span className="hidden xs:inline">{button.label}</span>
         </Button>
       </div>
     );
