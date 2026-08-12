@@ -4,7 +4,7 @@ import { useGetUsersListQuery, useLikeTaskCommentMutation, useUnlikeTaskCommentM
 import { format } from 'date-fns';
 import { AlertTriangle, Send, ThumbsUp, AtSign } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import toast from 'react-toastify';
+import { toast } from 'react-toastify';
 
 import {
   Dialog,

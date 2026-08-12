@@ -1,6 +1,6 @@
 import { AlertCircle, ArrowLeft, CheckCircle2, Eye, EyeOff, Lock } from 'lucide-react';
 import { useState } from 'react';
-import toast from 'react-toastify';
+import { toast } from 'react-toastify';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';

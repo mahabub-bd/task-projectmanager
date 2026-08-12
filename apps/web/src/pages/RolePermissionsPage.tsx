@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ArrowLeft, Save, ShieldAlert } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import toast from 'react-toastify';
+import { toast } from 'react-toastify';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   useGetPermissionsQuery,

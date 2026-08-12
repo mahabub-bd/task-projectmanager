@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Bell, Mail, Clock, CheckSquare } from 'lucide-react';
-import toast from 'react-toastify';
+import { toast } from 'react-toastify';
 import {
   useUpdateNotificationPreferenceMutation,
   useGetNotificationPreferencesQuery,

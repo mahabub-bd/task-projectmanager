@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Shield } from 'lucide-react';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import toast from 'react-toastify';
+import { toast } from 'react-toastify';
 import { z } from 'zod';
 import { useCreateRoleMutation, useUpdateRoleMutation } from '../../store/api';
 import { Button } from '../ui/button';

@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Briefcase, Building2, Mail, Shield } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import toast from 'react-toastify';
+import { toast } from 'react-toastify';
 import { z } from 'zod';
 import {
   useCreateUserMutation,

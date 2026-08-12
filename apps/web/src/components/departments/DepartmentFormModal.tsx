@@ -9,7 +9,7 @@ import { Briefcase, Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Fragment } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import toast from 'react-toastify';
+import { toast } from 'react-toastify';
 import { z } from 'zod';
 import {
   useCreateDepartmentMutation,

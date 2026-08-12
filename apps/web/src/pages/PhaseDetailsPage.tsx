@@ -1,7 +1,7 @@
 import ActionBar from '@/components/ui/ActionBar';
 import { Layers } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import toast from 'react-toastify';
+import { toast } from 'react-toastify';
 import { useNavigate, useParams } from 'react-router-dom';
 import MilestoneFormModal, { MilestoneFormData } from '../components/milestones/MilestoneFormModal';
 import PhaseDetailsGrid from '../components/phases/PhaseDetailsGrid';

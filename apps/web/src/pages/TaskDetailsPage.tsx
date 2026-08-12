@@ -1,6 +1,6 @@
 import { FileText } from 'lucide-react';
 import { useState } from 'react';
-import toast from 'react-toastify';
+import { toast } from 'react-toastify';
 import { useNavigate, useParams } from 'react-router-dom';
 import ActionBar from '@/components/ui/ActionBar';
 import TaskActivityTimeline from '../components/tasks/TaskActivityTimeline';

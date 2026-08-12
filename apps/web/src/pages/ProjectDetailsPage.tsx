@@ -1,7 +1,7 @@
 import ActionBar from '@/components/ui/ActionBar';
 import { FolderKanban } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import toast from 'react-toastify';
+import { toast } from 'react-toastify';
 import { useNavigate, useParams } from 'react-router-dom';
 import PhaseFormModal, { PhaseFormData } from '../components/phases/PhaseFormModal';
 import PhaseList from '../components/phases/PhaseList';
