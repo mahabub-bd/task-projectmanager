@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { useAppSelector } from '@/store/store';
 import { useState } from 'react';
-import toast from 'react-hot-toast';
+import toast from 'react-toastify';
 import { useAssignUsersToTaskMutation, useGetDepartmentsListQuery, useGetUsersByDepartmentQuery } from '../../store/api';
 
 interface TaskAssignModalProps {

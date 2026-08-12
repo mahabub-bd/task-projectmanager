@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertCircle, ArrowLeft, CheckCircle, Mail } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import toast from 'react-hot-toast';
+import toast from 'react-toastify';
 import { Link, useNavigate } from 'react-router-dom';
 import * as z from 'zod';
 import { Alert, AlertDescription } from '../components/ui/alert';

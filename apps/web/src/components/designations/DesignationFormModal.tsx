@@ -8,7 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { BadgeCheck } from 'lucide-react';
 import { Fragment, useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import toast from 'react-hot-toast';
+import toast from 'react-toastify';
 import { z } from 'zod';
 import {
   useCreateDesignationMutation,

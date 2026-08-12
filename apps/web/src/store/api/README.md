@@ -81,7 +81,7 @@ import { useGetProjectsQuery } from '@/store/api/projectsApi';
 
 ### organizationsApi.ts
 - CRUD operations for organizations
-- Organization logo upload/delete
+- Organization logo upload/delete (default, dark theme, light theme variants)
 
 ### projectsApi.ts
 - CRUD operations for projects

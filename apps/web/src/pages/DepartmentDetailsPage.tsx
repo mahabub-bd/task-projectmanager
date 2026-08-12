@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import toast from 'react-hot-toast';
+import toast from 'react-toastify';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Building2 } from 'lucide-react';
 import { FullPageLoader } from '../components/ui/loading-spinner';

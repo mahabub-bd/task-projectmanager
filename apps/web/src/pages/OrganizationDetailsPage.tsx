@@ -18,7 +18,7 @@ import {
   ImageIcon,
 } from 'lucide-react';
 import { useState } from 'react';
-import toast from 'react-hot-toast';
+import toast from 'react-toastify';
 import { useNavigate, useParams } from 'react-router-dom';
 import OrganizationFormModal from '../components/organizations/OrganizationFormModal';
 import PageLoadingState from '../components/PageLoadingState';

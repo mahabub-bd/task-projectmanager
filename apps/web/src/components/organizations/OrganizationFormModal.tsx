@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import toast from 'react-hot-toast';
+import toast from 'react-toastify';
 import { ImageIcon, Upload, X } from 'lucide-react';
 import { z } from 'zod';
 import {

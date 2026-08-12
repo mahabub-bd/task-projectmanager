@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { Toaster } from 'react-hot-toast';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 import { PersistGate } from 'redux-persist/integration/react';
@@ -19,10 +20,9 @@ ReactDOM.createRoot(document.getElementById('app')!).render(
           </BrowserRouter>
         </ThemeProvider>
       </PersistGate>
-      <Toaster
+      <ToastContainer
         position="top-right"
         gutter={12}
-
       />
     </Provider>
   </React.StrictMode>,

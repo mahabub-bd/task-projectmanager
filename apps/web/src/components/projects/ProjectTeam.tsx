@@ -5,7 +5,7 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { useRemoveProjectMemberMutation } from '@/store/api';
 import { Building2, User as UserIcon, Users, X } from 'lucide-react';
 import { useState } from 'react';
-import { toast } from 'react-hot-toast';
+import { toast } from 'react-toastify';
 
 interface ProjectTeamProps {
   project: any;

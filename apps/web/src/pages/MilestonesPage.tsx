@@ -10,7 +10,7 @@ import {
   Flag,
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import toast from 'react-hot-toast';
+import toast from 'react-toastify';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import MilestoneFormModal, { MilestoneFormData } from '../components/milestones/MilestoneFormModal';

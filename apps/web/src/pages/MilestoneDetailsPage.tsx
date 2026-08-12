@@ -2,7 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import toast from 'react-hot-toast';
+import toast from 'react-toastify';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Flag } from 'lucide-react';
 import { FullPageLoader } from '../components/ui/loading-spinner';

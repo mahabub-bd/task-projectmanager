@@ -6,7 +6,7 @@ import StatsCard from '@/components/ui/stats-card';
 import { Building2, Globe, Mail, Phone, Plus } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast';
+import toast from 'react-toastify';
 import OrganizationFormModal from '../components/organizations/OrganizationFormModal';
 import OrganizationsTableView from '../components/organizations/OrganizationsTableView';
 import PageLoadingState from '../components/PageLoadingState';

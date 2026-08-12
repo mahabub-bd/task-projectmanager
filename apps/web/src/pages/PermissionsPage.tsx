@@ -4,7 +4,7 @@ import { TablePagination } from '@/components/shared/TablePagination';
 import SearchBar from '@/components/ui/SearchBar';
 import { Key, Plus } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import toast from 'react-hot-toast';
+import toast from 'react-toastify';
 import PageLoadingState from '../components/PageLoadingState';
 import PermissionFormModal from '../components/permissions/PermissionFormModal';
 import PermissionsTableView from '../components/permissions/PermissionsTableView';

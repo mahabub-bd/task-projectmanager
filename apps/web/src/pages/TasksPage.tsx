@@ -4,7 +4,7 @@ import FilterBar from '@/components/ui/FilterBar';
 import StatsCard from '@/components/ui/stats-card';
 import { AlertCircle, CheckCircle2, Clock, FileText, Percent } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import toast from 'react-hot-toast';
+import toast from 'react-toastify';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import PageErrorState from '../components/PageErrorState';
