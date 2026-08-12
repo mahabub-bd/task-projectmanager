@@ -1,7 +1,7 @@
 import ActionBar from '@/components/ui/ActionBar';
 import { FolderKanban } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
+import { toastSuccess, toastError } from '@/lib/toast';
 import { useNavigate, useParams } from 'react-router-dom';
 import PhaseFormModal, { PhaseFormData } from '../components/phases/PhaseFormModal';
 import PhaseList from '../components/phases/PhaseList';
@@ -66,11 +66,11 @@ export default function ProjectDetailsPage() {
         budget: projectData.budget ? parseFloat(projectData.budget) : undefined,
         manager_id: projectData.manager_id ? Number(projectData.manager_id) : undefined,
       }).unwrap();
-      toast.success('Project updated successfully');
+      toastSuccess('Project updated successfully');
       setShowEditModal(false);
       refetch();
     } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to update project');
+      toastError(error?.data?.message || 'Failed to update project');
     }
   };
 
@@ -80,10 +80,10 @@ export default function ProjectDetailsPage() {
 
     try {
       await deleteProject(String(projectId)).unwrap();
-      toast.success('Project deleted successfully');
+      toastSuccess('Project deleted successfully');
       navigate('/projects');
     } catch {
-      toast.error('Failed to delete project');
+      toastError('Failed to delete project');
     }
   };
 
@@ -91,10 +91,10 @@ export default function ProjectDetailsPage() {
     if (!projectId) return;
     try {
       await updateProject({ id: String(projectId), status }).unwrap();
-      toast.success('Status updated');
+      toastSuccess('Status updated');
       await refetch();
     } catch {
-      toast.error('Failed to update status');
+      toastError('Failed to update status');
     }
   };
 
@@ -102,21 +102,21 @@ export default function ProjectDetailsPage() {
     if (!projectId) return;
     try {
       await updateProject({ id: String(projectId), priority }).unwrap();
-      toast.success('Priority updated');
+      toastSuccess('Priority updated');
       await refetch();
     } catch {
-      toast.error('Failed to update priority');
+      toastError('Failed to update priority');
     }
   };
 
   const handleCreatePhase = async (data: PhaseFormData) => {
     try {
       await createPhase(data).unwrap();
-      toast.success('Phase created successfully');
+      toastSuccess('Phase created successfully');
       setShowPhaseModal(false);
       refetchPhases();
     } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to create phase');
+      toastError(error?.data?.message || 'Failed to create phase');
     }
   };
 

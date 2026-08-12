@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
+import { toastSuccess, toastError } from '@/lib/toast';
 import { ImageIcon, Upload, X } from 'lucide-react';
 import { z } from 'zod';
 import {
@@ -144,7 +144,7 @@ export default function OrganizationFormModal({
           }).unwrap();
         }
 
-        toast.success('Organization updated successfully!');
+        toastSuccess('Organization updated successfully!');
       } else {
         // Create organization first
         const result = await createOrganization(data as OrganizationFormData).unwrap();
@@ -164,13 +164,13 @@ export default function OrganizationFormModal({
         if (logoPromises.length > 0) {
           try {
             await Promise.all(logoPromises);
-            toast.success('Organization created with logos!');
+            toastSuccess('Organization created with logos!');
           } catch (logoError) {
             console.error('Logo upload failed:', logoError);
-            toast.success('Organization created, but some logos may have failed to upload');
+            toastSuccess('Organization created, but some logos may have failed to upload');
           }
         } else {
-          toast.success('Organization created successfully!');
+          toastSuccess('Organization created successfully!');
         }
       }
       reset();
@@ -184,7 +184,7 @@ export default function OrganizationFormModal({
     } catch (error: any) {
       const errorMessage =
         error?.data?.message || `Failed to ${editingOrganization ? 'update' : 'create'} organization`;
-      toast.error(errorMessage);
+      toastError(errorMessage);
       setError('root', {
         type: 'manual',
         message: errorMessage,
@@ -198,13 +198,13 @@ export default function OrganizationFormModal({
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      toast.error('Only image files are allowed');
+      toastError('Only image files are allowed');
       return;
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('File size must be less than 5MB');
+      toastError('File size must be less than 5MB');
       return;
     }
 
@@ -224,13 +224,13 @@ export default function OrganizationFormModal({
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      toast.error('Only image files are allowed');
+      toastError('Only image files are allowed');
       return;
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('File size must be less than 5MB');
+      toastError('File size must be less than 5MB');
       return;
     }
 
@@ -250,13 +250,13 @@ export default function OrganizationFormModal({
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      toast.error('Only image files are allowed');
+      toastError('Only image files are allowed');
       return;
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('File size must be less than 5MB');
+      toastError('File size must be less than 5MB');
       return;
     }
 

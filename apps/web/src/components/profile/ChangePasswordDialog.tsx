@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Key, Loader2, Lock, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useState } from 'react';
-import { toast } from 'react-toastify';
+import { toastSuccess, toastError } from '@/lib/toast';
 import { useChangePasswordMutation } from '@/store/api';
 import { cn } from '@/lib/utils';
 
@@ -92,7 +92,7 @@ export function ChangePasswordDialog({ trigger }: ChangePasswordDialogProps) {
         newPassword: formData.newPassword,
       }).unwrap();
 
-      toast.success('Password changed successfully!');
+      toastSuccess('Password changed successfully!');
 
       // Reset form
       setFormData({
@@ -104,7 +104,7 @@ export function ChangePasswordDialog({ trigger }: ChangePasswordDialogProps) {
       setOpen(false);
     } catch (error: any) {
       const errorMessage = error?.data?.message || error?.message || 'Failed to change password';
-      toast.error(errorMessage);
+      toastError(errorMessage);
     }
   };
 

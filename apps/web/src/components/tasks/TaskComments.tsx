@@ -4,7 +4,7 @@ import { useGetUsersListQuery, useLikeTaskCommentMutation, useUnlikeTaskCommentM
 import { format } from 'date-fns';
 import { AlertTriangle, Send, ThumbsUp, AtSign } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { toast } from 'react-toastify';
+import { toastSuccess, toastError } from '@/lib/toast';
 
 import {
   Dialog,
@@ -187,22 +187,22 @@ export default function TaskComments({
   const handleLikeComment = async (commentId: number) => {
     try {
       await likeComment({ taskId: task.id, commentId: String(commentId) }).unwrap();
-      toast.success('Comment liked!');
+      toastSuccess('Comment liked!');
       onRefetchComments?.();
       onRefetchTask?.();
     } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to like comment');
+      toastError(error?.data?.message || 'Failed to like comment');
     }
   };
 
   const handleUnlikeComment = async (commentId: number) => {
     try {
       await unlikeComment({ taskId: task.id, commentId: String(commentId) }).unwrap();
-      toast.success('Comment unliked!');
+      toastSuccess('Comment unliked!');
       onRefetchComments?.();
       onRefetchTask?.();
     } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to unlike comment');
+      toastError(error?.data?.message || 'Failed to unlike comment');
     }
   };
 

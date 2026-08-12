@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Shield } from 'lucide-react';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
+import { toastSuccess, toastError } from '@/lib/toast';
 import { z } from 'zod';
 import { useCreateRoleMutation, useUpdateRoleMutation } from '../../store/api';
 import { Button } from '../ui/button';
@@ -67,10 +67,10 @@ export default function RoleFormModal({ open, onClose, editingRole }: RoleFormMo
           name: data.name,
           description: data.description,
         }).unwrap();
-        toast.success('Role updated successfully');
+        toastSuccess('Role updated successfully');
       } else {
         await createRole(data as RoleFormData).unwrap();
-        toast.success('Role created successfully');
+        toastSuccess('Role created successfully');
       }
 
       reset();
@@ -78,7 +78,7 @@ export default function RoleFormModal({ open, onClose, editingRole }: RoleFormMo
     } catch (error: any) {
       const errorMessage =
         error.data?.message || `Failed to ${editingRole ? 'update' : 'create'} role`;
-      toast.error(errorMessage);
+      toastError(errorMessage);
       setError('root', {
         type: 'manual',
         message: errorMessage,

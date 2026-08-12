@@ -5,7 +5,7 @@ import FilterBar from '@/components/ui/FilterBar';
 import StatsCard from '@/components/ui/stats-card';
 import { AlertCircle, CheckCircle2, Flag, FolderKanban } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import { toast } from 'react-toastify';
+import { toastSuccess, toastError } from '@/lib/toast';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import PageErrorState from '../components/PageErrorState';
@@ -101,7 +101,7 @@ export default function ProjectsPage() {
 
   const handleSubmit = async (data: any) => {
     if (!organizationId) {
-      toast.error('Organization ID is required');
+      toastError('Organization ID is required');
       return;
     }
 
@@ -126,7 +126,7 @@ export default function ProjectsPage() {
           progress: projectData.progress,
         }).unwrap();
         projectId = editingProject.id;
-        toast.success('Project updated');
+        toastSuccess('Project updated');
       } else {
         const result = await createProject({
           name: projectData.name,
@@ -142,7 +142,7 @@ export default function ProjectsPage() {
           progress: projectData.progress,
         }).unwrap();
         projectId = result.id;
-        toast.success('Project created');
+        toastSuccess('Project created');
       }
 
       // Add members if provided
@@ -164,7 +164,7 @@ export default function ProjectsPage() {
       closeModal();
       refetch();
     } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to save project');
+      toastError(error?.data?.message || 'Failed to save project');
     }
   };
 
@@ -173,10 +173,10 @@ export default function ProjectsPage() {
   const handleUpdateProgress = async (id: number) => {
     try {
       await updateProgress(String(id)).unwrap();
-      toast.success('Progress updated');
+      toastSuccess('Progress updated');
       refetch();
     } catch {
-      toast.error('Failed to update progress');
+      toastError('Failed to update progress');
     }
   };
 

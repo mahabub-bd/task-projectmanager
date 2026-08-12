@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertCircle, ArrowRight, Eye, EyeOff, LockKeyhole, Mail, ShieldCheck, Sparkles, Zap } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
+import { toastSuccess, toastError } from '@/lib/toast';
 import { Link, useNavigate } from 'react-router-dom';
 import * as z from 'zod';
 import { useTheme } from '../contexts/ThemeContext';
@@ -42,14 +42,14 @@ export default function LoginPage() {
     const result = await login({ email: data.email, password: data.password });
 
     if (result.success) {
-      toast.success('Login successful');
+      toastSuccess('Login successful');
       navigate('/dashboard');
       return;
     }
 
     const errorMessage = result.error || 'Invalid email or password';
     setError(errorMessage);
-    toast.error(errorMessage);
+    toastError(errorMessage);
   };
 
   const fillDemoCredentials = () => {

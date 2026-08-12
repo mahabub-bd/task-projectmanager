@@ -18,7 +18,7 @@ import {
   ImageIcon,
 } from 'lucide-react';
 import { useState } from 'react';
-import { toast } from 'react-toastify';
+import { toastSuccess, toastError } from '@/lib/toast';
 import { useNavigate, useParams } from 'react-router-dom';
 import OrganizationFormModal from '../components/organizations/OrganizationFormModal';
 import PageLoadingState from '../components/PageLoadingState';
@@ -53,10 +53,10 @@ export default function OrganizationDetailsPage() {
 
     try {
       await deleteOrganization(id || '').unwrap();
-      toast.success('Organization deleted successfully');
+      toastSuccess('Organization deleted successfully');
       navigate('/organizations');
     } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to delete organization');
+      toastError(error?.data?.message || 'Failed to delete organization');
     }
   };
 
@@ -66,22 +66,22 @@ export default function OrganizationDetailsPage() {
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file');
+      toastError('Please select an image file');
       return;
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('File size must be less than 5MB');
+      toastError('File size must be less than 5MB');
       return;
     }
 
     try {
       await uploadLogo({ id, file }).unwrap();
-      toast.success('Logo uploaded successfully');
+      toastSuccess('Logo uploaded successfully');
       refetch();
     } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to upload logo');
+      toastError(error?.data?.message || 'Failed to upload logo');
     }
   };
 
@@ -92,10 +92,10 @@ export default function OrganizationDetailsPage() {
 
     try {
       await deleteLogo(id || '').unwrap();
-      toast.success('Logo removed successfully');
+      toastSuccess('Logo removed successfully');
       refetch();
     } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to remove logo');
+      toastError(error?.data?.message || 'Failed to remove logo');
     }
   };
 
@@ -105,22 +105,22 @@ export default function OrganizationDetailsPage() {
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file');
+      toastError('Please select an image file');
       return;
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('File size must be less than 5MB');
+      toastError('File size must be less than 5MB');
       return;
     }
 
     try {
       await uploadDarkLogo({ id, file }).unwrap();
-      toast.success('Dark logo uploaded successfully');
+      toastSuccess('Dark logo uploaded successfully');
       refetch();
     } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to upload dark logo');
+      toastError(error?.data?.message || 'Failed to upload dark logo');
     }
   };
 
@@ -131,10 +131,10 @@ export default function OrganizationDetailsPage() {
 
     try {
       await deleteDarkLogo(id || '').unwrap();
-      toast.success('Dark logo removed successfully');
+      toastSuccess('Dark logo removed successfully');
       refetch();
     } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to remove dark logo');
+      toastError(error?.data?.message || 'Failed to remove dark logo');
     }
   };
 
@@ -144,22 +144,22 @@ export default function OrganizationDetailsPage() {
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file');
+      toastError('Please select an image file');
       return;
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('File size must be less than 5MB');
+      toastError('File size must be less than 5MB');
       return;
     }
 
     try {
       await uploadLightLogo({ id, file }).unwrap();
-      toast.success('Light logo uploaded successfully');
+      toastSuccess('Light logo uploaded successfully');
       refetch();
     } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to upload light logo');
+      toastError(error?.data?.message || 'Failed to upload light logo');
     }
   };
 
@@ -170,10 +170,10 @@ export default function OrganizationDetailsPage() {
 
     try {
       await deleteLightLogo(id || '').unwrap();
-      toast.success('Light logo removed successfully');
+      toastSuccess('Light logo removed successfully');
       refetch();
     } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to remove light logo');
+      toastError(error?.data?.message || 'Failed to remove light logo');
     }
   };
 

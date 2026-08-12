@@ -1,4 +1,4 @@
-import { toast } from 'react-toastify';
+import { toastSuccess, toastError } from '@/lib/toast';
 import { useEffect, useState } from 'react';
 import { Shield } from 'lucide-react';
 import { useGetRolesQuery, useGetUserRolesQuery, useSetUserRolesMutation } from '../../store/api';
@@ -45,10 +45,10 @@ export default function ManageRolesModal({ open, onClose, userId }: ManageRolesM
         userId: userId.toString(),
         roleIds: tempSelectedRoles,
       }).unwrap();
-      toast.success('User roles updated successfully');
+      toastSuccess('User roles updated successfully');
       onClose();
     } catch {
-      toast.error('Failed to update user roles');
+      toastError('Failed to update user roles');
     }
   };
 

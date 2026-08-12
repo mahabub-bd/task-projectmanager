@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { useAppSelector } from '@/store/store';
 import { useState } from 'react';
-import { toast } from 'react-toastify';
+import { toastSuccess, toastError } from '@/lib/toast';
 import { useAddProjectMemberMutation, useGetDepartmentsListQuery, useGetUsersByDepartmentQuery } from '../../store/api';
 
 interface ProjectTeamMemberModalProps {
@@ -59,7 +59,7 @@ export default function ProjectTeamMemberModal({
 
   const handleAssign = async () => {
     if (!projectId || selectedUserIds.length === 0) {
-      toast.error('Please select at least one user');
+      toastError('Please select at least one user');
       return;
     }
 
@@ -73,7 +73,7 @@ export default function ProjectTeamMemberModal({
           notes: notes.trim() || undefined,
         }).unwrap();
       }
-      toast.success(`${selectedUserIds.length} member(s) added successfully`);
+      toastSuccess(`${selectedUserIds.length} member(s) added successfully`);
       onClose();
       // Reset form
       setSelectedUserIds([]);
@@ -81,7 +81,7 @@ export default function ProjectTeamMemberModal({
       setSelectedRole('member');
       setNotes('');
     } catch {
-      toast.error('Failed to add member(s)');
+      toastError('Failed to add member(s)');
     }
   };
 

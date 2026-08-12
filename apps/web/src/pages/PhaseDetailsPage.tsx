@@ -1,7 +1,7 @@
 import ActionBar from '@/components/ui/ActionBar';
 import { Layers } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
+import { toastSuccess, toastError } from '@/lib/toast';
 import { useNavigate, useParams } from 'react-router-dom';
 import MilestoneFormModal, { MilestoneFormData } from '../components/milestones/MilestoneFormModal';
 import PhaseDetailsGrid from '../components/phases/PhaseDetailsGrid';
@@ -46,11 +46,11 @@ export default function PhaseDetailsPage() {
         id: String(phaseId),
         ...data,
       }).unwrap();
-      toast.success('Phase updated successfully');
+      toastSuccess('Phase updated successfully');
       setShowEditModal(false);
       refetch();
     } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to update phase');
+      toastError(error?.data?.message || 'Failed to update phase');
     }
   };
 
@@ -60,14 +60,14 @@ export default function PhaseDetailsPage() {
 
     try {
       await deletePhase(String(phaseId)).unwrap();
-      toast.success('Phase deleted successfully');
+      toastSuccess('Phase deleted successfully');
       if (phase?.project_id) {
         navigate(`/projects/${phase.project_id}`);
       } else {
         navigate('/projects');
       }
     } catch {
-      toast.error('Failed to delete phase');
+      toastError('Failed to delete phase');
     }
   };
 
@@ -75,10 +75,10 @@ export default function PhaseDetailsPage() {
     if (!phaseId) return;
     try {
       await updatePhase({ id: String(phaseId), status }).unwrap();
-      toast.success('Status updated');
+      toastSuccess('Status updated');
       await refetch();
     } catch {
-      toast.error('Failed to update status');
+      toastError('Failed to update status');
     }
   };
 
@@ -86,10 +86,10 @@ export default function PhaseDetailsPage() {
     if (!phaseId) return;
     try {
       await updatePhase({ id: String(phaseId), progress }).unwrap();
-      toast.success('Progress updated');
+      toastSuccess('Progress updated');
       await refetch();
     } catch {
-      toast.error('Failed to update progress');
+      toastError('Failed to update progress');
     }
   };
 
@@ -107,7 +107,7 @@ export default function PhaseDetailsPage() {
 
   const handleCreateMilestone = async (data: MilestoneFormData) => {
     if (!organizationId) {
-      toast.error('Organization ID is required');
+      toastError('Organization ID is required');
       return;
     }
 
@@ -119,11 +119,11 @@ export default function PhaseDetailsPage() {
         phase_id: phaseId ? Number(phaseId) : undefined,
         color: data.color || '#3b82f6',
       }).unwrap();
-      toast.success('Milestone created successfully');
+      toastSuccess('Milestone created successfully');
       setShowMilestoneModal(false);
       refetch();
     } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to create milestone');
+      toastError(error?.data?.message || 'Failed to create milestone');
     }
   };
 

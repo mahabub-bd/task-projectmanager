@@ -2,7 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
+import { toastSuccess, toastError } from '@/lib/toast';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Flag } from 'lucide-react';
 import { FullPageLoader } from '../components/ui/loading-spinner';
@@ -81,11 +81,11 @@ export default function MilestoneDetailsPage() {
         id: String(milestoneId),
         ...updateData,
       }).unwrap();
-      toast.success('Milestone updated successfully');
+      toastSuccess('Milestone updated successfully');
       setShowEditModal(false);
       refetch();
     } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to update milestone');
+      toastError(error?.data?.message || 'Failed to update milestone');
     }
   };
 
@@ -95,10 +95,10 @@ export default function MilestoneDetailsPage() {
 
     try {
       await deleteMilestone(String(milestoneId)).unwrap();
-      toast.success('Milestone deleted successfully');
+      toastSuccess('Milestone deleted successfully');
       navigate('/milestones');
     } catch {
-      toast.error('Failed to delete milestone');
+      toastError('Failed to delete milestone');
     }
   };
 
@@ -106,10 +106,10 @@ export default function MilestoneDetailsPage() {
     if (!milestoneId) return;
     try {
       await updateMilestone({ id: String(milestoneId), status }).unwrap();
-      toast.success('Status updated');
+      toastSuccess('Status updated');
       await refetch();
     } catch {
-      toast.error('Failed to update status');
+      toastError('Failed to update status');
     }
   };
 
@@ -117,10 +117,10 @@ export default function MilestoneDetailsPage() {
     if (!milestoneId) return;
     try {
       await updateMilestone({ id: String(milestoneId), progress }).unwrap();
-      toast.success('Progress updated');
+      toastSuccess('Progress updated');
       await refetch();
     } catch {
-      toast.error('Failed to update progress');
+      toastError('Failed to update progress');
     }
   };
 

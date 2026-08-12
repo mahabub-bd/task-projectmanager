@@ -1,6 +1,6 @@
 import { FileText } from 'lucide-react';
 import { useState } from 'react';
-import { toast } from 'react-toastify';
+import { toastSuccess, toastError } from '@/lib/toast';
 import { useNavigate, useParams } from 'react-router-dom';
 import ActionBar from '@/components/ui/ActionBar';
 import TaskActivityTimeline from '../components/tasks/TaskActivityTimeline';
@@ -106,11 +106,11 @@ export default function TaskDetailsPage() {
         due_date: data.due_date || undefined,
         project_id: data.project_id ? Number(data.project_id) : undefined,
       }).unwrap();
-      toast.success('Task updated');
+      toastSuccess('Task updated');
       setShowEditModal(false);
       refetch();
     } catch {
-      toast.error('Failed to update task');
+      toastError('Failed to update task');
     } finally {
       setIsUpdating(false);
     }
@@ -120,10 +120,10 @@ export default function TaskDetailsPage() {
     if (!taskId || !confirm('Delete this task?')) return;
     try {
       await deleteTask(taskId).unwrap();
-      toast.success('Task deleted');
+      toastSuccess('Task deleted');
       navigate('/tasks');
     } catch {
-      toast.error('Failed to delete task');
+      toastError('Failed to delete task');
     }
   };
 
@@ -131,10 +131,10 @@ export default function TaskDetailsPage() {
     if (!taskId) return;
     try {
       await updateTask({ id: taskId, status: status as any }).unwrap();
-      toast.success('Status updated');
+      toastSuccess('Status updated');
       await refetch();
     } catch {
-      toast.error('Failed to update status');
+      toastError('Failed to update status');
     }
   };
 
@@ -142,7 +142,7 @@ export default function TaskDetailsPage() {
     if (!taskId || !newTag.trim()) return;
 
     if (!organizationId) {
-      toast.error('Organization ID is required to create tags');
+      toastError('Organization ID is required to create tags');
       return;
     }
 
@@ -163,7 +163,7 @@ export default function TaskDetailsPage() {
         tagId = createdTag.data?.id || createdTag.id;
       } catch (error: any) {
         console.error('Tag creation error:', error);
-        toast.error(error?.data?.message?.[0] || 'Failed to create tag');
+        toastError(error?.data?.message?.[0] || 'Failed to create tag');
         return;
       }
     }
@@ -173,11 +173,11 @@ export default function TaskDetailsPage() {
 
     try {
       await updateTask({ id: taskId, tag_ids: updatedTagIds }).unwrap();
-      toast.success('Tag added');
+      toastSuccess('Tag added');
       setNewTag('');
       await refetch();
     } catch {
-      toast.error('Failed to add tag');
+      toastError('Failed to add tag');
     }
   };
 
@@ -189,10 +189,10 @@ export default function TaskDetailsPage() {
 
     try {
       await updateTask({ id: taskId, tag_ids: updatedTagIds }).unwrap();
-      toast.success('Tag removed');
+      toastSuccess('Tag removed');
       await refetch();
     } catch {
-      toast.error('Failed to remove tag');
+      toastError('Failed to remove tag');
     }
   };
 
@@ -206,10 +206,10 @@ export default function TaskDetailsPage() {
     try {
       await createComment({ taskId, content: newComment.trim(), mentions }).unwrap();
       setNewComment('');
-      toast.success('Comment added');
+      toastSuccess('Comment added');
       refetchComments();
     } catch {
-      toast.error('Failed to add comment');
+      toastError('Failed to add comment');
     }
   };
 
@@ -222,10 +222,10 @@ export default function TaskDetailsPage() {
         content: editingComment.content.trim(),
       }).unwrap();
       setEditingComment(null);
-      toast.success('Comment updated');
+      toastSuccess('Comment updated');
       refetchComments();
     } catch {
-      toast.error('Failed to update comment');
+      toastError('Failed to update comment');
     }
   };
 
@@ -233,10 +233,10 @@ export default function TaskDetailsPage() {
     if (!taskId) return;
     try {
       await deleteComment({ taskId, commentId: commentId.toString() }).unwrap();
-      toast.success('Comment deleted');
+      toastSuccess('Comment deleted');
       refetchComments();
     } catch {
-      toast.error('Failed to delete comment');
+      toastError('Failed to delete comment');
     }
   };
 

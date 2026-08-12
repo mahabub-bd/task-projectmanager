@@ -4,7 +4,7 @@ import FilterBar from '@/components/ui/FilterBar';
 import StatsCard from '@/components/ui/stats-card';
 import { AlertCircle, CheckCircle2, Clock, FileText, Percent } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { toast } from 'react-toastify';
+import { toastSuccess, toastError } from '@/lib/toast';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import PageErrorState from '../components/PageErrorState';
@@ -115,7 +115,7 @@ export default function TasksPage() {
 
     const orgId = Number(organizationId);
     if (!orgId || Number.isNaN(orgId)) {
-      toast.error('Organization ID is required to create tags');
+      toastError('Organization ID is required to create tags');
       return;
     }
 
@@ -144,9 +144,9 @@ export default function TasksPage() {
 
       setNewTagName('');
       await refetchTags();
-      toast.success('Tag created');
+      toastSuccess('Tag created');
     } catch (error: any) {
-      toast.error(error?.data?.message?.[0] || 'Failed to create tag');
+      toastError(error?.data?.message?.[0] || 'Failed to create tag');
     }
   };
 
@@ -162,11 +162,11 @@ export default function TasksPage() {
         tag_ids: selectedTagIds,
       }).unwrap();
 
-      toast.success('Task created');
+      toastSuccess('Task created');
       closeCreateModal();
       refetch();
     } catch {
-      toast.error('Failed to create task');
+      toastError('Failed to create task');
     }
   };
 

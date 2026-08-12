@@ -8,7 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Building2 } from 'lucide-react';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
+import { toastSuccess, toastError } from '@/lib/toast';
 import { z } from 'zod';
 import {
   useCreateDivisionMutation,
@@ -85,7 +85,7 @@ export default function DivisionFormModal({ open, onClose, editingDivision }: Di
           organization_id: organizationId,
           parent_division_id: parentValue,
         }).unwrap();
-        toast.success('Division updated successfully');
+        toastSuccess('Division updated successfully');
       } else {
         await createDivision({
           name: data.name,
@@ -93,14 +93,14 @@ export default function DivisionFormModal({ open, onClose, editingDivision }: Di
           organization_id: organizationId,
           parent_division_id: parentValue,
         } as any).unwrap();
-        toast.success('Division created successfully');
+        toastSuccess('Division created successfully');
       }
 
       reset();
       onClose();
     } catch (error: any) {
       const errorMessage = error.data?.message || `Failed to ${editingDivision ? 'update' : 'create'} division`;
-      toast.error(errorMessage);
+      toastError(errorMessage);
       setError('root', {
         type: 'manual',
         message: errorMessage,

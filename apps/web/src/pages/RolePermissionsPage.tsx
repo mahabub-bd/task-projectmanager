@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ArrowLeft, Save, ShieldAlert } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import { toast } from 'react-toastify';
+import { toastSuccess, toastError } from '@/lib/toast';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   useGetPermissionsQuery,
@@ -68,9 +68,9 @@ export default function RolePermissionsPage() {
 
     try {
       await setPermissions({ roleId, permissionIds: tempSelectedPermissions }).unwrap();
-      toast.success('Permissions updated successfully');
+      toastSuccess('Permissions updated successfully');
     } catch {
-      toast.error('Failed to update permissions');
+      toastError('Failed to update permissions');
     }
   };
 

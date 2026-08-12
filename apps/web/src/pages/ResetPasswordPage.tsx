@@ -1,6 +1,6 @@
 import { AlertCircle, ArrowLeft, CheckCircle2, Eye, EyeOff, Lock } from 'lucide-react';
 import { useState } from 'react';
-import { toast } from 'react-toastify';
+import { toastSuccess, toastError } from '@/lib/toast';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -69,7 +69,7 @@ export default function ResetPasswordPage() {
 
       if (response.ok) {
         setIsSuccess(true);
-        toast.success('Password reset successfully!');
+        toastSuccess('Password reset successfully!');
         // Redirect to login after 3 seconds
         setTimeout(() => {
           navigate('/login');
@@ -77,12 +77,12 @@ export default function ResetPasswordPage() {
       } else {
         const errorMessage = result.message || 'Failed to reset password';
         setError(errorMessage);
-        toast.error(errorMessage);
+        toastError(errorMessage);
       }
     } catch (err) {
       const errorMessage = 'Network error. Please try again.';
       setError(errorMessage);
-      toast.error(errorMessage);
+      toastError(errorMessage);
     } finally {
       setIsLoading(false);
     }

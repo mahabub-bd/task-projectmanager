@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Key } from 'lucide-react';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
+import { toastSuccess, toastError } from '@/lib/toast';
 import { z } from 'zod';
 import { useCreatePermissionMutation, useUpdatePermissionMutation } from '../../store/api';
 import { Button } from '../ui/button';
@@ -100,10 +100,10 @@ export default function PermissionFormModal({
           id: editingPermission.id.toString(),
           ...data,
         }).unwrap();
-        toast.success('Permission updated successfully');
+        toastSuccess('Permission updated successfully');
       } else {
         await createPermission(data as PermissionFormData).unwrap();
-        toast.success('Permission created successfully');
+        toastSuccess('Permission created successfully');
       }
 
       reset();
@@ -111,7 +111,7 @@ export default function PermissionFormModal({
     } catch (error: any) {
       const errorMessage =
         error.data?.message || `Failed to ${editingPermission ? 'update' : 'create'} permission`;
-      toast.error(errorMessage);
+      toastError(errorMessage);
       setError('root', {
         type: 'manual',
         message: errorMessage,

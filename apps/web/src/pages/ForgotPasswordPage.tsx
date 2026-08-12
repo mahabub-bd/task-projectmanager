@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertCircle, ArrowLeft, CheckCircle, Mail } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
+import { toastSuccess, toastError } from '@/lib/toast';
 import { Link, useNavigate } from 'react-router-dom';
 import * as z from 'zod';
 import { Alert, AlertDescription } from '../components/ui/alert';
@@ -52,16 +52,16 @@ export default function ForgotPasswordPage() {
 
       if (response.ok) {
         setSuccess(true);
-        toast.success('Password reset email sent successfully!');
+        toastSuccess('Password reset email sent successfully!');
       } else {
         const errorMessage = result.message || 'Failed to send reset email';
         setError(errorMessage);
-        toast.error(errorMessage);
+        toastError(errorMessage);
       }
     } catch (err) {
       const errorMessage = 'Network error. Please try again.';
       setError(errorMessage);
-      toast.error(errorMessage);
+      toastError(errorMessage);
     } finally {
       setIsLoading(false);
     }

@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { useAppSelector } from '@/store/store';
 import { useState } from 'react';
-import { toast } from 'react-toastify';
+import { toastSuccess, toastError } from '@/lib/toast';
 import { useAssignUsersToTaskMutation, useGetDepartmentsListQuery, useGetUsersByDepartmentQuery } from '../../store/api';
 
 interface TaskAssignModalProps {
@@ -46,7 +46,7 @@ export default function TaskAssignModal({ open, onClose, taskId, taskTitle, curr
 
   const handleAssign = async () => {
     if (!taskId || selectedUserIds.length === 0) {
-      toast.error('Please select at least one user');
+      toastError('Please select at least one user');
       return;
     }
 
@@ -56,10 +56,10 @@ export default function TaskAssignModal({ open, onClose, taskId, taskTitle, curr
         userIds: selectedUserIds,
         notes: notes.trim() || undefined,
       }).unwrap();
-      toast.success('Users assigned successfully');
+      toastSuccess('Users assigned successfully');
       onClose();
     } catch {
-      toast.error('Failed to assign users');
+      toastError('Failed to assign users');
     }
   };
 

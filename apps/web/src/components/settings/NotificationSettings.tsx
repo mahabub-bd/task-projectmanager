@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Bell, Mail, Clock, CheckSquare } from 'lucide-react';
-import { toast } from 'react-toastify';
+import { toastSuccess, toastError } from '@/lib/toast';
 import {
   useUpdateNotificationPreferenceMutation,
   useGetNotificationPreferencesQuery,
@@ -65,9 +65,9 @@ export default function NotificationSettings() {
         [`${field}_enabled`]: value,
       }).unwrap();
 
-      toast.success('Notification preference updated');
+      toastSuccess('Notification preference updated');
     } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to update preference');
+      toastError(error?.data?.message || 'Failed to update preference');
     }
   };
 
@@ -78,9 +78,9 @@ export default function NotificationSettings() {
         reminder_hours: hours,
       }).unwrap();
 
-      toast.success('Reminder time updated');
+      toastSuccess('Reminder time updated');
     } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to update reminder time');
+      toastError(error?.data?.message || 'Failed to update reminder time');
     }
   };
 

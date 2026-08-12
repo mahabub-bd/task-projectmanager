@@ -5,7 +5,7 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { useRemoveProjectMemberMutation } from '@/store/api';
 import { Building2, User as UserIcon, Users, X } from 'lucide-react';
 import { useState } from 'react';
-import { toast } from 'react-toastify';
+import { toastSuccess, toastError } from '@/lib/toast';
 
 interface ProjectTeamProps {
   project: any;
@@ -64,10 +64,10 @@ export default function ProjectTeam({ project, members }: ProjectTeamProps) {
         projectId: String(project.id),
         memberId: String(deleteDialog.memberId),
       }).unwrap();
-      toast.success('Member removed successfully');
+      toastSuccess('Member removed successfully');
       setDeleteDialog({ open: false, memberId: null, memberName: '' });
     } catch {
-      toast.error('Failed to remove member');
+      toastError('Failed to remove member');
     }
   };
 

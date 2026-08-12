@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { toast } from 'react-toastify';
+import { toastSuccess, toastError } from '@/lib/toast';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Building2 } from 'lucide-react';
 import { FullPageLoader } from '../components/ui/loading-spinner';
@@ -46,10 +46,10 @@ export default function DepartmentDetailsPage() {
 
     try {
       await deleteDepartment(String(departmentId)).unwrap();
-      toast.success('Department deleted successfully');
+      toastSuccess('Department deleted successfully');
       navigate('/departments');
     } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to delete department');
+      toastError(error?.data?.message || 'Failed to delete department');
     }
   };
 

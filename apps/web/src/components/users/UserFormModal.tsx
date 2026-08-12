@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Briefcase, Building2, Mail, Shield } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
+import { toastSuccess, toastError } from '@/lib/toast';
 import { z } from 'zod';
 import {
   useCreateUserMutation,
@@ -124,11 +124,11 @@ export default function UserFormModal({ open, onClose, editingUser }: UserFormMo
           ...updateData,
         }).unwrap();
         userId = editingUser.id.toString();
-        toast.success('User updated successfully');
+        toastSuccess('User updated successfully');
       } else {
         const result = await createUser(data as UserFormData).unwrap();
         userId = result.data.id.toString();
-        toast.success('User created successfully');
+        toastSuccess('User created successfully');
       }
 
       if (formSelectedRoles.length > 0) {
@@ -136,14 +136,14 @@ export default function UserFormModal({ open, onClose, editingUser }: UserFormMo
           userId,
           roleIds: formSelectedRoles,
         }).unwrap();
-        toast.success('Roles assigned successfully');
+        toastSuccess('Roles assigned successfully');
       }
 
       reset();
       onClose();
     } catch (error: any) {
       const errorMessage = error.data?.message || `Failed to ${editingUser ? 'update' : 'create'} user`;
-      toast.error(errorMessage);
+      toastError(errorMessage);
       setError('root', {
         type: 'manual',
         message: errorMessage,

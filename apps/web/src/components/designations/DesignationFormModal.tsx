@@ -8,7 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { BadgeCheck } from 'lucide-react';
 import { Fragment, useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
+import { toastSuccess, toastError } from '@/lib/toast';
 import { z } from 'zod';
 import {
   useCreateDesignationMutation,
@@ -81,17 +81,17 @@ export default function DesignationFormModal({ open, onClose, editingDesignation
           organization_id: organizationId,
           department_id: data.department_id ? Number(data.department_id) : undefined,
         } as any).unwrap();
-        toast.success('Designation updated successfully');
+        toastSuccess('Designation updated successfully');
       } else {
         await createDesignation(submitData as any).unwrap();
-        toast.success('Designation created successfully');
+        toastSuccess('Designation created successfully');
       }
 
       reset();
       onClose();
     } catch (error: any) {
       const errorMessage = error.data?.message || `Failed to ${editingDesignation ? 'update' : 'create'} designation`;
-      toast.error(errorMessage);
+      toastError(errorMessage);
       setError('root', { type: 'manual', message: errorMessage });
     }
   };

@@ -9,7 +9,7 @@ import { Briefcase, Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Fragment } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
+import { toastSuccess, toastError } from '@/lib/toast';
 import { z } from 'zod';
 import {
   useCreateDepartmentMutation,
@@ -97,17 +97,17 @@ export default function DepartmentFormModal({ open, onClose, editingDepartment }
           id: editingDepartment.id.toString(),
           ...submitData,
         }).unwrap();
-        toast.success('Department updated successfully');
+        toastSuccess('Department updated successfully');
       } else {
         await createDepartment(submitData as DepartmentFormData).unwrap();
-        toast.success('Department created successfully');
+        toastSuccess('Department created successfully');
       }
 
       reset();
       onClose();
     } catch (error: any) {
       const errorMessage = error.data?.message || `Failed to ${editingDepartment ? 'update' : 'create'} department`;
-      toast.error(errorMessage);
+      toastError(errorMessage);
       setError('root', {
         type: 'manual',
         message: errorMessage,
