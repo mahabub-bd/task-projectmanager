@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import FilterBar from '@/components/ui/FilterBar';
 import StatsCard from '@/components/ui/stats-card';
+import { toastError, toastSuccess } from '@/lib/toast';
 import {
   AlertCircle,
   CheckCircle2,
@@ -10,7 +11,6 @@ import {
   Flag,
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import toast from 'react-hot-toast';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import MilestoneFormModal, { MilestoneFormData } from '../components/milestones/MilestoneFormModal';
@@ -108,7 +108,7 @@ export default function MilestonesPage() {
 
   const handleSubmit = async (data: MilestoneFormData) => {
     if (!organizationId) {
-      toast.error('Organization ID is required');
+      toastError('Organization ID is required');
       return;
     }
 
@@ -123,7 +123,7 @@ export default function MilestonesPage() {
           id: editingMilestone.id,
           ...buildMilestoneUpdatePayload(data),
         }).unwrap();
-        toast.success('Milestone updated');
+        toastSuccess('Milestone updated');
       } else {
         await createMilestone(
           buildMilestonePayload(
@@ -131,12 +131,12 @@ export default function MilestonesPage() {
             Number(organizationId),
           ),
         ).unwrap();
-        toast.success('Milestone created');
+        toastSuccess('Milestone created');
       }
       closeModal();
       refetch();
     } catch (error: any) {
-      toast.error(error?.data?.message || 'Failed to save milestone');
+      toastError(error?.data?.message || 'Failed to save milestone');
     }
   };
 
@@ -145,10 +145,10 @@ export default function MilestonesPage() {
   const handleUpdateProgress = async (id: number) => {
     try {
       await updateProgress(String(id)).unwrap();
-      toast.success('Progress updated');
+      toastSuccess('Progress updated');
       refetch();
     } catch {
-      toast.error('Failed to update progress');
+      toastError('Failed to update progress');
     }
   };
 

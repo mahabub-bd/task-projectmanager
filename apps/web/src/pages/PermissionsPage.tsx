@@ -1,11 +1,12 @@
-import { TablePagination } from '@/components/shared/TablePagination';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { PageHeader } from '@/components/shared/PageHeader';
+import { TablePagination } from '@/components/shared/TablePagination';
 import { TableSkeleton } from '@/components/shared/TableSkeleton';
 import SearchBar from '@/components/ui/SearchBar';
 import { KeyRound, Plus } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import toast from 'react-hot-toast';
+
+import { toastError, toastSuccess } from '@/lib/toast';
 import PermissionFormModal from '../components/permissions/PermissionFormModal';
 import PermissionsTableView from '../components/permissions/PermissionsTableView';
 import { useDeletePermissionMutation, useGetPermissionsQuery } from '../store/api';
@@ -51,9 +52,9 @@ export default function PermissionsPage() {
     if (window.confirm('Are you sure you want to delete this permission?')) {
       try {
         await deletePermission(id.toString()).unwrap();
-        toast.success('Permission deleted successfully!');
+        toastSuccess('Permission deleted successfully!');
       } catch (error: any) {
-        toast.error(error?.data?.message || 'Failed to delete permission');
+        toastError(error?.data?.message || 'Failed to delete permission');
       }
     }
   };
