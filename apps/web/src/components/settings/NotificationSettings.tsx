@@ -54,7 +54,7 @@ const notificationGroups: NotificationGroup[] = [
   },
 ];
 
-export default function NotificationSettings() {
+export default function NotificationSettings({ compact = false }: { compact?: boolean } = {}) {
   const { data: preferences, isLoading } = useGetNotificationPreferencesQuery();
   const [updatePreference] = useUpdateNotificationPreferenceMutation();
 
@@ -100,12 +100,14 @@ export default function NotificationSettings() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-xl sm:text-2xl font-bold tracking-tight">Notification Settings</h2>
-          <p className="text-muted-foreground text-xs sm:text-sm">Manage how you receive notifications</p>
+      {!compact && (
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xl sm:text-2xl font-bold tracking-tight">Notification Settings</h2>
+            <p className="text-muted-foreground text-xs sm:text-sm">Manage how you receive notifications</p>
+          </div>
         </div>
-      </div>
+      )}
 
       {notificationGroups.map((group) => {
         const Icon = group.icon;

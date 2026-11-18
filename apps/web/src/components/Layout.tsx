@@ -53,9 +53,17 @@ export default function Layout({ children }: LayoutProps) {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Unified header (full width) */}
+      <Header
+        onMenuOpen={() => setSidebarOpen(true)}
+        breadcrumbs={breadcrumbs}
+        sidebarOpen={sidebarOpen}
+      />
+
       {/* Sidebar */}
       <Sidebar
         isOpen={sidebarOpen}
+        collapsed={false}
         onClose={() => setSidebarOpen(false)}
         navigation={filteredNavigation}
         collapsedGroups={collapsedGroups}
@@ -65,14 +73,12 @@ export default function Layout({ children }: LayoutProps) {
       />
 
       {/* Main content */}
-      <div className={cn('flex-1 transition-[margin] duration-300', sidebarOpen && 'lg:ml-64')}>
-        {/* Header */}
-        <Header
-          onMenuOpen={() => setSidebarOpen(true)}
-          breadcrumbs={breadcrumbs}
-          sidebarOpen={sidebarOpen}
-        />
-
+      <div
+        className={cn(
+          'flex-1 transition-[margin] duration-300',
+          sidebarOpen && 'lg:ml-52'
+        )}
+      >
         {/* Page content */}
         <main className="md:p-6 p-2 lg:p-8 xl:p-10">
           {children}

@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/hooks/useAuth';
+import { useOrganizationLogo } from '@/hooks/useOrganizationLogo';
 import { cn } from '@/lib/utils';
 import {
   ChevronDown,
@@ -19,9 +20,7 @@ import {
   KeyRound,
   LayoutDashboard,
   LogOut,
-  Maximize2,
   Menu,
-  Minimize2,
   Moon,
   PencilLine,
   Settings2,
@@ -32,6 +31,7 @@ import {
 import type { ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { HeaderSearch } from './HeaderSearch';
+import { Logo } from './Logo';
 import type { Breadcrumb } from './types';
 
 interface HeaderProps {
@@ -76,8 +76,9 @@ const getInitials = (name: string) =>
     .slice(0, 2);
 
 export function Header({ onMenuOpen, breadcrumbs, sidebarOpen = false }: HeaderProps) {
-  const { theme, toggleTheme, compactMode, toggleCompactMode } = useTheme();
+  const { theme, toggleTheme } = useTheme();
   const { user, logout } = useAuth();
+  const { logoUrl, hasThemeSpecificLogos, organizationName } = useOrganizationLogo();
   const navigate = useNavigate();
 
   const currentLabel = breadcrumbs[breadcrumbs.length - 1]?.label || 'Dashboard';
@@ -89,10 +90,30 @@ export function Header({ onMenuOpen, breadcrumbs, sidebarOpen = false }: HeaderP
   };
 
   return (
-    <header className="sticky top-0 z-30 border-b border-border/70 bg-card/85 backdrop-blur-xl supports-backdrop-filter:bg-card/70 dark:bg-card/80">
+    <header className="sticky top-0 z-30 border-b border-border/70 bg-gradient-to-r from-primary/[0.04] via-card/95 to-primary/[0.04] backdrop-blur-xl supports-backdrop-filter:bg-gradient-to-r supports-backdrop-filter:from-primary/[0.03] supports-backdrop-filter:via-card/90 supports-backdrop-filter:to-primary/[0.03] dark:from-primary/[0.06] dark:via-card/95 dark:to-primary/[0.06]">
       <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
 
       <div className="app-header-inner flex h-16 items-center gap-3 px-3 sm:px-5 lg:px-7">
+        {/* Logo / brand */}
+        <Link to="/dashboard" className="flex shrink-0 items-center gap-2.5" aria-label="Home">
+          <div className="grid h-8 w-8 shrink-0 place-items-center overflow-hidden rounded-lg bg-primary/10">
+            {hasThemeSpecificLogos && logoUrl ? (
+              <img
+                src={logoUrl}
+                alt={organizationName || 'Organization'}
+                className="h-full w-full object-contain"
+              />
+            ) : (
+              <Logo className="h-5 w-auto text-primary" />
+            )}
+          </div>
+          <span className="hidden text-sm font-semibold tracking-tight xl:block">
+            {organizationName || 'Taskflow'}
+          </span>
+        </Link>
+
+        <div aria-hidden="true" className="h-6 w-px shrink-0 bg-border/60" />
+
         {/* Left: menu + location */}
         <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
           {!sidebarOpen && (
@@ -152,7 +173,7 @@ export function Header({ onMenuOpen, breadcrumbs, sidebarOpen = false }: HeaderP
 
         {/* Right: unified toolbar */}
         <div className="flex flex-1 items-center justify-end gap-1.5 sm:gap-2">
-          <div className="flex items-center gap-0.5 rounded-xl border border-border/70 bg-background/60 p-1">
+          <div className="flex items-center gap-0.5 rounded-xl bg-background/60 p-1">
             <HeaderSearch iconOnly enableShortcut={false} className="lg:hidden" />
 
             <HeaderIconButton
@@ -161,15 +182,6 @@ export function Header({ onMenuOpen, breadcrumbs, sidebarOpen = false }: HeaderP
               pressed={theme === 'dark'}
             >
               {theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-            </HeaderIconButton>
-
-            <HeaderIconButton
-              label={compactMode ? 'Disable compact mode' : 'Enable compact mode'}
-              onClick={toggleCompactMode}
-              pressed={compactMode}
-              className="hidden sm:grid"
-            >
-              {compactMode ? <Maximize2 className="h-4 w-4" /> : <Minimize2 className="h-4 w-4" />}
             </HeaderIconButton>
 
             <NotificationCenter />
@@ -182,9 +194,9 @@ export function Header({ onMenuOpen, breadcrumbs, sidebarOpen = false }: HeaderP
                   <button
                     type="button"
                     aria-label="Open account menu"
-                    className="group flex items-center gap-2 rounded-xl border border-transparent p-1 pr-1.5 text-left transition-colors hover:border-border/70 hover:bg-accent/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring lg:pr-2.5"
+                    className="group flex items-center gap-2 rounded-xl p-1 pr-1.5 text-left transition-colors hover:bg-accent/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring lg:pr-2.5"
                   >
-                    <Avatar className="h-8 w-8 shrink-0 border border-border/60 shadow-sm">
+                    <Avatar className="h-8 w-8 shrink-0 shadow-sm">
                       <AvatarImage src={user.avatar} alt={user.name} />
                       <AvatarFallback className="bg-primary text-[11px] font-semibold text-primary-foreground">
                         {getInitials(user.name)}
