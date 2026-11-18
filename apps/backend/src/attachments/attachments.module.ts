@@ -14,16 +14,26 @@ import { S3Service } from '../common/services/s3.service';
     TypeOrmModule.forFeature([TaskAttachment, Task]),
     MulterModule.registerAsync({
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        storage: multer.memoryStorage(), // Store files in memory for S3 upload
-        limits: {
-          fileSize: configService.get<number>('MAX_FILE_SIZE', 10 * 1024 * 1024), // 10MB default
-        },
-      }),
+      useFactory: (configService: ConfigService) => {
+        const defaultFileSize = 10 * 1024 * 1024; // 10MB default
+        const parsedFileSize = Number(configService.get('MAX_FILE_SIZE'));
+        // Env vars are strings; multer requires limits.fileSize to be a non-negative integer
+        const fileSize =
+          Number.isInteger(parsedFileSize) && parsedFileSize > 0
+            ? parsedFileSize
+            : defaultFileSize;
+
+        return {
+          storage: multer.memoryStorage(), // Store files in memory for S3 upload
+          limits: { fileSize },
+        };
+      },
     }),
   ],
   controllers: [AttachmentsController],
   providers: [AttachmentsService, S3Service],
-  exports: [AttachmentsService, S3Service],
+  // Re-export MulterModule so dependent modules (e.g. OrganizationsModule)
+  // resolve MULTER_MODULE_OPTIONS and share the same fileSize limit.
+  exports: [AttachmentsService, S3Service, MulterModule],
 })
 export class AttachmentsModule {}
