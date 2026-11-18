@@ -1,7 +1,7 @@
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { ArrowRight, Building2, FolderKanban, Gauge, Users } from 'lucide-react';
+import { Building2, FolderKanban, Gauge, UsersRound } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { DashboardCard } from './DashboardCard';
 
 interface Department {
   id: number;
@@ -28,108 +28,80 @@ export default function DepartmentOverview({ departmentStats, onNavigate }: Depa
   const totalDepartments = departmentStats.length;
   const totalProjects = departmentStats.reduce((sum, dept) => sum + dept.totalProjects, 0);
   const totalTeamMembers = departmentStats.reduce((sum, dept) => sum + dept.teamMembers, 0);
-  const avgCompletionRate = totalDepartments > 0
-    ? Math.round(departmentStats.reduce((sum, dept) => sum + dept.progress, 0) / totalDepartments)
-    : 0;
+  const avgCompletionRate =
+    totalDepartments > 0
+      ? Math.round(departmentStats.reduce((sum, dept) => sum + dept.progress, 0) / totalDepartments)
+      : 0;
 
-  // Sort departments by progress
-  const sortedDepartments = [...departmentStats].sort((a, b) => b.progress - a.progress);
-
-  // Stat tiles: label + value, identity chip beside the text (never colored text).
-  // Hue order keeps blue/purple at opposite ends so they are never adjacent.
-  const summaryStats = [
-    { label: 'Departments', value: `${totalDepartments}`, icon: Building2, chip: 'bg-blue-500/10 text-blue-600 dark:text-blue-500' },
-    { label: 'Projects', value: `${totalProjects}`, icon: FolderKanban, chip: 'bg-emerald-500/10 text-emerald-600' },
-    { label: 'Progress', value: `${avgCompletionRate}%`, icon: Gauge, chip: 'bg-amber-500/10 text-amber-600' },
-    { label: 'Team Members', value: `${totalTeamMembers}`, icon: Users, chip: 'bg-purple-500/10 text-purple-600 dark:text-purple-500' },
+  const summaryStats: { label: string; value: string | number; icon: LucideIcon }[] = [
+    { label: 'Departments', value: totalDepartments, icon: Building2 },
+    { label: 'Projects', value: totalProjects, icon: FolderKanban },
+    { label: 'Avg. progress', value: `${avgCompletionRate}%`, icon: Gauge },
+    { label: 'Members', value: totalTeamMembers, icon: UsersRound },
   ];
 
+  const topDepartments = [...departmentStats].sort((a, b) => b.progress - a.progress).slice(0, 4);
+
   return (
-    <Card className="h-full border-2">
-      <CardContent className="p-4 h-full flex flex-col">
-        {/* Header */}
-        <div className="flex items-center justify-between gap-3 mb-4">
-          <div className="flex items-center gap-2 min-w-0 flex-1">
-            <div className="rounded-lg bg-primary/10 p-1.5 shrink-0">
-              <Building2 className="h-4 w-4 text-primary" />
-            </div>
-            <div className="min-w-0">
-              <h3 className="text-base font-bold truncate">Department Overview</h3>
-              <p className="text-xs text-muted-foreground truncate">Performance & Statistics</p>
-            </div>
-          </div>
-          <Button variant="ghost" size="sm" onClick={() => onNavigate?.('/departments')} className="gap-1 shrink-0 -mr-1">
-            <span className="hidden xl:inline">View all</span>
-            <ArrowRight className="h-4 w-4" />
-          </Button>
-        </div>
-
-        {/* Summary stat tiles */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
-          {summaryStats.map((stat) => {
-            const Icon = stat.icon;
-
-            return (
-              <div key={stat.label} className="rounded-lg border p-2.5 space-y-1.5 min-w-0">
-                <div className="flex items-center gap-1.5 min-w-0">
-                  <div className={`rounded-md p-1 shrink-0 ${stat.chip}`}>
-                    <Icon className="h-3 w-3" />
-                  </div>
-                  <p className="text-[11px] text-muted-foreground truncate">{stat.label}</p>
-                </div>
-                <p className="text-lg font-bold leading-none tracking-tight">{stat.value}</p>
+    <DashboardCard
+      icon={Building2}
+      title="Departments"
+      subtitle="Performance across teams"
+      action={onNavigate ? { label: 'View all', onClick: () => onNavigate('/departments') } : undefined}
+    >
+      <div className="grid grid-cols-2 gap-2.5">
+        {summaryStats.map((stat) => {
+          const Icon = stat.icon;
+          return (
+            <div key={stat.label} className="rounded-xl border border-border/60 bg-background/40 p-3">
+              <div className="flex items-center gap-1.5 text-muted-foreground">
+                <Icon className="h-3.5 w-3.5" />
+                <span className="truncate text-[10px] font-medium uppercase tracking-wide">{stat.label}</span>
               </div>
-            );
-          })}
-        </div>
-
-        {/* Top performers — single-series bars, direct-labeled */}
-        <div className="flex flex-col flex-1 min-h-0">
-          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">Top Performers</p>
-
-          {sortedDepartments.length === 0 ? (
-            <div className="flex-1 flex items-center justify-center">
-              <div className="text-center">
-                <Building2 className="mx-auto h-10 w-10 text-muted-foreground/50 mb-2" />
-                <p className="text-xs text-muted-foreground">No departments found</p>
-              </div>
+              <p className="mt-2 text-lg font-semibold tabular-nums tracking-tight">{stat.value}</p>
             </div>
-          ) : (
-            <div className="space-y-1.5 flex-1 overflow-y-auto -mx-1">
-              {sortedDepartments.slice(0, 4).map((dept, index) => (
-                <button
-                  key={dept.department.id}
-                  type="button"
-                  onClick={() => onNavigate?.('/departments')}
-                  className="w-full text-left rounded-lg p-2.5 hover:bg-accent/50 transition-colors cursor-pointer group"
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-semibold text-muted-foreground w-5 shrink-0 tabular-nums">
-                      #{index + 1}
+          );
+        })}
+      </div>
+
+      <div className="mt-5">
+        <p className="mb-2.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+          Top performers
+        </p>
+
+        {topDepartments.length === 0 ? (
+          <p className="py-6 text-center text-xs text-muted-foreground">No departments found</p>
+        ) : (
+          <div className="space-y-3">
+            {topDepartments.map((dept, index) => (
+              <button
+                key={dept.department.id}
+                type="button"
+                onClick={() => onNavigate?.('/departments')}
+                className="group block w-full rounded-lg text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <div className="flex items-center justify-between gap-2 text-xs">
+                  <span className="flex min-w-0 items-center gap-2">
+                    <span className="w-4 shrink-0 text-[10px] font-semibold tabular-nums text-muted-foreground">
+                      {index + 1}
                     </span>
-                    <p className="text-xs font-semibold truncate flex-1 min-w-0 group-hover:text-primary transition-colors">
+                    <span className="truncate font-medium transition-colors group-hover:text-primary">
                       {dept.department.name}
-                    </p>
-                    <span className="text-xs font-bold shrink-0 tabular-nums">{dept.progress}%</span>
-                  </div>
-
-                  <p className="text-[11px] text-muted-foreground mt-1 pl-7">
-                    {dept.activeProjects} {dept.activeProjects === 1 ? 'project' : 'projects'} · {dept.teamMembers} {dept.teamMembers === 1 ? 'member' : 'members'}
+                    </span>
+                  </span>
+                  <span className="shrink-0 font-semibold tabular-nums">{dept.progress}%</span>
+                </div>
+                <div className="ml-6 mt-1.5">
+                  <Progress value={dept.progress} className="h-1.5" />
+                  <p className="mt-1 text-[10px] text-muted-foreground">
+                    {dept.activeProjects} active projects · {dept.teamMembers} members
                   </p>
-
-                  <div className="pl-7 mt-1.5">
-                    <Progress
-                      value={dept.progress}
-                      className="h-1.5"
-                      aria-label={`${dept.department.name} completion: ${dept.progress}%`}
-                    />
-                  </div>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    </DashboardCard>
   );
 }

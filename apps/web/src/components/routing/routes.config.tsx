@@ -5,7 +5,7 @@ import RegisterPage from '@/pages/RegisterPage';
 import ResetPasswordPage from '@/pages/ResetPasswordPage';
 import React, { lazy } from 'react';
 
-// Eager (critical)
+
 
 
 // Lazy pages

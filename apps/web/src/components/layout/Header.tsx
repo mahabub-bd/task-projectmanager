@@ -2,52 +2,86 @@ import { NotificationCenter } from '@/components/notifications/NotificationCente
 import { ChangePasswordDialog, EditProfileDialog } from '@/components/profile';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuSeparator,
-  DropdownMenuTrigger
+  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 import {
+  ChevronDown,
   ChevronRight,
-  Key,
+  KeyRound,
+  LayoutDashboard,
   LogOut,
   Maximize2,
   Menu,
   Minimize2,
   Moon,
-  Settings,
-  Shield,
+  PencilLine,
+  Settings2,
+  ShieldCheck,
   Sun,
-  User,
+  UserRound,
 } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Breadcrumb } from './types';
+import { HeaderSearch } from './HeaderSearch';
+import type { Breadcrumb } from './types';
 
 interface HeaderProps {
   onMenuOpen: () => void;
   breadcrumbs: Breadcrumb[];
+  sidebarOpen?: boolean;
 }
 
-export function Header({ onMenuOpen, breadcrumbs }: HeaderProps) {
+interface HeaderIconButtonProps {
+  label: string;
+  onClick: () => void;
+  children: ReactNode;
+  pressed?: boolean;
+  className?: string;
+}
+
+function HeaderIconButton({ label, onClick, children, pressed, className }: HeaderIconButtonProps) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      title={label}
+      aria-label={label}
+      aria-pressed={pressed}
+      className={cn(
+        'grid h-8 w-8 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-accent/70 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+        pressed && 'bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary',
+        className
+      )}
+    >
+      {children}
+    </button>
+  );
+}
+
+const getInitials = (name: string) =>
+  name
+    .split(' ')
+    .map((part) => part[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+
+export function Header({ onMenuOpen, breadcrumbs, sidebarOpen = false }: HeaderProps) {
   const { theme, toggleTheme, compactMode, toggleCompactMode } = useTheme();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
-  };
+  const currentLabel = breadcrumbs[breadcrumbs.length - 1]?.label || 'Dashboard';
+  const roleLabel = user?.roles?.[0]?.name || user?.email || 'Member';
 
   const handleLogout = async () => {
     await logout();
@@ -55,176 +89,195 @@ export function Header({ onMenuOpen, breadcrumbs }: HeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-30 border-b bg-card/95 backdrop-blur supports-backdrop-filter:bg-card/60 dark:bg-card/90 dark:border-border/60">
-      <div className="flex h-14 sm:h-16 items-center justify-between px-3 sm:px-4 lg:px-6">
-        <div className="flex items-center gap-2 sm:gap-4 min-w-0">
-          {/* Mobile menu button */}
-          <button
-            onClick={onMenuOpen}
-            className="xl:hidden p-2 hover:bg-accent rounded-lg transition-colors shrink-0"
-            title="Open menu"
-          >
-            <Menu className="h-5 w-5" />
-          </button>
+    <header className="sticky top-0 z-30 border-b border-border/70 bg-card/85 backdrop-blur-xl supports-backdrop-filter:bg-card/70 dark:bg-card/80">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
 
-          {/* Breadcrumbs - Hidden on mobile, shown on tablet and above */}
-          <nav className="hidden sm:flex items-center min-w-0">
-            <ol className="flex items-center gap-1.5 text-sm">
-              {breadcrumbs.map((crumb, index) => (
-                <li key={crumb.href} className="flex items-center gap-1.5">
-                  {index > 0 && (
-                    <ChevronRight className="h-4 w-4 text-muted-foreground/40 shrink-0" />
-                  )}
-                  {index === breadcrumbs.length - 1 ? (
-                    <span className="font-semibold text-foreground px-2.5 py-1 rounded-md bg-primary/10 dark:bg-primary/20">
-                      {crumb.label}
-                    </span>
-                  ) : (
-                    <Link
-                      to={crumb.href}
-                      className="text-muted-foreground hover:text-foreground hover:bg-accent dark:hover:bg-accent/30 px-2.5 py-1 rounded-md transition-all duration-200 font-medium"
-                    >
-                      {crumb.label}
-                    </Link>
-                  )}
-                </li>
-              ))}
+      <div className="app-header-inner flex h-16 items-center gap-3 px-3 sm:px-5 lg:px-7">
+        {/* Left: menu + location */}
+        <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
+          {!sidebarOpen && (
+            <button
+              type="button"
+              onClick={onMenuOpen}
+              title="Open menu"
+              aria-label="Open menu"
+              className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-border/70 bg-background/60 text-foreground transition-colors hover:border-primary/40 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <Menu className="h-4 w-4" />
+            </button>
+          )}
+
+          {/* Mobile: current page only */}
+          <div className="min-w-0 sm:hidden">
+            <p className="truncate text-sm font-semibold tracking-tight">{currentLabel}</p>
+          </div>
+
+          {/* Tablet and up: full breadcrumb trail */}
+          <nav aria-label="Breadcrumb" className="hidden min-w-0 sm:block">
+            <ol className="flex min-w-0 items-center gap-1 text-sm">
+              {breadcrumbs.map((crumb, index) => {
+                const isLast = index === breadcrumbs.length - 1;
+                const isFirst = index === 0;
+
+                return (
+                  <li key={crumb.href} className="flex min-w-0 items-center gap-1">
+                    {index > 0 && (
+                      <ChevronRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground/40" />
+                    )}
+                    {isLast ? (
+                      <span className="inline-flex min-w-0 items-center gap-1.5 rounded-lg bg-primary/10 px-2.5 py-1 font-medium text-primary dark:bg-primary/15">
+                        {isFirst && <LayoutDashboard className="h-3.5 w-3.5 shrink-0" />}
+                        <span className="truncate">{crumb.label}</span>
+                      </span>
+                    ) : (
+                      <Link
+                        to={crumb.href}
+                        className="inline-flex min-w-0 items-center gap-1.5 rounded-lg px-2 py-1 font-medium text-muted-foreground transition-colors hover:bg-accent/60 hover:text-foreground"
+                      >
+                        {isFirst && <LayoutDashboard className="h-3.5 w-3.5 shrink-0" />}
+                        <span className="truncate">{crumb.label}</span>
+                      </Link>
+                    )}
+                  </li>
+                );
+              })}
             </ol>
           </nav>
         </div>
 
-        <div className="flex items-center gap-1 sm:gap-1.5">
-          {/* Theme Toggle - Hide on very small screens if needed */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleTheme}
-            className="h-8 w-8 sm:h-9 sm:w-9 hover:bg-accent/80 dark:hover:bg-accent/20"
-            title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-          >
-            {theme === 'light' ? (
-              <Moon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            ) : (
-              <Sun className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            )}
-          </Button>
+        {/* Center: global search */}
+        <div className="hidden flex-1 justify-center lg:flex">
+          <HeaderSearch />
+        </div>
 
-          {/* Compact Mode Toggle - Hide on small mobile screens */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleCompactMode}
-            className={cn(
-              'hidden sm:flex h-8 w-8 sm:h-9 sm:w-9 hover:bg-accent/80 dark:hover:bg-accent/20',
-              compactMode && 'bg-accent/50 dark:bg-accent/30'
-            )}
-            title={compactMode ? 'Disable compact mode' : 'Enable compact mode'}
-          >
-            {compactMode ? (
-              <Maximize2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            ) : (
-              <Minimize2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            )}
-          </Button>
+        {/* Right: unified toolbar */}
+        <div className="flex flex-1 items-center justify-end gap-1.5 sm:gap-2">
+          <div className="flex items-center gap-0.5 rounded-xl border border-border/70 bg-background/60 p-1">
+            <HeaderSearch iconOnly enableShortcut={false} className="lg:hidden" />
 
-          {/* Notifications */}
-          <NotificationCenter />
+            <HeaderIconButton
+              label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+              onClick={toggleTheme}
+              pressed={theme === 'dark'}
+            >
+              {theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+            </HeaderIconButton>
 
-          {/* User Profile Dropdown */}
+            <HeaderIconButton
+              label={compactMode ? 'Disable compact mode' : 'Enable compact mode'}
+              onClick={toggleCompactMode}
+              pressed={compactMode}
+              className="hidden sm:grid"
+            >
+              {compactMode ? <Maximize2 className="h-4 w-4" /> : <Minimize2 className="h-4 w-4" />}
+            </HeaderIconButton>
+
+            <NotificationCenter />
+          </div>
+
           {user && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="relative h-8 w-8 sm:h-9 sm:w-9 rounded-full hover:bg-accent/80 dark:hover:bg-accent/20 transition-colors p-0"
-                  title="User menu"
-                >
-                  <Avatar className="h-7 w-7 sm:h-8 sm:w-8 border-2 border-border/50 dark:border-border/30">
-                    <AvatarImage src={user.avatar} alt={user.name} />
-                    <AvatarFallback className="bg-gradient-to-br from-primary to-primary/70 text-primary-foreground text-[10px] sm:text-xs font-semibold">
-                      {getInitials(user.name)}
-                    </AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-52 sm:w-56" align="end" forceMount>
-                {/* User Info Section */}
-                <div className="px-2 sm:px-2.5 py-2.5 sm:py-3 border-b border-border/60 dark:border-border/40">
-                  <div className="flex items-center gap-2 sm:gap-3">
-                    <Avatar className="h-8 w-8 sm:h-10 sm:w-10 border-2 border-border/50 dark:border-border/30">
+            <>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    aria-label="Open account menu"
+                    className="group flex items-center gap-2 rounded-xl border border-transparent p-1 pr-1.5 text-left transition-colors hover:border-border/70 hover:bg-accent/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring lg:pr-2.5"
+                  >
+                    <Avatar className="h-8 w-8 shrink-0 border border-border/60 shadow-sm">
                       <AvatarImage src={user.avatar} alt={user.name} />
-                      <AvatarFallback className="bg-gradient-to-br from-primary to-primary/70 text-primary-foreground text-xs sm:text-sm font-semibold">
+                      <AvatarFallback className="bg-primary text-[11px] font-semibold text-primary-foreground">
                         {getInitials(user.name)}
                       </AvatarFallback>
                     </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-foreground truncate">{user.name}</p>
-                      <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                    <span className="hidden min-w-0 lg:block">
+                      <span className="block max-w-32 truncate text-xs font-semibold leading-tight">
+                        {user.name}
+                      </span>
+                      <span className="mt-0.5 block max-w-32 truncate text-[10px] text-muted-foreground">
+                        {roleLabel}
+                      </span>
+                    </span>
+                    <ChevronDown className="hidden h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform group-data-[state=open]:rotate-180 lg:block" />
+                  </button>
+                </DropdownMenuTrigger>
+
+                <DropdownMenuContent className="w-64" align="end" forceMount>
+                  <div className="px-2.5 py-3">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-10 w-10 shrink-0 border border-border/60">
+                        <AvatarImage src={user.avatar} alt={user.name} />
+                        <AvatarFallback className="bg-primary text-sm font-semibold text-primary-foreground">
+                          {getInitials(user.name)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-semibold">{user.name}</p>
+                        <p className="truncate text-xs text-muted-foreground">{user.email}</p>
+                      </div>
                     </div>
-                  </div>
-                  {/* User Role Badge */}
-                  {user.roles && user.roles.length > 0 && (
-                    <div className="mt-2 flex items-center gap-1.5">
-                      <Shield className="h-3 w-3 text-muted-foreground" />
-                      <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4">
-                        {user.roles[0].name}
+                    <div className="mt-2.5 flex items-center gap-1.5">
+                      <ShieldCheck className="h-3.5 w-3.5 text-muted-foreground" />
+                      <Badge variant="secondary" className="max-w-full truncate px-2 py-0.5 text-[10px]">
+                        {roleLabel}
                       </Badge>
                     </div>
-                  )}
-                </div>
+                  </div>
 
-                {/* Menu Items */}
-                <DropdownMenuGroup className="py-1">
-                  <DropdownMenuItem asChild>
-                    <Link to="/profile" className="cursor-pointer">
-                      <User className="h-4 w-4 text-muted-foreground" />
-                      <span>View Profile</span>
-                      <ChevronRight className="ml-auto h-3.5 w-3.5 opacity-50" />
-                    </Link>
+                  <DropdownMenuSeparator />
+
+                  <DropdownMenuGroup className="py-1">
+                    <DropdownMenuItem asChild>
+                      <Link to="/profile" className="cursor-pointer">
+                        <UserRound className="text-muted-foreground" />
+                        <span>View profile</span>
+                        <ChevronRight className="ml-auto text-muted-foreground/50" />
+                      </Link>
+                    </DropdownMenuItem>
+
+                    <EditProfileDialog
+                      trigger={
+                        <DropdownMenuItem onSelect={(event) => event.preventDefault()} className="cursor-pointer">
+                          <PencilLine className="text-muted-foreground" />
+                          <span>Edit profile</span>
+                        </DropdownMenuItem>
+                      }
+                    />
+
+                    <ChangePasswordDialog
+                      trigger={
+                        <DropdownMenuItem onSelect={(event) => event.preventDefault()} className="cursor-pointer">
+                          <KeyRound className="text-muted-foreground" />
+                          <span>Change password</span>
+                        </DropdownMenuItem>
+                      }
+                    />
+                  </DropdownMenuGroup>
+
+                  <DropdownMenuSeparator />
+
+                  <DropdownMenuGroup className="py-1">
+                    <DropdownMenuItem asChild>
+                      <Link to="/settings" className="cursor-pointer">
+                        <Settings2 className="text-muted-foreground" />
+                        <span>Settings</span>
+                        <ChevronRight className="ml-auto text-muted-foreground/50" />
+                      </Link>
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+
+                  <DropdownMenuSeparator />
+
+                  <DropdownMenuItem
+                    className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive"
+                    onClick={handleLogout}
+                  >
+                    <LogOut />
+                    <span>Log out</span>
                   </DropdownMenuItem>
-
-                  <EditProfileDialog
-                    trigger={
-                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                        <User className="h-4 w-4 text-muted-foreground" />
-                        <span>Edit Profile</span>
-                        <ChevronRight className="ml-auto h-3.5 w-3.5 opacity-50" />
-                      </DropdownMenuItem>
-                    }
-                  />
-
-                  <ChangePasswordDialog
-                    trigger={
-                      <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="cursor-pointer">
-                        <Key className="h-4 w-4 text-muted-foreground" />
-                        <span>Change Password</span>
-                        <ChevronRight className="ml-auto h-3.5 w-3.5 opacity-50" />
-                      </DropdownMenuItem>
-                    }
-                  />
-
-                  <DropdownMenuSeparator className="my-1" />
-
-                  <DropdownMenuItem asChild className="cursor-pointer">
-                    <Link to="/settings">
-                      <Settings className="h-4 w-4 text-muted-foreground" />
-                      <span>Settings</span>
-                      <ChevronRight className="ml-auto h-3.5 w-3.5 opacity-50" />
-                    </Link>
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-
-                {/* Logout Section */}
-                <DropdownMenuSeparator className="my-1" />
-                <DropdownMenuItem
-                  className="cursor-pointer text-red-600 dark:text-red-500 hover:text-red-700 dark:hover:text-red-400 hover:bg-red-800 dark:hover:bg-red-950/50 focus:text-red-700 dark:focus:text-red-400 focus:bg-red-100 dark:focus:bg-red-950/50"
-                  onClick={handleLogout}
-                >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  <span>Log out</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
           )}
         </div>
       </div>

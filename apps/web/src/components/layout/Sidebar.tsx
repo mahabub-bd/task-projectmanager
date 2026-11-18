@@ -1,11 +1,10 @@
-import { useTheme } from '@/contexts/ThemeContext';
+import { useOrganizationLogo } from '@/hooks/useOrganizationLogo';
 import { cn } from '@/lib/utils';
-import { useAuth } from '@/store/authHooks';
 import type { PageAction } from '@/types/components';
-import { ChevronRight, X } from 'lucide-react';
+import { ChevronDown, PanelLeftClose, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Logo } from './Logo';
-import { NavGroup } from './types';
+import type { NavGroup } from './types';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -17,142 +16,157 @@ interface SidebarProps {
   pageActions: PageAction[];
 }
 
-export function Sidebar({ isOpen, onClose, navigation, collapsedGroups, onToggleGroup, isActive, pageActions }: SidebarProps) {
-  const { user } = useAuth();
-  const { theme } = useTheme();
-
-  // Determine which logo to use based on theme
-  const getLogoUrl = () => {
-    if (theme === 'dark' && user?.organization_dark_logo) {
-      return user.organization_dark_logo;
-    }
-    if (theme === 'light' && user?.organization_light_logo) {
-      return user.organization_light_logo;
-    }
-    // Fallback to generic logo if available
-    return user?.organization_logo || null;
-  };
-
-  const logoUrl = getLogoUrl();
-  const hasThemeSpecificLogos = user?.organization_light_logo || user?.organization_dark_logo;
+export function Sidebar({
+  isOpen,
+  onClose,
+  navigation,
+  collapsedGroups,
+  onToggleGroup,
+  isActive,
+  pageActions,
+}: SidebarProps) {
+  const { logoUrl, hasThemeSpecificLogos, organizationName } = useOrganizationLogo();
 
   return (
     <aside
+      aria-label="Sidebar navigation"
       className={cn(
-        'fixed left-0 top-0 z-40 h-screen border-r bg-card transition-all duration-300 flex flex-col',
-        'w-[280px] sm:w-72 xl:w-64',
+        'fixed inset-y-0 left-0 z-40 flex w-[288px] flex-col border-r border-border/70 bg-card/95 backdrop-blur-xl transition-transform duration-300 lg:w-64',
         !isOpen && '-translate-x-full'
       )}
     >
-      {/* Sidebar Header */}
-      <div className="h-16 border-b bg-card/95 backdrop-blur supports-backdrop-filter:bg-card/60">
-        <div className="flex h-full items-center justify-between px-3 xl:px-4">
-          <div className="flex items-center gap-2 xl:gap-3">
+      {/* Brand / workspace */}
+      <div className="flex h-16 shrink-0 items-center gap-2 border-b border-border/70 px-4">
+        <div className="flex min-w-0 flex-1 items-center gap-2.5">
+          <div className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-xl border border-border/70 bg-background/70">
             {hasThemeSpecificLogos && logoUrl ? (
-              <div className="h-16 xl:h-14 w-16 xl:w-14 overflow-hidden flex items-center justify-center">
-                <img
-                  src={logoUrl}
-                  alt={user?.organization_name || 'Organization'}
-                  className="h-full w-full object-cover"
-                />
-              </div>
+              <img
+                src={logoUrl}
+                alt={organizationName || 'Organization'}
+                className="h-full w-full object-contain"
+              />
             ) : (
-              <>
-                <Logo className="h-9 xl:h-10 w-auto" />
-                {user?.organization_name && (
-                  <div className="flex flex-col">
-                    <span className="text-sm xl:text-base font-semibold">
-                      {user.organization_name}
-                    </span>
-                  </div>
-                )}
-              </>
+              <Logo className="h-6 w-auto" />
             )}
           </div>
-          <button
-            onClick={onClose}
-            className="lg:hidden xl:hidden p-1.5 hover:bg-accent rounded-md transition-colors"
-          >
-            <X className="h-4 w-4" />
-          </button>
+
+          <div className="min-w-0">
+            <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              Workspace
+            </p>
+            <p className="truncate text-sm font-semibold tracking-tight">
+              {organizationName || 'Taskflow'}
+            </p>
+          </div>
         </div>
+
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close navigation"
+          title="Close navigation"
+          className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-muted-foreground transition-colors hover:bg-muted/70 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <X className="h-4 w-4 lg:hidden" />
+          <PanelLeftClose className="hidden h-4 w-4 lg:block" />
+        </button>
       </div>
 
       {/* Navigation */}
-      <nav className="sidebar-nav flex-1 overflow-y-auto px-2 xl:px-3 py-4 space-y-4 xl:space-y-6">
-        {navigation.map((group) => (
-          <div key={group.title}>
-            <button
-              onClick={() => onToggleGroup(group.title)}
-              className="w-full flex items-center justify-between px-2 xl:px-3 py-1.5 xl:py-2 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors rounded-md hover:bg-accent/50"
-            >
-              <span className="uppercase tracking-wider">{group.title}</span>
-              <ChevronRight className={cn(
-                "h-3 xl:h-3.5 w-3 xl:w-3.5 transition-transform duration-200",
-                !collapsedGroups[group.title] && "transform rotate-90"
-              )} />
-            </button>
-            {!collapsedGroups[group.title] && (
-              <div className="space-y-0.5 mt-1">
-                {group.items.map((item) => (
-                  <Link
-                    key={item.name}
-                    to={item.href}
-                    onClick={() => {
-                      // Close sidebar on mobile when navigating
-                      if (window.innerWidth < 1024) {
-                        onClose();
-                      }
-                    }}
+      <nav aria-label="Main navigation" className="sidebar-nav flex-1 overflow-y-auto px-3 py-4">
+        <div className="space-y-5">
+          {navigation.map((group) => {
+            const collapsed = Boolean(collapsedGroups[group.title]);
+            const groupId = `nav-group-${group.title.toLowerCase().replace(/\s+/g, '-')}`;
+
+            return (
+              <div key={group.title}>
+                <button
+                  type="button"
+                  onClick={() => onToggleGroup(group.title)}
+                  aria-expanded={!collapsed}
+                  aria-controls={groupId}
+                  className="group flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <span>{group.title}</span>
+                  <ChevronDown
                     className={cn(
-                      "flex items-center gap-2 xl:gap-3 px-2 xl:px-3 py-2 xl:py-2.5 text-sm font-medium rounded-lg transition-all duration-200",
-                      "hover:bg-accent",
-                      isActive(item.href)
-                        ? "bg-primary/10 text-primary shadow-sm"
-                        : "text-muted-foreground hover:text-foreground"
+                      'h-3.5 w-3.5 transition-transform duration-200',
+                      collapsed && '-rotate-90'
                     )}
-                  >
-                    <item.icon className={cn(
-                      "h-4 xl:h-4.5 w-4 xl:w-4.5 transition-colors",
-                      isActive(item.href) && "text-primary"
-                    )} />
-                    <span className="flex-1 text-left text-xs xl:text-sm">{item.name}</span>
-                    {isActive(item.href) && (
-                      <div className="h-1 xl:h-1.5 w-1 xl:w-1.5 rounded-full bg-primary" />
-                    )}
-                  </Link>
-                ))}
+                  />
+                </button>
+
+                <div id={groupId} className={cn('mt-1 space-y-0.5', collapsed && 'hidden')}>
+                  {group.items.map((item) => {
+                    const active = isActive(item.href);
+                    const Icon = item.icon;
+
+                    return (
+                      <Link
+                        key={item.name}
+                        to={item.href}
+                        aria-current={active ? 'page' : undefined}
+                        onClick={() => {
+                          if (window.innerWidth < 1024) onClose();
+                        }}
+                        className={cn(
+                          'group relative flex items-center gap-3 rounded-lg px-2.5 py-2 text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                          active
+                            ? 'bg-primary/10 text-primary'
+                            : 'text-muted-foreground hover:bg-muted/70 hover:text-foreground'
+                        )}
+                      >
+                        {active && (
+                          <span
+                            aria-hidden="true"
+                            className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-r-full bg-primary"
+                          />
+                        )}
+                        <Icon
+                          className={cn(
+                            'h-4 w-4 shrink-0 transition-colors',
+                            active ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'
+                          )}
+                        />
+                        <span className="min-w-0 flex-1 truncate">{item.name}</span>
+                      </Link>
+                    );
+                  })}
+                </div>
               </div>
-            )}
-          </div>
-        ))}
+            );
+          })}
+        </div>
       </nav>
 
-      {/* Sidebar Footer */}
-      <div className="border-t p-3 xl:p-4">
-        {pageActions.length > 0 && (
-          <div className="space-y-2">
+      {/* Page-specific actions */}
+      {pageActions.length > 0 && (
+        <div className="shrink-0 border-t border-border/70 p-3">
+          <p className="px-2.5 pb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+            Page actions
+          </p>
+          <div className="space-y-1">
             {pageActions.map((action, index) => (
               <button
                 key={index}
+                type="button"
                 onClick={action.onClick}
                 disabled={action.disabled}
                 className={cn(
-                  'w-full flex items-center gap-2 px-2 xl:px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200',
-                  'hover:bg-accent',
+                  'flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium transition-colors hover:bg-muted/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50',
                   action.variant === 'destructive'
-                    ? 'text-destructive hover:text-destructive hover:bg-destructive/10'
-                    : 'text-muted-foreground hover:text-foreground',
-                  action.disabled && 'opacity-50 cursor-not-allowed'
+                    ? 'text-destructive hover:bg-destructive/10'
+                    : 'text-muted-foreground hover:text-foreground'
                 )}
               >
-                {action.icon && <span>{action.icon}</span>}
-                <span className="flex-1 text-left text-xs xl:text-sm">{action.label}</span>
+                {action.icon && <span className="grid h-5 w-5 shrink-0 place-items-center">{action.icon}</span>}
+                <span className="min-w-0 flex-1 truncate text-left">{action.label}</span>
               </button>
             ))}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </aside>
   );
 }

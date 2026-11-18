@@ -1,4 +1,5 @@
-import { ReactNode, useState } from 'react';
+import { useState } from 'react';
+import type { ReactNode } from 'react';
 import { useLocation } from 'react-router-dom';
 import { usePageActions } from '../contexts/PageActionsContext';
 import { cn } from '../lib/utils';
@@ -64,11 +65,12 @@ export default function Layout({ children }: LayoutProps) {
       />
 
       {/* Main content */}
-      <div className={cn('flex-1 transition-all duration-300', sidebarOpen && 'lg:ml-[280px] xl:ml-64')}>
+      <div className={cn('flex-1 transition-[margin] duration-300', sidebarOpen && 'lg:ml-64')}>
         {/* Header */}
         <Header
           onMenuOpen={() => setSidebarOpen(true)}
           breadcrumbs={breadcrumbs}
+          sidebarOpen={sidebarOpen}
         />
 
         {/* Page content */}
@@ -79,8 +81,10 @@ export default function Layout({ children }: LayoutProps) {
 
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
-        <div
-          className="fixed inset-0 z-30 bg-background/80 backdrop-blur-sm lg:hidden xl:hidden"
+        <button
+          type="button"
+          aria-label="Close navigation"
+          className="fixed inset-0 z-30 bg-background/70 backdrop-blur-sm lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}

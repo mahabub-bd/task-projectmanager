@@ -10,8 +10,16 @@ import QuickActions from '../components/dashboard/QuickActions';
 import RecentTasks from '../components/dashboard/RecentTasks';
 import TeamOverview from '../components/dashboard/TeamOverview';
 import WelcomeHeader from '../components/dashboard/WelcomeHeader';
-import { FullPageLoader } from '../components/ui/loading-spinner';
-import { useGetActivityLogQuery, useGetDepartmentsQuery, useGetMilestonesQuery, useGetOrganizationsQuery, useGetProjectsQuery, useGetTasksQuery } from '../store/api';
+import { useAppSelector } from '../store/hooks';
+import { hasPermission } from '../utils/permissions';
+import {
+  useGetActivityLogQuery,
+  useGetDepartmentsQuery,
+  useGetMilestonesQuery,
+  useGetOrganizationsQuery,
+  useGetProjectsQuery,
+  useGetTasksQuery,
+} from '../store/api';
 
 // Helper function to calculate accurate project progress
 const calculateProjectProgress = (project: any, allTasks: any[]) => {
@@ -28,8 +36,39 @@ const calculateProjectProgress = (project: any, allTasks: any[]) => {
   };
 };
 
+function DashboardSkeleton() {
+  return (
+    <div className="dashboard-page space-y-5 sm:space-y-6" aria-busy="true" aria-label="Loading dashboard">
+      <div className="h-24 animate-pulse rounded-2xl bg-muted/40" />
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
+        {[0, 1, 2, 3, 4].map((item) => (
+          <div key={item} className="h-16 animate-pulse rounded-xl bg-muted/40" />
+        ))}
+      </div>
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        {[0, 1, 2, 3].map((item) => (
+          <div key={item} className="h-32 animate-pulse rounded-2xl bg-muted/40" />
+        ))}
+      </div>
+      <div className="grid gap-5 xl:grid-cols-12">
+        <div className="space-y-5 xl:col-span-7 2xl:col-span-8">
+          <div className="h-80 animate-pulse rounded-2xl bg-muted/40" />
+          <div className="h-80 animate-pulse rounded-2xl bg-muted/40" />
+        </div>
+        <div className="space-y-5 xl:col-span-5 2xl:col-span-4">
+          <div className="h-64 animate-pulse rounded-2xl bg-muted/40" />
+          <div className="h-64 animate-pulse rounded-2xl bg-muted/40" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function DashboardPage() {
   const navigate = useNavigate();
+  const user = useAppSelector((state) => state.auth.user);
+  const canViewAuditLogs = hasPermission(user, 'read:audit');
+
   // Fetch all data without pagination limit for accurate stats
   const { data: projectsResponse, isLoading: isLoadingProjects } = useGetProjectsQuery({ limit: 1000 });
   const { data: tasksResponse, isLoading: isLoadingTasks } = useGetTasksQuery({ limit: 1000 });
@@ -38,10 +77,9 @@ export default function DashboardPage() {
   const { data: activitiesResponse, isLoading: isLoadingActivities } = useGetActivityLogQuery({ limit: 5 });
   const { data: organizationsResponse } = useGetOrganizationsQuery({ limit: 1000 });
 
-  // Overall loading state
-  const isLoading = isLoadingProjects || isLoadingTasks || isLoadingMilestones || isLoadingDepartments || isLoadingActivities;
+  const isLoading =
+    isLoadingProjects || isLoadingTasks || isLoadingMilestones || isLoadingDepartments || isLoadingActivities;
 
-  // Extract items and totals from paginated response format
   const projects = projectsResponse?.items || [];
   const tasks = tasksResponse?.items || [];
   const milestones = milestonesResponse?.items || [];
@@ -49,7 +87,6 @@ export default function DashboardPage() {
   const auditLogs = activitiesResponse?.items || [];
   const organizations = organizationsResponse || [];
 
-  // Calculate organization statistics
   const orgStats = useMemo(() => {
     let totalDepartments = 0;
     let totalUsers = 0;
@@ -66,69 +103,81 @@ export default function DashboardPage() {
     };
   }, [organizations]);
 
-  // Use the total count from API response for accurate stats
   const totalProjectsCount = projectsResponse?.total || projects.length;
   const totalTasksCount = tasksResponse?.total || tasks.length;
   const totalMilestonesCount = milestonesResponse?.total || milestones.length;
 
-  // Calculate task statistics
   const taskStats = useMemo(() => {
     const now = new Date();
     const total = totalTasksCount;
-    // For completed/inProgress/overdue, we can only count from the loaded items
-    // These might be underestimates if we have more data than loaded
     const completed = tasks.filter((t: any) => t.status === 'completed').length;
     const inProgress = tasks.filter((t: any) => t.status === 'in_progress').length;
-    const overdue = tasks.filter((t: any) => new Date(t.due_date) < now && t.status !== 'completed').length;
+    const overdue = tasks.filter(
+      (t: any) => new Date(t.due_date) < now && t.status !== 'completed'
+    ).length;
     const completionRate = total > 0 ? Math.round((completed / total) * 100) : 0;
 
     return { total, completed, inProgress, overdue, completionRate };
   }, [tasks, totalTasksCount]);
 
-  // Calculate project statistics with accurate progress
   const projectStats = useMemo(() => {
     const total = totalProjectsCount;
     const completed = projects.filter((p: any) => p.status === 'completed').length;
     const active = projects.filter((p: any) => p.status === 'active').length;
 
-    // Calculate progress dynamically based on actual tasks
-    const projectsWithProgress = projects.map((project: any) => {
-      const progressData = calculateProjectProgress(project, tasks);
+    const projectsWithProgress = projects.map((project: any) => ({
+      ...project,
+      ...calculateProjectProgress(project, tasks),
+    }));
 
-      return {
-        ...project,
-        ...progressData,
-      };
-    });
-
-    const avgProgress = total > 0
-      ? Math.round(projectsWithProgress.reduce((sum: number, p: any) => sum + (p.progress || 0), 0) / total)
-      : 0;
-
-    const totalMilestones = totalMilestonesCount;
-    const completedMilestones = milestones.filter((m: any) => m.status === 'completed').length;
-    const completedTasks = tasks.filter((t: any) => t.status === 'completed').length;
+    const avgProgress =
+      total > 0
+        ? Math.round(projectsWithProgress.reduce((sum: number, p: any) => sum + (p.progress || 0), 0) / total)
+        : 0;
 
     return {
       total,
       completed,
       active,
       avgProgress,
-      totalMilestones,
-      completedMilestones,
-      completedTasks,
+      totalMilestones: totalMilestonesCount,
+      completedMilestones: milestones.filter((m: any) => m.status === 'completed').length,
+      completedTasks: tasks.filter((t: any) => t.status === 'completed').length,
       projectsWithProgress,
     };
   }, [projects, milestones, tasks, totalProjectsCount, totalMilestonesCount]);
 
-  // Get recent tasks
+  // Delivery health uses real workspace data instead of fabricated trend values.
+  const healthStats = useMemo(() => {
+    const now = new Date();
+    const activeTasks = tasks.filter((t: any) => t.status !== 'completed');
+    const overdueTasks = activeTasks.filter(
+      (t: any) => t.due_date && new Date(t.due_date) < now
+    ).length;
+    const onTrackRate =
+      activeTasks.length > 0 ? Math.round(((activeTasks.length - overdueTasks) / activeTasks.length) * 100) : 100;
+    const milestoneRate =
+      totalMilestonesCount > 0
+        ? Math.round((projectStats.completedMilestones / totalMilestonesCount) * 100)
+        : 0;
+
+    return {
+      completionRate: taskStats.completionRate,
+      onTrackRate,
+      milestoneRate,
+      activeTasks: activeTasks.length,
+      overdueTasks,
+      completedMilestones: projectStats.completedMilestones,
+      totalMilestones: totalMilestonesCount,
+    };
+  }, [tasks, totalMilestonesCount, projectStats.completedMilestones, taskStats.completionRate]);
+
   const recentTasks = useMemo(() => {
     return [...tasks]
       .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
       .slice(0, 5);
   }, [tasks]);
 
-  // Get featured projects (active projects with most tasks) with accurate progress
   const featuredProjects = useMemo(() => {
     const projectsWithAccurateProgress = projects.map((project: any) => {
       const progressData = calculateProjectProgress(project, tasks);
@@ -148,7 +197,6 @@ export default function DashboardPage() {
       .slice(0, 5);
   }, [projects, tasks]);
 
-  // Transform audit logs into activity feed items
   const activities = useMemo(() => {
     return auditLogs.map((log: any) => {
       const { action, entity_type, created_at, user, new_values, old_values } = log;
@@ -158,7 +206,6 @@ export default function DashboardPage() {
       let description = '';
       let projectName = '';
 
-      // Map audit log actions to activity types
       switch (entity_type) {
         case 'project':
           type = 'project_updated';
@@ -245,10 +292,12 @@ export default function DashboardPage() {
         title,
         description,
         timestamp: new Date(created_at),
-        user: user ? {
-          name: user.name,
-          avatar: user.avatar_url,
-        } : undefined,
+        user: user
+          ? {
+              name: user.name,
+              avatar: user.avatar_url,
+            }
+          : undefined,
         metadata: {
           projectName,
         },
@@ -256,7 +305,6 @@ export default function DashboardPage() {
     });
   }, [auditLogs]);
 
-  // Calculate department statistics
   const departmentStats = useMemo(() => {
     return departments.map((dept: any) => {
       const deptProjects = projects.filter((p: any) => p.department_id === dept.id);
@@ -277,7 +325,6 @@ export default function DashboardPage() {
     });
   }, [departments, projects, tasks]);
 
-  // Calculate team member workload
   const teamMembers = useMemo(() => {
     const memberMap = new Map();
 
@@ -312,125 +359,60 @@ export default function DashboardPage() {
     return Array.from(memberMap.values());
   }, [tasks]);
 
-  // Performance metrics
-  const performanceMetrics = useMemo(() => {
-    const twoWeeksAgoCompleted = Math.max(0, taskStats.completed - Math.floor(taskStats.completed * 0.2));
-
-    return {
-      tasksCompleted: {
-        value: taskStats.completed,
-        previousValue: twoWeeksAgoCompleted,
-        target: Math.ceil(taskStats.total * 0.8),
-        format: 'number' as const,
-      },
-      projectsOnTrack: {
-        value: projectStats.active,
-        previousValue: Math.max(0, projectStats.active - 1),
-        target: projectStats.total,
-        format: 'number' as const,
-      },
-      teamProductivity: {
-        value: taskStats.completionRate,
-        previousValue: Math.max(0, taskStats.completionRate - 5),
-        target: 85,
-        format: 'percentage' as const,
-      },
-      avgCompletionTime: {
-        value: 5.2,
-        previousValue: 5.8,
-        target: 4,
-        unit: 'days',
-        format: 'number' as const,
-      },
-    };
-  }, [taskStats, projectStats]);
-
   const handleNavigate = (path: string) => {
     navigate(path);
   };
 
   if (isLoading) {
-    return <FullPageLoader text="Loading dashboard..." />;
+    return <DashboardSkeleton />;
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6 lg:space-y-8">
-      {/* Header Section */}
-      <div className="flex flex-col gap-4 sm:gap-6">
-        <WelcomeHeader />
-        <QuickActions onNavigate={handleNavigate} />
-      </div>
+    <div className="dashboard-page space-y-5 sm:space-y-6">
+      <WelcomeHeader onNavigate={handleNavigate} />
+      <QuickActions onNavigate={handleNavigate} />
 
-      {/* Stats Overview */}
-      <section className="w-full">
-        <EnhancedStatsOverview
-          stats={{
-            totalTasks: taskStats.total,
-            completedTasks: taskStats.completed,
-            inProgressTasks: taskStats.inProgress,
-            totalProjects: projectStats.total,
-            activeProjects: projectStats.active,
-            completedProjects: projectStats.completed,
-            totalMilestones: projectStats.totalMilestones,
-            completedMilestones: projectStats.completedMilestones,
-            overdueTasks: taskStats.overdue,
-            completionRate: taskStats.completionRate,
-            totalOrganizations: orgStats.totalOrganizations,
-            totalDepartments: orgStats.totalDepartments,
-            totalUsers: orgStats.totalUsers,
-          }}
-          onNavigate={handleNavigate}
-        />
-      </section>
+      <EnhancedStatsOverview
+        stats={{
+          totalTasks: taskStats.total,
+          completedTasks: taskStats.completed,
+          inProgressTasks: taskStats.inProgress,
+          totalProjects: projectStats.total,
+          activeProjects: projectStats.active,
+          completedProjects: projectStats.completed,
+          totalMilestones: projectStats.totalMilestones,
+          completedMilestones: projectStats.completedMilestones,
+          overdueTasks: taskStats.overdue,
+          completionRate: taskStats.completionRate,
+          totalOrganizations: orgStats.totalOrganizations,
+          totalDepartments: orgStats.totalDepartments,
+          totalUsers: orgStats.totalUsers,
+        }}
+        onNavigate={handleNavigate}
+      />
 
-      {/* Main Content Grid - Responsive grid for all screens */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
-        {/* Project Spotlight - Full width on mobile, spans 2 cols on large screens */}
-        <section className="lg:col-span-2 xl:col-span-2">
+      <div className="grid grid-cols-1 gap-4 sm:gap-5 xl:grid-cols-12">
+        <div className="space-y-4 sm:space-y-5 xl:col-span-7 2xl:col-span-8">
           <ProjectSpotlight
             projects={featuredProjects}
             isLoading={false}
             onNavigate={handleNavigate}
           />
-        </section>
+          <RecentTasks tasks={recentTasks} isLoading={false} onNavigate={handleNavigate} />
+          <TeamOverview teamMembers={teamMembers} onNavigate={handleNavigate} />
+        </div>
 
-        {/* Performance Overview - 1 col on mobile, 1 col on desktop */}
-        <section className="lg:col-span-1 xl:col-span-1">
-          <PerformanceOverview metrics={performanceMetrics} />
-        </section>
-
-        {/* Recent Tasks - 1 col on mobile, 1 col on desktop */}
-        <section>
-          <RecentTasks
-            tasks={recentTasks}
-            isLoading={false}
-            onNavigate={handleNavigate}
+        <div className="space-y-4 sm:space-y-5 xl:col-span-5 2xl:col-span-4">
+          <PerformanceOverview stats={healthStats} />
+          <ActivityFeed
+            activities={activities}
+            limit={5}
+            onNavigate={canViewAuditLogs ? handleNavigate : undefined}
           />
-        </section>
-
-        {/* Activity Feed - 1 col on mobile, 1 col on desktop */}
-        <section>
-          <ActivityFeed activities={activities} limit={5} />
-        </section>
-
-        {/* Department Overview - 1 col on mobile, 1 col on desktop */}
-        <section className="hidden xl:block">
-          <DepartmentOverview
-            departmentStats={departmentStats}
-            onNavigate={handleNavigate}
-          />
-        </section>
-
-        {/* Team Overview - 1 col on mobile, 1 col on desktop */}
-        <section className="hidden lg:block">
-          <TeamOverview
-            teamMembers={teamMembers}
-            onNavigate={handleNavigate}
-          />
-        </section>
+          <DepartmentOverview departmentStats={departmentStats} onNavigate={handleNavigate} />
+        </div>
       </div>
 
-      {/* Footer */}
       <DashboardFooter />
     </div>
   );

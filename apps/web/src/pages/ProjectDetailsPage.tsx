@@ -1,5 +1,5 @@
 import ActionBar from '@/components/ui/ActionBar';
-import { FolderKanban } from 'lucide-react';
+import { NotFound } from '@/components/shared/NotFound';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -14,7 +14,6 @@ import ProjectTasksList from '../components/projects/ProjectTasksList';
 import ProjectTeam from '../components/projects/ProjectTeam';
 import ProjectTeamMemberModal from '../components/projects/ProjectTeamMemberModal';
 import ProjectTimeline from '../components/projects/ProjectTimeline';
-import { Button } from '../components/ui/button';
 import { FullPageLoader } from '../components/ui/loading-spinner';
 import { useCreatePhaseMutation, useDeleteProjectMutation, useGetPhasesByProjectQuery, useGetProjectMembersQuery, useGetProjectQuery, useGetUsersListQuery, useUpdateProjectMutation } from '../store/api';
 
@@ -125,16 +124,7 @@ export default function ProjectDetailsPage() {
   }
 
   if (isError || !project) {
-    return (
-      <div className="flex items-center justify-center p-12">
-        <div className="text-center">
-          <FolderKanban className="h-16 w-16 mx-auto text-muted-foreground/50 mb-4" />
-          <h3 className="text-lg font-semibold mb-2">Project not found</h3>
-          <p className="text-muted-foreground mb-4">The project you're looking for doesn't exist or you don't have access to it.</p>
-          <Button onClick={() => navigate('/projects')} className="mt-4">Back to Projects</Button>
-        </div>
-      </div>
-    );
+    return <NotFound entityType="project" />;
   }
 
   // Get current member IDs for the modal

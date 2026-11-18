@@ -1,16 +1,5 @@
-export const getPermissionCategoryColor = (category: string): string => {
-  const colors: Record<string, string> = {
-    users: 'bg-blue-500',
-    departments: 'bg-green-500',
-    projects: 'bg-purple-500',
-    tasks: 'bg-orange-500',
-    organizations: 'bg-pink-500',
-    roles: 'bg-cyan-500',
-    permissions: 'bg-amber-500',
-    audit_logs: 'bg-gray-500',
-  };
-  return colors[category] || 'bg-gray-500';
-};
+import { Circle, Eye, Pencil, Plus, Trash2 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 export const formatPermissionLabel = (permission: any): string => {
   if (!permission) return '';
@@ -28,27 +17,25 @@ export const getPermissionActionBadgeVariant = (action: string): 'default' | 'se
   return variants[action] || 'secondary';
 };
 
-export const getPermissionActionIcon = (action: string): string => {
-  const icons: Record<string, string> = {
-    create: '➕',
-    read: '👁️',
-    update: '✏️',
-    delete: '🗑️',
+export const getPermissionActionIcon = (action: string): LucideIcon => {
+  const icons: Record<string, LucideIcon> = {
+    create: Plus,
+    read: Eye,
+    update: Pencil,
+    delete: Trash2,
   };
-  return icons[action] || '•';
-};
-
-export const getPermissionAvatarColor = (permission: any): string => {
-  return getPermissionCategoryColor(permission.category || 'other');
+  return icons[action] || Circle;
 };
 
 export const getPermissionResourceBadgeColor = (resource: string): string => {
   const colors: Record<string, string> = {
-    users: 'bg-blue-100 text-blue-800',
-    departments: 'bg-green-100 text-green-800',
-    projects: 'bg-purple-100 text-purple-800',
-    tasks: 'bg-orange-100 text-orange-800',
-    organizations: 'bg-pink-100 text-pink-800',
+    users: 'bg-blue-500/10 text-blue-700 dark:text-blue-300',
+    departments: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300',
+    projects: 'bg-violet-500/10 text-violet-700 dark:text-violet-300',
+    tasks: 'bg-amber-500/10 text-amber-700 dark:text-amber-300',
+    organizations: 'bg-pink-500/10 text-pink-700 dark:text-pink-300',
+    roles: 'bg-cyan-500/10 text-cyan-700 dark:text-cyan-300',
+    permissions: 'bg-orange-500/10 text-orange-700 dark:text-orange-300',
   };
-  return colors[resource] || 'bg-gray-100 text-gray-800';
+  return colors[resource] || 'bg-muted text-muted-foreground';
 };

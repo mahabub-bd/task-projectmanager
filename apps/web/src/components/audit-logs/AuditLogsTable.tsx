@@ -1,14 +1,113 @@
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import type { AuditLog } from '@/types/notifications';
 import { format } from 'date-fns';
-import { AlertCircle, Calendar, CheckCircle, ChevronDown, ChevronRight, FileText, Trash2, User as UserIcon } from 'lucide-react';
+import {
+  AlertCircle,
+  CalendarDays,
+  CheckCircle2,
+  ChevronDown,
+  ChevronRight,
+  FileText,
+  Trash2,
+  UserRound,
+} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { useState } from 'react';
 
 interface AuditLogsTableProps {
   logs: AuditLog[];
+}
+
+type ActionStyle = {
+  icon: LucideIcon;
+  badge: string;
+  tile: string;
+};
+
+function getActionStyle(action: string): ActionStyle {
+  const lowerAction = action.toLowerCase();
+
+  if (lowerAction.includes('create') || lowerAction.includes('add')) {
+    return {
+      icon: CheckCircle2,
+      badge: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300',
+      tile: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-300',
+    };
+  }
+  if (lowerAction.includes('update') || lowerAction.includes('edit')) {
+    return {
+      icon: AlertCircle,
+      badge: 'bg-blue-500/10 text-blue-700 dark:text-blue-300',
+      tile: 'bg-blue-500/10 text-blue-600 dark:text-blue-300',
+    };
+  }
+  if (lowerAction.includes('delete') || lowerAction.includes('remove')) {
+    return {
+      icon: Trash2,
+      badge: 'bg-destructive/10 text-destructive',
+      tile: 'bg-destructive/10 text-destructive',
+    };
+  }
+  return {
+    icon: FileText,
+    badge: 'bg-muted text-muted-foreground',
+    tile: 'bg-muted text-muted-foreground',
+  };
+}
+
+function getEntityBadgeColor(entityType: string) {
+  const colors: Record<string, string> = {
+    User: 'bg-blue-500/10 text-blue-700 dark:text-blue-300',
+    Department: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300',
+    Role: 'bg-violet-500/10 text-violet-700 dark:text-violet-300',
+    Permission: 'bg-amber-500/10 text-amber-700 dark:text-amber-300',
+    Organization: 'bg-pink-500/10 text-pink-700 dark:text-pink-300',
+    Task: 'bg-cyan-500/10 text-cyan-700 dark:text-cyan-300',
+    Project: 'bg-indigo-500/10 text-indigo-700 dark:text-indigo-300',
+    Milestone: 'bg-yellow-600/10 text-yellow-700 dark:text-yellow-300',
+  };
+  return colors[entityType] || 'bg-muted text-muted-foreground';
+}
+
+function ActionCell({ action }: { action: string }) {
+  const style = getActionStyle(action);
+  const Icon = style.icon;
+
+  return (
+    <div className="flex items-center gap-2">
+      <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-lg ${style.tile}`}>
+        <Icon className="h-3.5 w-3.5" />
+      </span>
+      <Badge variant="secondary" className={`border-0 font-normal ${style.badge}`}>
+        {action.charAt(0).toUpperCase() + action.slice(1)}
+      </Badge>
+    </div>
+  );
+}
+
+function ChangeValues({ values, label }: { values: unknown; label: 'Before' | 'After' }) {
+  if (!values || typeof values !== 'object' || Object.keys(values).length === 0) return null;
+
+  return (
+    <div className="rounded-lg border border-border/60 bg-muted/40 p-2.5">
+      <p
+        className={`mb-1.5 text-[10px] font-semibold uppercase tracking-wide ${
+          label === 'Before' ? 'text-destructive' : 'text-emerald-600 dark:text-emerald-400'
+        }`}
+      >
+        {label}
+      </p>
+      <div className="space-y-1 text-xs text-muted-foreground">
+        {Object.entries(values as Record<string, unknown>).map(([key, value]) => (
+          <div key={key} className="flex min-w-0 gap-2">
+            <span className="shrink-0 font-medium text-foreground">{key}:</span>
+            <span className="min-w-0 truncate">{String(value)}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 export function AuditLogsTable({ logs }: AuditLogsTableProps) {
@@ -26,269 +125,163 @@ export function AuditLogsTable({ logs }: AuditLogsTableProps) {
     });
   };
 
-  const getActionIcon = (action: string) => {
-    const lowerAction = action.toLowerCase();
-    if (lowerAction.includes('create') || lowerAction.includes('add')) {
-      return <CheckCircle className="h-4 w-4 text-emerald-500" />;
-    }
-    if (lowerAction.includes('update') || lowerAction.includes('edit')) {
-      return <AlertCircle className="h-4 w-4 text-blue-500" />;
-    }
-    if (lowerAction.includes('delete') || lowerAction.includes('remove')) {
-      return <Trash2 className="h-4 w-4 text-red-500" />;
-    }
-    return <FileText className="h-4 w-4 text-gray-500" />;
-  };
-
-  const getActionBadgeVariant = (action: string): "default" | "secondary" | "destructive" | "outline" => {
-    const lowerAction = action.toLowerCase();
-    if (lowerAction.includes('create') || lowerAction.includes('add')) {
-      return 'default';
-    }
-    if (lowerAction.includes('update') || lowerAction.includes('edit')) {
-      return 'secondary';
-    }
-    if (lowerAction.includes('delete') || lowerAction.includes('remove')) {
-      return 'destructive';
-    }
-    return 'outline';
-  };
-
-  const getEntityBadgeColor = (entityType: string) => {
-    const colors: Record<string, string> = {
-      User: 'bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20',
-      Department: 'bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20',
-      Role: 'bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-500/20',
-      Permission: 'bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20',
-      Organization: 'bg-pink-500/10 text-pink-700 dark:text-pink-400 border-pink-500/20',
-      Task: 'bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 border-cyan-500/20',
-      Project: 'bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border-indigo-500/20',
-      Milestone: 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/20',
-    };
-    return colors[entityType] || 'bg-gray-500/10 text-gray-700 dark:text-gray-400 border-gray-500/20';
-  };
-
   const renderMobileCard = (log: AuditLog) => {
-    const isExpanded = expandedRows.has(String(log.id));
-    const hasDetails = log.description || log.old_values || log.new_values;
+    const id = String(log.id);
+    const isExpanded = expandedRows.has(id);
+    const hasDetails = Boolean(log.description || log.old_values || log.new_values);
 
     return (
-      <Card key={log.id} className="mb-3 overflow-hidden">
-        <Button
-          variant="ghost"
-          onClick={() => toggleRow(String(log.id))}
-          className="w-full justify-between px-4 py-3 h-auto hover:bg-muted/50 rounded-none"
+      <div key={id} className="dashboard-card overflow-hidden">
+        <button
+          type="button"
+          onClick={() => toggleRow(id)}
+          aria-expanded={isExpanded}
+          className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
         >
-          <div className="flex items-center gap-3 flex-1 min-w-0">
-            <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-              <UserIcon className="h-4 w-4 text-primary" />
-            </div>
-            <div className="flex flex-col items-start min-w-0 flex-1">
-              <p className="font-medium text-sm truncate w-full">
-                {log.user?.name || 'System'}
-              </p>
-              <div className="flex items-center gap-2 mt-0.5">
-                {getActionIcon(log.action)}
-                <Badge variant={getActionBadgeVariant(log.action)} className="font-normal text-xs">
-                  {log.action.charAt(0).toUpperCase() + log.action.slice(1)}
-                </Badge>
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 flex-shrink-0">
-            <Badge variant="outline" className={`font-normal text-xs ${getEntityBadgeColor(log.entity_type)}`}>
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+            <UserRound className="h-4 w-4" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-sm font-semibold">{log.user?.name || 'System'}</span>
+            <span className="mt-1.5 block">
+              <ActionCell action={log.action} />
+            </span>
+          </span>
+          <span className="flex shrink-0 items-center gap-2">
+            <Badge variant="secondary" className={`border-0 font-normal ${getEntityBadgeColor(log.entity_type)}`}>
               {log.entity_type}
             </Badge>
-            {hasDetails && (
-              <div className="ml-2">
-                {isExpanded ? (
-                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                ) : (
-                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                )}
-              </div>
-            )}
-          </div>
-        </Button>
+            {hasDetails &&
+              (isExpanded ? (
+                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+              ) : (
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              ))}
+          </span>
+        </button>
 
         {isExpanded && (
-          <CardContent className="px-4 pb-4 pt-0 space-y-3">
-            {/* Timestamp & IP */}
-            <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-              <div className="flex items-center gap-1.5">
-                <Calendar className="h-3 w-3" />
-                <span>{format(new Date(log.created_at), 'PPp')}</span>
-              </div>
+          <div className="space-y-3 border-t border-border/60 px-4 pb-4 pt-3">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+              <span className="inline-flex items-center gap-1.5">
+                <CalendarDays className="h-3.5 w-3.5" />
+                {format(new Date(log.created_at), 'PPp')}
+              </span>
               {log.ip_address && (
-                <>
-                  <span className="text-muted-foreground/50">•</span>
-                  <code className="bg-muted px-2 py-0.5 rounded font-mono">
-                    {log.ip_address}
-                  </code>
-                </>
+                <code className="rounded-md bg-muted px-1.5 py-0.5 font-mono text-[11px]">
+                  {log.ip_address}
+                </code>
+              )}
+              {log.entity_id && (
+                <span className="font-mono">ID: {log.entity_id}</span>
               )}
             </div>
 
-            {/* Entity ID */}
-            {log.entity_id && (
-              <div className="text-xs">
-                <span className="text-muted-foreground">Entity ID: </span>
-                <span className="font-mono">{log.entity_id}</span>
-              </div>
-            )}
-
-            {/* Description */}
             {log.description && (
-              <div className="text-sm pt-2 border-t">
-                <p className="font-medium">{log.description}</p>
-              </div>
+              <p className="text-sm text-foreground">{log.description}</p>
             )}
 
-            {/* Changes */}
             {(log.old_values || log.new_values) && (
-              <div className="space-y-2 pt-2 border-t">
-                {log.old_values && Object.keys(log.old_values).length > 0 && (
-                  <div className="rounded-lg bg-muted/50 p-3">
-                    <p className="text-xs font-semibold text-red-600 dark:text-red-400 mb-1">Before:</p>
-                    <div className="text-xs text-muted-foreground space-y-1">
-                      {Object.entries(log.old_values).map(([key, value]) => (
-                        <div key={key} className="flex gap-2">
-                          <span className="font-medium">{key}:</span>
-                          <span className="truncate">{String(value)}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {log.new_values && Object.keys(log.new_values).length > 0 && (
-                  <div className="rounded-lg bg-muted/50 p-3">
-                    <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 mb-1">After:</p>
-                    <div className="text-xs text-muted-foreground space-y-1">
-                      {Object.entries(log.new_values).map(([key, value]) => (
-                        <div key={key} className="flex gap-2">
-                          <span className="font-medium">{key}:</span>
-                          <span className="truncate">{String(value)}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+              <div className="grid gap-2 sm:grid-cols-2">
+                <ChangeValues values={log.old_values} label="Before" />
+                <ChangeValues values={log.new_values} label="After" />
               </div>
             )}
-          </CardContent>
+          </div>
         )}
-      </Card>
+      </div>
     );
   };
 
-  const renderDesktopTable = () => (
-    <Card>
-      <CardContent className="p-0">
+  return (
+    <>
+      {/* Mobile cards */}
+      <div className="space-y-3 md:hidden">
+        {logs.map((log) => renderMobileCard(log))}
+      </div>
+
+      {/* Desktop table */}
+      <div className="dashboard-card hidden overflow-hidden md:block">
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow className="hover:bg-transparent">
-                <TableHead className="w-50 hidden md:table-cell">User</TableHead>
-                <TableHead className="w-35">Action</TableHead>
-                <TableHead className="w-45 hidden lg:table-cell">Entity</TableHead>
-                <TableHead className="hidden xl:table-cell">Details</TableHead>
-                <TableHead className="w-50 hidden lg:table-cell">Timestamp</TableHead>
-                <TableHead className="w-35 hidden xl:table-cell">IP Address</TableHead>
+              <TableRow className="border-border/60 hover:bg-transparent">
+                <TableHead className="w-56 pl-5 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                  User
+                </TableHead>
+                <TableHead className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                  Action
+                </TableHead>
+                <TableHead className="hidden text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground lg:table-cell">
+                  Entity
+                </TableHead>
+                <TableHead className="hidden text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground xl:table-cell">
+                  Details
+                </TableHead>
+                <TableHead className="hidden text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground lg:table-cell">
+                  Timestamp
+                </TableHead>
+                <TableHead className="hidden pr-5 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground xl:table-cell">
+                  IP Address
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {logs.map((log) => (
-                <TableRow key={log.id} className="hover:bg-muted/50">
-                  {/* User - hidden on mobile */}
-                  <TableCell className="hidden md:table-cell">
+                <TableRow key={log.id} className="border-border/60 transition-colors hover:bg-muted/35">
+                  <TableCell className="pl-5">
                     <div className="flex items-center gap-3">
-                      <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                        <UserIcon className="h-4 w-4 text-primary" />
-                      </div>
+                      <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
+                        <UserRound className="h-4 w-4" />
+                      </span>
                       <div className="min-w-0">
-                        <p className="font-medium text-sm truncate">{log.user?.name || 'System'}</p>
+                        <p className="truncate text-sm font-medium">{log.user?.name || 'System'}</p>
                         {log.user?.email && (
-                          <p className="text-xs text-muted-foreground truncate">{log.user.email}</p>
+                          <p className="truncate text-xs text-muted-foreground">{log.user.email}</p>
                         )}
                       </div>
                     </div>
                   </TableCell>
 
-                  {/* Action - always visible */}
                   <TableCell>
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                      <div className="flex items-center gap-2">
-                        {getActionIcon(log.action)}
-                        <Badge variant={getActionBadgeVariant(log.action)} className="font-normal">
-                          {log.action.charAt(0).toUpperCase() + log.action.slice(1)}
-                        </Badge>
-                      </div>
-                      {/* Mobile: show user name below action */}
-                      <div className="md:hidden flex items-center gap-2 text-xs text-muted-foreground">
-                        <UserIcon className="h-3 w-3" />
-                        <span className="truncate">{log.user?.name || 'System'}</span>
-                      </div>
-                    </div>
+                    <ActionCell action={log.action} />
                   </TableCell>
 
-                  {/* Entity - hidden on small screens */}
                   <TableCell className="hidden lg:table-cell">
                     <div className="space-y-1">
-                      <Badge variant="outline" className={`font-normal ${getEntityBadgeColor(log.entity_type)}`}>
+                      <Badge variant="secondary" className={`border-0 font-normal ${getEntityBadgeColor(log.entity_type)}`}>
                         {log.entity_type}
                       </Badge>
-                      <p className="text-xs text-muted-foreground font-mono">ID: {log.entity_id}</p>
+                      {log.entity_id && (
+                        <p className="font-mono text-[11px] text-muted-foreground">ID: {log.entity_id}</p>
+                      )}
                     </div>
                   </TableCell>
 
-                  {/* Details - hidden on medium screens */}
                   <TableCell className="hidden xl:table-cell">
-                    <div className="text-sm max-w-md space-y-2">
-                      {log.description && (
-                        <p className="text-foreground font-medium">{log.description}</p>
-                      )}
+                    <div className="max-w-md space-y-2">
+                      {log.description && <p className="text-sm font-medium">{log.description}</p>}
                       {(log.old_values || log.new_values) && (
-                        <div className="space-y-1.5 rounded-lg bg-muted/50 p-2">
-                          {log.old_values && Object.keys(log.old_values).length > 0 && (
-                            <div className="text-xs">
-                              <span className="text-red-600 dark:text-red-400 font-semibold">Before: </span>
-                              <span className="text-muted-foreground">
-                                {Object.entries(log.old_values).map(([key, value]) => `${key}: ${value}`).join(', ')}
-                              </span>
-                            </div>
-                          )}
-                          {log.new_values && Object.keys(log.new_values).length > 0 && (
-                            <div className="text-xs">
-                              <span className="text-emerald-600 dark:text-emerald-400 font-semibold">After: </span>
-                              <span className="text-muted-foreground">
-                                {Object.entries(log.new_values).map(([key, value]) => `${key}: ${value}`).join(', ')}
-                              </span>
-                            </div>
-                          )}
+                        <div className="grid gap-2 sm:grid-cols-2">
+                          <ChangeValues values={log.old_values} label="Before" />
+                          <ChangeValues values={log.new_values} label="After" />
                         </div>
                       )}
                       {!log.description && !log.old_values && !log.new_values && (
-                        <span className="text-muted-foreground italic">No details available</span>
+                        <span className="text-xs italic text-muted-foreground">No details available</span>
                       )}
                     </div>
                   </TableCell>
 
-                  {/* Timestamp - hidden on small screens */}
                   <TableCell className="hidden lg:table-cell">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2 text-sm">
-                        <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
-                        <span className="font-medium">{format(new Date(log.created_at), 'PPp')}</span>
-                      </div>
-                      <p className="text-xs text-muted-foreground font-mono">
-                        {format(new Date(log.created_at), 'HH:mm:ss')}
-                      </p>
+                    <div className="flex items-center gap-2 text-sm">
+                      <CalendarDays className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                      <span className="whitespace-nowrap">{format(new Date(log.created_at), 'PPp')}</span>
                     </div>
                   </TableCell>
 
-                  {/* IP Address - hidden on medium screens */}
-                  <TableCell className="hidden xl:table-cell">
-                    <code className="text-xs bg-muted px-2 py-1 rounded font-mono">
+                  <TableCell className="hidden pr-5 xl:table-cell">
+                    <code className="rounded-md bg-muted px-2 py-1 font-mono text-[11px]">
                       {log.ip_address || '-'}
                     </code>
                   </TableCell>
@@ -297,20 +290,6 @@ export function AuditLogsTable({ logs }: AuditLogsTableProps) {
             </TableBody>
           </Table>
         </div>
-      </CardContent>
-    </Card>
-  );
-
-  return (
-    <>
-      {/* Mobile Card Layout - visible only on small screens */}
-      <div className="md:hidden space-y-0">
-        {logs.map((log) => renderMobileCard(log))}
-      </div>
-
-      {/* Desktop Table Layout - hidden on small screens */}
-      <div className="hidden md:block">
-        {renderDesktopTable()}
       </div>
     </>
   );

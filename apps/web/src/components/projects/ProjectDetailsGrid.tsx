@@ -42,20 +42,18 @@ export default function ProjectDetailsGrid({ project, onStatusChange, onPriority
   };
 
   return (
-    <section className="overflow-hidden rounded-xl border bg-card shadow-sm">
-      <div className="flex items-center justify-between border-b px-3 py-3 sm:px-4 sm:py-3 lg:px-5 dark:border-border">
-        <div>
-          <h2 className="text-sm font-semibold text-foreground sm:text-base">Project Details</h2>
-          <p className="text-xs text-muted-foreground dark:text-muted-foreground/70">Status, schedule, and team overview</p>
-        </div>
-        {isOverdue && <Badge variant="destructive" className="text-xs">Overdue</Badge>}
+    <section className="rounded-lg border bg-card">
+      <div className="flex items-center justify-between border-b px-3 py-2">
+        <h2 className="text-sm font-semibold">Project Details</h2>
+        {isOverdue && <Badge variant="destructive" className="text-[10px] px-1.5 py-0">Overdue</Badge>}
       </div>
-      <div className="grid gap-px bg-border sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-        <div className="space-y-1.5 bg-card p-3 sm:p-4">
-          <label className="text-xs font-medium text-muted-foreground dark:text-muted-foreground/80">Status</label>
+      <div className="grid gap-px bg-border sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-9">
+        {/* Status */}
+        <div className="bg-card px-3 py-2">
+          <label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Status</label>
           {onStatusChange ? (
             <Select value={project.status} onValueChange={onStatusChange}>
-              <SelectTrigger className="h-8 w-full text-sm">
+              <SelectTrigger className="mt-1 h-7 w-full text-xs">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -67,17 +65,18 @@ export default function ProjectDetailsGrid({ project, onStatusChange, onPriority
               </SelectContent>
             </Select>
           ) : (
-            <Badge className={`w-fit ${statusColors[project.status] || 'bg-gray-100'}`}>
+            <Badge className={`mt-1 text-[10px] px-1.5 py-0 ${statusColors[project.status] || 'bg-gray-100'}`}>
               {project.status?.replace('_', ' ').toUpperCase() || 'N/A'}
             </Badge>
           )}
         </div>
 
-        <div className="space-y-1.5 bg-card p-3 sm:p-4">
-          <label className="text-xs font-medium text-muted-foreground dark:text-muted-foreground/80">Priority</label>
+        {/* Priority */}
+        <div className="bg-card px-3 py-2">
+          <label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Priority</label>
           {onPriorityChange ? (
             <Select value={project.priority || 'medium'} onValueChange={onPriorityChange}>
-              <SelectTrigger className="h-8 w-full text-sm">
+              <SelectTrigger className="mt-1 h-7 w-full text-xs">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -88,71 +87,84 @@ export default function ProjectDetailsGrid({ project, onStatusChange, onPriority
               </SelectContent>
             </Select>
           ) : (
-            <Badge className={`w-fit ${priorityColors[project.priority] || 'bg-gray-100'}`}>
+            <Badge className={`mt-1 text-[10px] px-1.5 py-0 ${priorityColors[project.priority] || 'bg-gray-100'}`}>
               {(project.priority || 'medium').toUpperCase()}
             </Badge>
           )}
         </div>
 
-        <div className="space-y-1.5 bg-card p-3 sm:p-4">
-          <label className="text-xs font-medium text-muted-foreground dark:text-muted-foreground/80">Budget</label>
-          <div className="flex items-center gap-1.5 text-sm">
-            <DollarSign className="h-3.5 w-3.5 text-muted-foreground dark:text-muted-foreground/70 shrink-0" />
-            <span className="font-medium text-foreground truncate">
+        {/* Budget */}
+        <div className="bg-card px-3 py-2">
+          <label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Budget</label>
+          <div className="mt-1 flex items-center gap-1">
+            <DollarSign className="h-3 w-3 text-muted-foreground shrink-0" />
+            <span className="text-xs font-medium truncate">
               {project.budget ? project.budget.toLocaleString() : 'Not set'}
             </span>
           </div>
         </div>
 
-        <div className="space-y-1.5 bg-card p-3 sm:p-4">
-          <label className="text-xs font-medium text-muted-foreground dark:text-muted-foreground/80">Project Manager</label>
-          <div className="flex items-center gap-1.5 text-sm">
-            <User className="h-3.5 w-3.5 text-muted-foreground dark:text-muted-foreground/70 shrink-0" />
-            <span className="font-medium text-foreground truncate">
+        {/* Project Manager */}
+        <div className="bg-card px-3 py-2">
+          <label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Manager</label>
+          <div className="mt-1 flex items-center gap-1">
+            <User className="h-3 w-3 text-muted-foreground shrink-0" />
+            <span className="text-xs font-medium truncate">
               {project.manager?.name || 'Not assigned'}
             </span>
           </div>
         </div>
 
-        <div className="space-y-1.5 bg-card p-3 sm:p-4">
-          <label className="text-xs font-medium text-muted-foreground dark:text-muted-foreground/80">Start Date</label>
-          <div className="flex items-center gap-1.5 text-sm">
-            <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground dark:text-muted-foreground/70 shrink-0" />
-            <span className="text-foreground truncate">{safeFormatDate(project.start_date)}</span>
+        {/* Start Date */}
+        <div className="bg-card px-3 py-2">
+          <label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Start Date</label>
+          <div className="mt-1 flex items-center gap-1">
+            <CalendarIcon className="h-3 w-3 text-muted-foreground shrink-0" />
+            <span className="text-xs truncate">{safeFormatDate(project.start_date)}</span>
           </div>
         </div>
 
-        <div className={`space-y-1.5 p-3 sm:p-4 ${isOverdue ? 'bg-red-50/70 dark:bg-red-950/20' : 'bg-card'}`}>
-          <label className="text-xs font-medium text-muted-foreground dark:text-muted-foreground/80">Due Date</label>
-          <div className={`flex items-center gap-1.5 text-sm ${isOverdue ? 'font-medium text-red-600 dark:text-red-400' : 'text-foreground'}`}>
-            <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground dark:text-muted-foreground/70 shrink-0" />
-            <span className="truncate">{safeFormatDate(project.due_date)}</span>
+        {/* Due Date */}
+        <div className={`bg-card px-3 py-2 ${isOverdue ? 'bg-red-50/70 dark:bg-red-950/20' : ''}`}>
+          <label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Due Date</label>
+          <div className={`mt-1 flex items-center gap-1 ${isOverdue ? 'font-medium text-red-600 dark:text-red-400' : ''}`}>
+            <CalendarIcon className="h-3 w-3 text-muted-foreground shrink-0" />
+            <span className="text-xs truncate">{safeFormatDate(project.due_date)}</span>
           </div>
         </div>
 
-        <div className="space-y-1.5 bg-card p-3 sm:p-4">
-          <label className="text-xs font-medium text-muted-foreground dark:text-muted-foreground/80">End Date</label>
-          <div className="flex items-center gap-1.5 text-sm">
-            <CalendarIcon className="h-3.5 w-3.5 text-muted-foreground dark:text-muted-foreground/70 shrink-0" />
-            <span className="text-foreground truncate">{safeFormatDate(project.end_date)}</span>
+        {/* End Date */}
+        <div className="bg-card px-3 py-2">
+          <label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">End Date</label>
+          <div className="mt-1 flex items-center gap-1">
+            <CalendarIcon className="h-3 w-3 text-muted-foreground shrink-0" />
+            <span className="text-xs truncate">{safeFormatDate(project.end_date)}</span>
           </div>
         </div>
 
-        <div className="space-y-1.5 bg-card p-3 sm:p-4">
-          <label className="text-xs font-medium text-muted-foreground dark:text-muted-foreground/80">Team Members</label>
-          <div className="flex items-center gap-1.5 text-sm">
-            <User className="h-3.5 w-3.5 text-muted-foreground dark:text-muted-foreground/70 shrink-0" />
-            <span className="font-medium text-foreground">
+        {/* Team Members */}
+        <div className="bg-card px-3 py-2">
+          <label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Team</label>
+          <div className="mt-1 flex items-center gap-1">
+            <User className="h-3 w-3 text-muted-foreground shrink-0" />
+            <span className="text-xs font-medium">
               {project.members?.length || 0} members
             </span>
           </div>
         </div>
 
-        <div className="space-y-1.5 bg-card p-3 sm:p-4">
-          <label className="text-xs font-medium text-muted-foreground dark:text-muted-foreground/80">Work Items</label>
-          <div className="flex items-center gap-3 text-sm">
-            <span className="flex items-center gap-1.5 font-medium text-foreground"><ListTodo className="h-3.5 w-3.5 text-muted-foreground dark:text-muted-foreground/70 shrink-0" />{project.task_count || 0}</span>
-            <span className="flex items-center gap-1.5 font-medium text-foreground"><Flag className="h-3.5 w-3.5 text-muted-foreground dark:text-muted-foreground/70 shrink-0" />{project.milestone_count || 0}</span>
+        {/* Work Items */}
+        <div className="bg-card px-3 py-2">
+          <label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Work Items</label>
+          <div className="mt-1 flex items-center gap-2">
+            <span className="flex items-center gap-1 text-xs font-medium">
+              <ListTodo className="h-3 w-3 text-muted-foreground shrink-0" />
+              {project.task_count || 0}
+            </span>
+            <span className="flex items-center gap-1 text-xs font-medium">
+              <Flag className="h-3 w-3 text-muted-foreground shrink-0" />
+              {project.milestone_count || 0}
+            </span>
           </div>
         </div>
       </div>

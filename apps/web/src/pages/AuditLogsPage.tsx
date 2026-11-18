@@ -1,9 +1,11 @@
 import { AuditLogsFilters, AuditLogsTable, type AuditLog } from '@/components/audit-logs';
+import { EmptyState } from '@/components/shared/EmptyState';
+import { PageHeader } from '@/components/shared/PageHeader';
 import { TablePagination } from '@/components/shared/TablePagination';
+import { TableSkeleton } from '@/components/shared/TableSkeleton';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { format } from 'date-fns';
-import { Download, FileText } from 'lucide-react';
+import { Download, ScrollText } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useGetAuditLogsQuery } from '../store/api';
@@ -45,9 +47,18 @@ export default function AuditLogsPage() {
     callback();
   };
 
+  const handleClearFilters = () => {
+    setCurrentPage(1);
+    setSearchQuery('');
+    setActionFilter('');
+    setEntityFilter('');
+  };
+
   // Get unique actions and entity types for filters
   const { uniqueActions, uniqueEntityTypes } = useMemo(() => {
-    if (!auditLogsData || auditLogsData.length === 0) return { uniqueActions: [], uniqueEntityTypes: [] };
+    if (!auditLogsData || auditLogsData.length === 0) {
+      return { uniqueActions: [], uniqueEntityTypes: [] };
+    }
 
     const actions = new Set<string>();
     const entities = new Set<string>();
@@ -89,87 +100,74 @@ export default function AuditLogsPage() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-        <div className="min-w-0">
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Audit Logs</h1>
-          <p className="text-muted-foreground mt-1 text-sm sm:text-base">
-            Track all system activities and changes
-          </p>
-        </div>
-        <Button onClick={handleExport} variant="outline" size="sm" className="sm:size-default w-full sm:w-auto shrink-0">
-          <Download className="h-4 w-4 sm:mr-2" />
-          <span className="hidden sm:inline">Export Logs</span>
-          <span className="sm:hidden">Export</span>
-        </Button>
+      <PageHeader
+        title="Audit Logs"
+        description="Track all system activities and changes"
+        icon={ScrollText}
+        badge={isLoading ? undefined : totalLogs}
+        actions={
+          <Button
+            onClick={handleExport}
+            variant="outline"
+            size="sm"
+            className="h-9 rounded-lg text-xs sm:text-sm"
+          >
+            <Download className="h-4 w-4 sm:mr-2" />
+            <span className="hidden sm:inline">Export logs</span>
+            <span className="sm:hidden">Export</span>
+          </Button>
+        }
+      />
+
+      {/* Filters */}
+      <div className="dashboard-card p-4 sm:p-5">
+        <AuditLogsFilters
+          searchQuery={searchQuery}
+          actionFilter={actionFilter}
+          entityFilter={entityFilter}
+          onSearchChange={(value) => handleFilterChange(() => setSearchQuery(value))}
+          onActionChange={(value) => handleFilterChange(() => setActionFilter(value))}
+          onEntityChange={(value) => handleFilterChange(() => setEntityFilter(value))}
+          onClear={handleClearFilters}
+          uniqueActions={uniqueActions}
+          uniqueEntityTypes={uniqueEntityTypes}
+        />
       </div>
 
-      {/* Filters Card */}
-      <Card>
-        <CardContent className="p-4 sm:p-6 pt-4 sm:pt-6">
-          <AuditLogsFilters
-            searchQuery={searchQuery}
-            actionFilter={actionFilter}
-            entityFilter={entityFilter}
-            onSearchChange={(value) => handleFilterChange(() => setSearchQuery(value))}
-            onActionChange={(value) => handleFilterChange(() => setActionFilter(value))}
-            onEntityChange={(value) => handleFilterChange(() => setEntityFilter(value))}
-            uniqueActions={uniqueActions}
-            uniqueEntityTypes={uniqueEntityTypes}
-          />
-        </CardContent>
-      </Card>
-
-      {/* Audit Logs Table */}
+      {/* Audit logs */}
       {isLoading ? (
-        <Card>
-          <CardContent className="p-8 sm:p-12">
-            <div className="flex flex-col items-center gap-4">
-              <div className="h-10 w-10 sm:h-12 sm:w-12 animate-pulse rounded-full bg-muted"></div>
-              <p className="text-muted-foreground text-sm sm:text-base">Loading audit logs...</p>
-            </div>
-          </CardContent>
-        </Card>
-      ) : auditLogsData && auditLogsData.length > 0 ? (
+        <TableSkeleton rows={6} />
+      ) : auditLogsData.length > 0 ? (
         <>
           <AuditLogsTable logs={auditLogsData} />
 
-          {/* Pagination */}
-          <Card>
-            <CardContent className="p-4 sm:p-6 pt-4 sm:pt-6">
-              <TablePagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                totalItems={totalLogs}
-                itemsPerPage={itemsPerPage}
-                onPageChange={setCurrentPage}
-                onItemsPerPageChange={(value) => {
-                  setItemsPerPage(value);
-                  setCurrentPage(1);
-                }}
-                showStats={true}
-              />
-            </CardContent>
-          </Card>
+          <div className="dashboard-card p-3 sm:p-4">
+            <TablePagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={totalLogs}
+              itemsPerPage={itemsPerPage}
+              onPageChange={setCurrentPage}
+              onItemsPerPageChange={(value) => {
+                setItemsPerPage(value);
+                setCurrentPage(1);
+              }}
+              showStats
+            />
+          </div>
         </>
       ) : (
-        <Card>
-          <CardContent className="p-8 sm:p-12">
-            <div className="flex flex-col items-center gap-4">
-              <div className="h-14 w-14 sm:h-16 sm:w-16 rounded-full bg-muted flex items-center justify-center">
-                <FileText className="h-7 w-7 sm:h-8 sm:w-8 text-muted-foreground opacity-50" />
-              </div>
-              <div className="text-center px-4">
-                <h3 className="text-lg font-semibold">No audit logs found</h3>
-                <p className="text-muted-foreground mt-1 text-sm sm:text-base">
-                  {searchQuery || actionFilter || entityFilter
-                    ? 'Try adjusting your filters to find what you\'re looking for'
-                    : 'No system activities have been recorded yet'}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="dashboard-card">
+          <EmptyState
+            icon={ScrollText}
+            title="No audit logs found"
+            description={
+              searchQuery || actionFilter || entityFilter
+                ? 'Try adjusting your filters to find what you’re looking for.'
+                : 'No system activities have been recorded yet.'
+            }
+          />
+        </div>
       )}
     </div>
   );

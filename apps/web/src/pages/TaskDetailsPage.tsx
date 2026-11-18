@@ -1,8 +1,8 @@
-import { FileText } from 'lucide-react';
+import { NotFound } from '@/components/shared/NotFound';
+import ActionBar from '@/components/ui/ActionBar';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate, useParams } from 'react-router-dom';
-import ActionBar from '@/components/ui/ActionBar';
 import TaskActivityTimeline from '../components/tasks/TaskActivityTimeline';
 import TaskAssignModal from '../components/tasks/TaskAssignModal';
 import TaskComments from '../components/tasks/TaskComments';
@@ -10,7 +10,6 @@ import TaskDetailsGrid from '../components/tasks/TaskDetailsGrid';
 import TaskEditModal, { TaskEditFormValues } from '../components/tasks/TaskEditModal';
 import TaskOverview from '../components/tasks/TaskOverview';
 import TaskTags from '../components/tasks/TaskTags';
-import { Button } from '../components/ui/button';
 import { FullPageLoader } from '../components/ui/loading-spinner';
 import {
   useCreateTagMutation,
@@ -252,16 +251,7 @@ export default function TaskDetailsPage() {
   }
 
   if (isError || !task) {
-    return (
-      <div className="flex items-center justify-center p-12">
-        <div className="text-center">
-          <FileText className="h-16 w-16 mx-auto text-muted-foreground/50 mb-4" />
-          <h3 className="text-lg font-semibold mb-2">Task not found</h3>
-          <p className="text-muted-foreground mb-4">The task you're looking for doesn't exist or you don't have access to it.</p>
-          <Button onClick={() => navigate('/tasks')} className="mt-4">Back to Tasks</Button>
-        </div>
-      </div>
-    );
+    return <NotFound entityType="task" />;
   }
 
   return (

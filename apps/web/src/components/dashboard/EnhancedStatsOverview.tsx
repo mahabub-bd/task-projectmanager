@@ -1,20 +1,15 @@
-import { Card, CardContent } from '@/components/ui/card';
-import {
-  AlertCircle,
-  Building2,
-  FileText,
-  FolderKanban
-} from 'lucide-react';
-import { useMemo } from 'react';
+import { cn } from '@/lib/utils';
+import { AlertCircle, Building2, FolderKanban, ListTodo } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 interface StatCard {
   title: string;
-  value: string | number;
-  icon: any;
-  color: string;
+  value: number;
+  icon: LucideIcon;
+  description: string;
   progress?: number;
-  description?: string;
-  clickHandler?: () => void;
+  tone: 'blue' | 'violet' | 'emerald' | 'rose';
+  path: string;
 }
 
 interface EnhancedStatsOverviewProps {
@@ -36,122 +31,90 @@ interface EnhancedStatsOverviewProps {
   onNavigate?: (path: string) => void;
 }
 
+const toneStyles: Record<StatCard['tone'], { icon: string; bar: string }> = {
+  blue: { icon: 'bg-blue-500/10 text-blue-600 dark:text-blue-400', bar: 'bg-blue-500' },
+  violet: { icon: 'bg-violet-500/10 text-violet-600 dark:text-violet-400', bar: 'bg-violet-500' },
+  emerald: { icon: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400', bar: 'bg-emerald-500' },
+  rose: { icon: 'bg-rose-500/10 text-rose-600 dark:text-rose-400', bar: 'bg-rose-500' },
+};
+
 export default function EnhancedStatsOverview({ stats, onNavigate }: EnhancedStatsOverviewProps) {
-  const statCards: StatCard[] = useMemo(() => {
-    const taskProgress = stats.totalTasks > 0 ? Math.round((stats.completedTasks / stats.totalTasks) * 100) : 0;
-    const projectProgress = stats.totalProjects > 0 ? Math.round((stats.completedProjects / stats.totalProjects) * 100) : 0;
-
-    return [
-      {
-        title: 'Total Tasks',
-        value: stats.totalTasks,
-        icon: FileText,
-        color: 'blue',
-        progress: taskProgress,
-        description: `${stats.completedTasks} completed • ${stats.inProgressTasks} in progress`,
-        clickHandler: () => onNavigate?.('/tasks'),
-      },
-      {
-        title: 'Active Projects',
-        value: stats.activeProjects,
-        icon: FolderKanban,
-        color: 'purple',
-        progress: projectProgress,
-        description: `${stats.totalProjects} total • ${stats.completedProjects} completed`,
-        clickHandler: () => onNavigate?.('/projects'),
-      },
-      {
-        title: 'Organizations',
-        value: stats.totalOrganizations || 0,
-        icon: Building2,
-        color: 'emerald',
-        description: `${stats.totalDepartments || 0} departments • ${stats.totalUsers || 0} users`,
-        clickHandler: () => onNavigate?.('/organizations'),
-      },
-      {
-        title: 'Needs Attention',
-        value: stats.overdueTasks,
-        icon: AlertCircle,
-        color: stats.overdueTasks > 0 ? 'red' : 'gray',
-        description: stats.overdueTasks > 0 ? 'Tasks overdue' : 'All caught up!',
-        clickHandler: () => onNavigate?.('/tasks'),
-      },
-    ];
-  }, [stats, onNavigate]);
-
-  const getColorClasses = (color: string) => {
-    const colors = {
-      blue: {
-        bg: 'bg-blue-500/10',
-        text: 'text-blue-600 dark:text-blue-400',
-        progress: 'bg-blue-500',
-      },
-      purple: {
-        bg: 'bg-purple-500/10',
-        text: 'text-purple-600 dark:text-purple-400',
-        progress: 'bg-purple-500',
-      },
-      emerald: {
-        bg: 'bg-emerald-500/10',
-        text: 'text-emerald-600 dark:text-emerald-400',
-        progress: 'bg-emerald-500',
-      },
-      red: {
-        bg: 'bg-red-500/10',
-        text: 'text-red-600 dark:text-red-400',
-        progress: 'bg-red-500',
-      },
-      gray: {
-        bg: 'bg-gray-500/10',
-        text: 'text-gray-600 dark:text-gray-400',
-        progress: 'bg-gray-500',
-      },
-    };
-    return colors[color as keyof typeof colors] || colors.blue;
-  };
+  const statCards: StatCard[] = [
+    {
+      title: 'Total tasks',
+      value: stats.totalTasks,
+      icon: ListTodo,
+      description: `${stats.completedTasks} done · ${stats.inProgressTasks} in progress`,
+      progress: stats.totalTasks > 0 ? Math.round((stats.completedTasks / stats.totalTasks) * 100) : 0,
+      tone: 'blue',
+      path: '/tasks',
+    },
+    {
+      title: 'Active projects',
+      value: stats.activeProjects,
+      icon: FolderKanban,
+      description: `${stats.totalProjects} total · ${stats.completedProjects} completed`,
+      progress: stats.totalProjects > 0 ? Math.round((stats.completedProjects / stats.totalProjects) * 100) : 0,
+      tone: 'violet',
+      path: '/projects',
+    },
+    {
+      title: 'Organizations',
+      value: stats.totalOrganizations || 0,
+      icon: Building2,
+      description: `${stats.totalDepartments || 0} departments · ${stats.totalUsers || 0} members`,
+      tone: 'emerald',
+      path: '/organizations',
+    },
+    {
+      title: 'Needs attention',
+      value: stats.overdueTasks,
+      icon: AlertCircle,
+      description: stats.overdueTasks > 0 ? 'Overdue tasks to review' : 'Nothing overdue right now',
+      tone: 'rose',
+      path: '/tasks',
+    },
+  ];
 
   return (
-    <div className="grid gap-2 sm:gap-3 grid-cols-2 sm:grid-cols-2 lg:grid-cols-4">
-      {statCards.map((stat) => {
-        const colors = getColorClasses(stat.color);
+    <section aria-label="Workspace statistics" className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      {statCards.map((stat, index) => {
         const Icon = stat.icon;
+        const tone = toneStyles[stat.tone];
 
         return (
-          <Card
+          <button
             key={stat.title}
-            className="group hover:shadow-md transition-all duration-300 cursor-pointer border hover:border-primary/50"
-            onClick={stat.clickHandler}
+            type="button"
+            onClick={() => onNavigate?.(stat.path)}
+            style={{ animationDelay: `${index * 60}ms` }}
+            className="dashboard-card dashboard-enter group w-full p-4 text-left transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:p-5"
           >
-            <CardContent className="p-3 sm:p-4">
-              <div className="space-y-1.5 sm:space-y-2">
-                {/* Value and title with icon on right */}
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-xl sm:text-2xl font-bold tracking-tight">{stat.value}</h3>
-                    <p className="text-xs sm:text-sm font-medium text-muted-foreground mt-0.5 truncate">{stat.title}</p>
-                  </div>
-                  <div className={`rounded-lg ${colors.bg} p-1.5 sm:p-2 transition-all duration-300 group-hover:scale-110 shrink-0`}>
-                    <Icon className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${colors.text}`} />
-                  </div>
-                </div>
-
-                {/* Description - always show */}
-                <p className="text-[11px] sm:text-sm text-muted-foreground line-clamp-1">{stat.description}</p>
-
-                {/* Progress bar - if exists */}
-                {stat.progress !== undefined && (
-                  <div className="h-1.5 sm:h-2 w-full bg-muted rounded-full overflow-hidden">
-                    <div
-                      className={`h-full rounded-full ${colors.progress} transition-all duration-500`}
-                      style={{ width: `${stat.progress}%` }}
-                    />
-                  </div>
-                )}
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <p className="truncate text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground sm:text-[11px]">
+                  {stat.title}
+                </p>
+                <p className="mt-2 text-2xl font-semibold tracking-tight tabular-nums sm:text-3xl">{stat.value}</p>
               </div>
-            </CardContent>
-          </Card>
+              <span className={cn('grid h-9 w-9 shrink-0 place-items-center rounded-xl', tone.icon)}>
+                <Icon className="h-4 w-4" />
+              </span>
+            </div>
+
+            <p className="mt-2 truncate text-[11px] text-muted-foreground sm:text-xs">{stat.description}</p>
+
+            {stat.progress !== undefined && (
+              <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                <div
+                  className={cn('h-full rounded-full transition-[width] duration-700', tone.bar)}
+                  style={{ width: `${Math.min(stat.progress, 100)}%` }}
+                />
+              </div>
+            )}
+          </button>
         );
       })}
-    </div>
+    </section>
   );
 }

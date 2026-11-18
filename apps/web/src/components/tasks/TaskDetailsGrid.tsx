@@ -22,22 +22,19 @@ interface TaskDetailsGridProps {
 
 export default function TaskDetailsGrid({ task, assignedUsers, isOverdue, onStatusChange }: TaskDetailsGridProps) {
   return (
-    <section className="overflow-hidden rounded-xl border bg-card shadow-sm">
-      <div className="flex items-center justify-between border-b px-3 py-3 sm:px-4 sm:py-3 lg:px-5">
-        <div>
-          <h2 className="text-sm font-semibold sm:text-base">Task Details</h2>
-          <p className="text-xs text-muted-foreground">Assignment, schedule, and project context</p>
-        </div>
-        {isOverdue && <Badge variant="destructive" className="text-xs">Overdue</Badge>}
+    <section className="rounded-lg border bg-card">
+      <div className="flex items-center justify-between border-b px-3 py-2">
+        <h2 className="text-sm font-semibold">Task Details</h2>
+        {isOverdue && <Badge variant="destructive" className="text-[10px] px-1.5 py-0">Overdue</Badge>}
       </div>
-      <div className="grid gap-px bg-border sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-px bg-border sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         {/* Status */}
-        <div className="space-y-1.5 bg-card p-3 sm:p-4">
-          <label className="text-xs font-medium text-muted-foreground block">Status</label>
+        <div className="bg-card px-3 py-2">
+          <label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wide">Status</label>
           <select
             value={task.status}
             onChange={(e) => onStatusChange(e.target.value)}
-            className="h-8 w-full rounded-md border bg-background px-2 text-sm"
+            className="mt-1 h-7 w-full rounded border bg-background px-2 text-xs"
           >
             <option value="draft">Draft</option>
             <option value="open">Open</option>
@@ -49,70 +46,70 @@ export default function TaskDetailsGrid({ task, assignedUsers, isOverdue, onStat
         </div>
 
         {/* Due Date */}
-        <div className={`space-y-1.5 p-3 sm:p-4 ${isOverdue ? 'bg-red-50/70 dark:bg-red-950/20' : 'bg-card'}`}>
-          <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-            <CalendarIcon className="h-3.5 w-3.5 shrink-0" />
+        <div className={`bg-card px-3 py-2 ${isOverdue ? 'bg-red-50/70 dark:bg-red-950/20' : ''}`}>
+          <div className="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground uppercase tracking-wide">
+            <CalendarIcon className="h-3 w-3 shrink-0" />
             Due Date
           </div>
-          <p className={`text-sm font-medium truncate ${isOverdue ? 'text-red-600 dark:text-red-400' : ''}`}>
+          <p className={`mt-1 text-xs font-medium ${isOverdue ? 'text-red-600 dark:text-red-400' : ''}`}>
             {safeFormatDate(task.due_date, 'MMM d, yyyy')}
           </p>
         </div>
 
-        {/* Assignee */}
-        <div className="space-y-1.5 bg-card p-3 sm:p-4">
-          <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-            <User className="h-3.5 w-3.5 shrink-0" />
+        {/* Assignees */}
+        <div className="bg-card px-3 py-2">
+          <div className="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground uppercase tracking-wide">
+            <User className="h-3 w-3 shrink-0" />
             Assignees
           </div>
-          <div className="flex flex-wrap gap-1.5">
+          <div className="mt-1 flex flex-wrap gap-1">
             {assignedUsers.length > 0 ? (
               assignedUsers.map((assignedUser: any) => (
-                <Badge key={assignedUser.id} variant="secondary" className="text-xs">
+                <Badge key={assignedUser.id} variant="secondary" className="text-[10px] px-1.5 py-0">
                   {assignedUser.name}
                 </Badge>
               ))
             ) : (
-              <p className="text-sm text-muted-foreground">Unassigned</p>
+              <p className="text-xs text-muted-foreground">Unassigned</p>
             )}
           </div>
         </div>
 
         {/* Creator */}
-        <div className="space-y-1.5 bg-card p-3 sm:p-4">
-          <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-            <User className="h-3.5 w-3.5 shrink-0" />
+        <div className="bg-card px-3 py-2">
+          <div className="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground uppercase tracking-wide">
+            <User className="h-3 w-3 shrink-0" />
             Created by
           </div>
-          <p className="text-sm truncate">{task.created_by_user?.name || 'Unknown'}</p>
+          <p className="mt-1 text-xs truncate">{task.created_by_user?.name || 'Unknown'}</p>
         </div>
 
         {/* Created Date */}
-        <div className="space-y-1.5 bg-card p-3 sm:p-4">
-          <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-            <Clock className="h-3.5 w-3.5 shrink-0" />
+        <div className="bg-card px-3 py-2">
+          <div className="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground uppercase tracking-wide">
+            <Clock className="h-3 w-3 shrink-0" />
             Created Date
           </div>
-          <p className="text-sm truncate">{safeFormatDate(task.created_at, 'MMM d, yyyy')}</p>
+          <p className="mt-1 text-xs truncate">{safeFormatDate(task.created_at, 'MMM d, yyyy')}</p>
         </div>
 
         {/* Project */}
-        <div className="space-y-1.5 bg-card p-3 sm:p-4">
-          <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-            <FolderKanban className="h-3.5 w-3.5 shrink-0" />
+        <div className="bg-card px-3 py-2">
+          <div className="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground uppercase tracking-wide">
+            <FolderKanban className="h-3 w-3 shrink-0" />
             Project
           </div>
           {task.project ? (
-            <div className="space-y-1">
-              <p className="text-sm font-medium truncate">{task.project.name}</p>
+            <div className="mt-1">
+              <p className="text-xs font-medium truncate">{task.project.name}</p>
               {task.project.status && (
-                <p className="text-xs text-muted-foreground">
+                <p className="text-[10px] text-muted-foreground">
                   {task.project.status.replace('_', ' ')}
                 </p>
               )}
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">No project assigned</p>
+            <p className="mt-1 text-xs text-muted-foreground">No project assigned</p>
           )}
         </div>
       </div>
