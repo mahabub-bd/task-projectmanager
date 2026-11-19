@@ -151,7 +151,7 @@ export default function EnhancedStatsOverview({ stats, onNavigate }: EnhancedSta
       value: stats.overdueTasks,
       icon: AlertCircle,
       description:
-        stats.overdueTasks > 0 ? 'Overdue tasks waiting on you' : 'Nothing overdue right now',
+        stats.overdueTasks > 0 ? 'Overdue tasks to review' : 'Nothing overdue right now',
       chip:
         stats.overdueTasks > 0
           ? { label: `${stats.overdueTasks} overdue`, variant: 'danger' }
@@ -179,8 +179,8 @@ export default function EnhancedStatsOverview({ stats, onNavigate }: EnhancedSta
             aria-label={`${stat.title}: ${stat.value}. ${stat.description}. Open details`}
             style={{ animationDelay: `${index * 60}ms` }}
             className={cn(
-              'dashboard-card dashboard-enter group relative flex h-full w-full flex-col overflow-hidden p-4 text-left transition-all duration-300',
-              'hover:-translate-y-1 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:p-5',
+              'dashboard-card dashboard-enter group relative flex h-full w-full flex-col overflow-hidden p-3 text-left transition-all duration-300',
+              'hover:-translate-y-1 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
               tone.border
             )}
           >
@@ -188,40 +188,44 @@ export default function EnhancedStatsOverview({ stats, onNavigate }: EnhancedSta
             <span
               aria-hidden="true"
               className={cn(
-                'pointer-events-none absolute -top-24 -right-24 h-48 w-48 rounded-full bg-linear-to-br to-transparent opacity-40 blur-2xl transition-opacity duration-500 group-hover:opacity-100',
+                'pointer-events-none absolute -top-14 -right-14 h-32 w-32 rounded-full bg-linear-to-br to-transparent opacity-40 blur-2xl transition-opacity duration-500 group-hover:opacity-100',
                 tone.glow
               )}
             />
 
-            <div className="relative flex items-start justify-between gap-2">
+            <div className="relative flex items-center justify-between gap-2">
+              <p className="min-w-0 flex-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground sm:text-xs">
+                {stat.title}
+              </p>
               <span
                 className={cn(
-                  'grid h-9 w-9 shrink-0 place-items-center rounded-xl transition-transform duration-300 group-hover:scale-105 sm:h-10 sm:w-10',
+                  'relative grid h-8 w-8 shrink-0 place-items-center rounded-lg transition-transform duration-300 group-hover:scale-105',
                   tone.icon
                 )}
               >
-                <Icon className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
+                <Icon
+                  className="h-4 w-4 transition-opacity duration-200 group-hover:opacity-0 group-focus-visible:opacity-0"
+                  aria-hidden="true"
+                />
+                {/* Replaces the category icon on hover/focus to signal navigation */}
+                <ArrowUpRight
+                  className="absolute h-4 w-4 opacity-0 transition-opacity duration-200 group-focus-visible:opacity-100 group-hover:opacity-100"
+                  aria-hidden="true"
+                />
               </span>
-              <ArrowUpRight
-                className="h-4 w-4 shrink-0 text-muted-foreground opacity-0 transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100 group-focus-visible:opacity-100"
-                aria-hidden="true"
-              />
             </div>
 
-            <div className="relative mt-4 flex-1">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground sm:text-xs">
-                {stat.title}
-              </p>
-              <p className="mt-1.5 text-2xl font-semibold tracking-tight tabular-nums sm:text-3xl">
+            <div className="relative mt-2 flex-1">
+              <p className="text-2xl font-semibold tracking-tight tabular-nums">
                 {stat.value}
               </p>
-              <p className="mt-1.5 text-[13px] leading-snug text-muted-foreground">
+              <p className="mt-1 text-xs leading-snug text-muted-foreground">
                 {stat.description}
               </p>
             </div>
 
-            {/* Footer sits on a fixed 1.5rem line so every card in a row aligns */}
-            <div className="relative mt-3 flex h-6 items-center gap-2">
+            {/* Footer sits on a fixed 1.25rem line so every card in a row aligns */}
+            <div className="relative mt-1.5 flex h-5 items-center gap-2">
               {percent !== undefined ? (
                 <>
                   <div
@@ -244,7 +248,7 @@ export default function EnhancedStatsOverview({ stats, onNavigate }: EnhancedSta
               ) : stat.chip ? (
                 <span
                   className={cn(
-                    'inline-flex max-w-full items-center gap-1.5 truncate rounded-full px-2 py-0.5 text-xs font-medium',
+                    'inline-flex max-w-full items-center gap-1.5 truncate rounded-full px-1.5 py-0.5 text-xs font-medium',
                     chipStyles[stat.chip.variant]
                   )}
                 >

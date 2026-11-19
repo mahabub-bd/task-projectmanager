@@ -36,7 +36,7 @@ function DashboardSkeleton() {
       {/* Mirrors EnhancedStatsOverview: six stat cards */}
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4 2xl:grid-cols-6">
         {[0, 1, 2, 3, 4, 5].map((item) => (
-          <div key={item} className="h-56 animate-pulse rounded-2xl bg-muted/40" />
+          <div key={item} className="h-36 animate-pulse rounded-2xl bg-muted/40" />
         ))}
       </div>
       <div className="grid gap-5 xl:grid-cols-12">
