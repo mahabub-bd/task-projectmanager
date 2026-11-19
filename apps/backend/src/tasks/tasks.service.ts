@@ -44,12 +44,19 @@ export class TasksService {
   private async updateProjectProgress(projectId: number): Promise<void> {
     if (!projectId) return;
 
-    const tasks = await this.taskRepository.find({
-      where: { project_id: projectId },
-    });
+    // Count in SQL instead of loading every task row.
+    const counts = await this.taskRepository
+      .createQueryBuilder('task')
+      .select('COUNT(*)', 'total')
+      .addSelect(
+        `COUNT(*) FILTER (WHERE task.status = '${TaskStatus.COMPLETED}')`,
+        'completed',
+      )
+      .where('task.project_id = :projectId', { projectId })
+      .getRawOne<{ total: string; completed: string }>();
 
-    const totalTasks = tasks.length;
-    const completedTasks = tasks.filter((task) => task.status === TaskStatus.COMPLETED).length;
+    const totalTasks = Number(counts?.total ?? 0);
+    const completedTasks = Number(counts?.completed ?? 0);
     const progress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
     await this.projectRepository.update(projectId, {

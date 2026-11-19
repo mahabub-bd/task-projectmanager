@@ -50,8 +50,8 @@ export default function QuickActions({ onNavigate }: QuickActionsProps) {
               <Icon className="h-4 w-4" />
             </span>
             <span className="min-w-0">
-              <span className="block truncate text-xs font-semibold sm:text-sm">{action.title}</span>
-              <span className="block truncate text-[11px] text-muted-foreground">{action.description}</span>
+              <span className="block truncate text-sm font-semibold sm:text-base">{action.title}</span>
+              <span className="block truncate text-[13px] text-muted-foreground">{action.description}</span>
             </span>
           </button>
         );

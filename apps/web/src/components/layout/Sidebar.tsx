@@ -31,7 +31,7 @@ export function Sidebar({
       className={cn(
         'fixed top-16 bottom-0 left-0 z-40 flex flex-col border-r border-border/70 bg-card/95 backdrop-blur-xl transition-all duration-300 w-[240px]',
         !isOpen && '-translate-x-full',
-        isOpen && (collapsed ? 'lg:w-16' : 'lg:w-52')
+        isOpen && (collapsed ? 'lg:w-16' : 'lg:w-52 2xl:w-72')
       )}
     >
       {/* Navigation */}

@@ -76,11 +76,11 @@ export default function Layout({ children }: LayoutProps) {
       <div
         className={cn(
           'flex-1 transition-[margin] duration-300',
-          sidebarOpen && 'lg:ml-52'
+          sidebarOpen && 'lg:ml-52 2xl:ml-72'
         )}
       >
         {/* Page content */}
-        <main className="md:p-6 p-2 lg:p-8 xl:p-10">
+        <main className="md:p-4 p-2 lg:p-5 xl:p-6">
           {children}
         </main>
       </div>

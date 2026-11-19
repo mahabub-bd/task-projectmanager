@@ -35,7 +35,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="space-y-2 sm:space-y-3 max-w-[1536px] mx-auto">
+    <div className="space-y-2 sm:space-y-3">
       {/* Page header */}
       <div className="rounded-xl border border-background bg-card/50 p-3 sm:p-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">

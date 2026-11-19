@@ -21,16 +21,16 @@ export default function WelcomeHeader({ onNavigate }: WelcomeHeaderProps) {
   return (
     <header className="dashboard-enter flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
       <div className="min-w-0 space-y-3">
-        <span className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+        <span className="inline-flex items-center gap-2 text-[13px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
           <CalendarDays className="h-3 w-3" />
           {format(now, 'EEEE, MMM d, yyyy')}
         </span>
 
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+          <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
             {getGreeting(now.getHours())}, <span className="text-primary">{firstName}</span>
           </h1>
-          <p className="mt-1.5 max-w-xl text-sm text-muted-foreground">
+          <p className="mt-1.5 max-w-xl text-base text-muted-foreground">
             Here's a clear view of your projects, tasks, and team today.
           </p>
         </div>

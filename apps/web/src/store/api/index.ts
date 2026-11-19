@@ -2,6 +2,9 @@
 export { apiSlice, baseQueryWithReauth } from './baseApi';
 export type { BaseQueryFn, FetchArgs, FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
 
+// Dashboard API
+export { dashboardApi, useGetDashboardStatsQuery } from './dashboardApi';
+
 // Auth API
 export {
   authApi,

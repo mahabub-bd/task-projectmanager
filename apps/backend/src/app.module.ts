@@ -13,6 +13,7 @@ import { PhasesModule } from './phases/phases.module';
 import { MilestonesModule } from './milestones/milestones.module';
 import { TagsModule } from './tags/tags.module';
 import { TasksModule } from './tasks/tasks.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 import { CommentsModule } from './comments/comments.module';
 import { AttachmentsModule } from './attachments/attachments.module';
 import { AuditLogsModule } from './audit-logs/audit-logs.module';
@@ -127,6 +128,7 @@ import { MilestoneStatusHistory } from './entities/milestone-status-history.enti
     MilestonesModule,
     TagsModule,
     TasksModule,
+    DashboardModule,
     CommentsModule,
     AttachmentsModule,
     AuditLogsModule,

@@ -31,7 +31,7 @@ const statusBadge = (status?: string) => {
   };
 
   return (
-    <Badge variant={variants[status || ''] || 'secondary'} className="px-2 py-0.5 text-[10px]">
+    <Badge variant={variants[status || ''] || 'secondary'} className="px-2 py-0.5 text-xs">
       {labels[status || ''] || status || 'Unknown'}
     </Badge>
   );
@@ -119,7 +119,7 @@ export default function ProjectSpotlight({ projects, isLoading, onNavigate }: Pr
                   />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="min-w-0 flex-1 truncate text-sm font-semibold transition-colors group-hover:text-primary">
+                      <h3 className="min-w-0 flex-1 truncate text-base font-semibold transition-colors group-hover:text-primary">
                         {project.name}
                       </h3>
                       {priorityDot(project.priority)}
@@ -129,7 +129,7 @@ export default function ProjectSpotlight({ projects, isLoading, onNavigate }: Pr
                     <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
                       {statusBadge(project.status)}
                       {isOverdue && (
-                        <Badge variant="priority-urgent" className="px-2 py-0.5 text-[10px]">
+                        <Badge variant="priority-urgent" className="px-2 py-0.5 text-xs">
                           Overdue
                         </Badge>
                       )}
@@ -139,7 +139,7 @@ export default function ProjectSpotlight({ projects, isLoading, onNavigate }: Pr
 
                 <div className="mt-3 flex items-center gap-3 pl-4">
                   <div className="min-w-0 flex-1 space-y-1.5">
-                    <div className="flex items-center justify-between gap-2 text-[11px]">
+                    <div className="flex items-center justify-between gap-2 text-[13px]">
                       <span className="truncate text-muted-foreground">
                         {project.completedTasks ?? 0} of {totalTasks} tasks done
                       </span>
@@ -149,7 +149,7 @@ export default function ProjectSpotlight({ projects, isLoading, onNavigate }: Pr
                   </div>
                   <span
                     className={cn(
-                      'inline-flex shrink-0 items-center gap-1 text-[11px] text-muted-foreground',
+                      'inline-flex shrink-0 items-center gap-1 text-[13px] text-muted-foreground',
                       isOverdue && 'text-rose-600 dark:text-rose-400'
                     )}
                   >
@@ -158,7 +158,7 @@ export default function ProjectSpotlight({ projects, isLoading, onNavigate }: Pr
                   </span>
                 </div>
 
-                <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 pl-4 text-[11px] text-muted-foreground">
+                <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 pl-4 text-[13px] text-muted-foreground">
                   <span className="inline-flex items-center gap-1">
                     <UserRound className="h-3 w-3" />
                     {project.manager?.name?.split(' ')[0] || 'Unassigned'}

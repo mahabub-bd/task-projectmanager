@@ -98,8 +98,8 @@ export default function ActivityFeed({ activities = [], limit = 5, onNavigate }:
                 </span>
 
                 <div className="min-w-0 flex-1 pt-0.5">
-                  <p className="text-xs font-medium leading-snug">{activity.title}</p>
-                  <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-muted-foreground">
+                  <p className="text-sm font-medium leading-snug">{activity.title}</p>
+                  <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-muted-foreground">
                     {activity.user && <span>{activity.user.name.split(' ')[0]}</span>}
                     {activity.description && (
                       <>

@@ -41,14 +41,14 @@ export function DashboardCard({
           )}
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <h2 className="truncate text-sm font-semibold tracking-tight sm:text-base">{title}</h2>
+              <h2 className="truncate text-base font-semibold tracking-tight sm:text-lg">{title}</h2>
               {count !== undefined && (
-                <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold tabular-nums text-muted-foreground">
+                <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-semibold tabular-nums text-muted-foreground">
                   {count}
                 </span>
               )}
             </div>
-            {subtitle && <p className="truncate text-xs text-muted-foreground">{subtitle}</p>}
+            {subtitle && <p className="truncate text-sm text-muted-foreground">{subtitle}</p>}
           </div>
         </div>
 
@@ -56,7 +56,7 @@ export function DashboardCard({
           <button
             type="button"
             onClick={action.onClick}
-            className="group/link inline-flex shrink-0 items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-primary/5 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="group/link inline-flex shrink-0 items-center gap-1 rounded-lg px-2 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-primary/5 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             {action.label}
             <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5" />
@@ -91,13 +91,13 @@ export function DashboardEmptyState({
       <span className="mb-3 grid h-11 w-11 place-items-center rounded-2xl bg-muted text-muted-foreground">
         <Icon className="h-5 w-5" />
       </span>
-      <p className="text-sm font-semibold">{title}</p>
-      {description && <p className="mt-1 max-w-xs text-xs text-muted-foreground">{description}</p>}
+      <p className="text-base font-semibold">{title}</p>
+      {description && <p className="mt-1 max-w-xs text-sm text-muted-foreground">{description}</p>}
       {actionLabel && onAction && (
         <button
           type="button"
           onClick={onAction}
-          className="mt-4 rounded-lg bg-primary px-3.5 py-2 text-xs font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          className="mt-4 rounded-lg bg-primary px-3.5 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           {actionLabel}
         </button>

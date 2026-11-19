@@ -1,4 +1,4 @@
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 import { Route, Routes } from 'react-router-dom';
 
 
@@ -9,6 +9,20 @@ import { PageActionsProvider } from './contexts/PageActionsContext';
 import NotFoundPage from './pages/NotFoundPage';
 
 function App() {
+  // Prefetch the dashboard (heaviest page) while the browser is idle,
+  // so its code-split chunk is ready before the user navigates to it.
+  useEffect(() => {
+    const prefetch = () => import('@/pages/DashboardPage');
+    const id =
+      typeof requestIdleCallback === 'function'
+        ? requestIdleCallback(prefetch)
+        : setTimeout(prefetch, 1500);
+    return () => {
+      if (typeof cancelIdleCallback === 'function' && typeof id === 'number') cancelIdleCallback(id);
+      else clearTimeout(id as number);
+    };
+  }, []);
+
   return (
     <PageActionsProvider>
       <div className="min-h-screen bg-background">

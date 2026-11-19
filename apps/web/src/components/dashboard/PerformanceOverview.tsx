@@ -39,8 +39,8 @@ function ProgressRing({ value }: { value: number }) {
         />
       </svg>
       <div className="absolute text-center">
-        <p className="text-2xl font-semibold tabular-nums tracking-tight">{safeValue}%</p>
-        <p className="mt-0.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+        <p className="text-3xl font-semibold tabular-nums tracking-tight">{safeValue}%</p>
+        <p className="mt-0.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
           Completed
         </p>
       </div>
@@ -86,8 +86,8 @@ export default function PerformanceOverview({ stats }: PerformanceOverviewProps)
           {signals.map((signal) => (
             <div key={signal.label} className="space-y-1.5">
               <div className="flex items-baseline justify-between gap-2">
-                <span className="text-xs font-medium">{signal.label}</span>
-                <span className="text-xs font-semibold tabular-nums">{signal.value}%</span>
+                <span className="text-sm font-medium">{signal.label}</span>
+                <span className="text-sm font-semibold tabular-nums">{signal.value}%</span>
               </div>
               <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
                 <div
@@ -95,13 +95,13 @@ export default function PerformanceOverview({ stats }: PerformanceOverviewProps)
                   style={{ width: `${Math.min(signal.value, 100)}%` }}
                 />
               </div>
-              <p className="text-[11px] text-muted-foreground">{signal.hint}</p>
+              <p className="text-[13px] text-muted-foreground">{signal.hint}</p>
             </div>
           ))}
         </div>
       </div>
 
-      <p className="mt-5 border-t border-border/60 pt-3 text-[11px] text-muted-foreground">
+      <p className="mt-5 border-t border-border/60 pt-3 text-[13px] text-muted-foreground">
         Calculated from current tasks and milestones in this workspace.
       </p>
     </DashboardCard>

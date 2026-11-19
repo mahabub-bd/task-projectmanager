@@ -83,23 +83,23 @@ export default function TeamOverview({ teamMembers, onNavigate }: TeamOverviewPr
               >
                 <Avatar className="h-9 w-9 shrink-0 border border-border/70">
                   <AvatarImage src={member.avatar} alt={member.name} />
-                  <AvatarFallback className="bg-primary/10 text-[11px] font-semibold text-primary">
+                  <AvatarFallback className="bg-primary/10 text-[13px] font-semibold text-primary">
                     {getInitials(member.name)}
                   </AvatarFallback>
                 </Avatar>
 
                 <div className="min-w-0 flex-1 space-y-1.5">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="truncate text-xs font-semibold transition-colors group-hover:text-primary">
+                    <span className="truncate text-sm font-semibold transition-colors group-hover:text-primary">
                       {member.name}
                     </span>
-                    <span className={cn('shrink-0 text-[10px] font-medium', workload.tone)}>
+                    <span className={cn('shrink-0 text-xs font-medium', workload.tone)}>
                       {workload.label}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Progress value={rate} className="h-1.5 flex-1" />
-                    <span className="w-14 shrink-0 text-right text-[10px] tabular-nums text-muted-foreground">
+                    <span className="w-14 shrink-0 text-right text-xs tabular-nums text-muted-foreground">
                       {member.tasks.completed}/{member.tasks.total}
                     </span>
                   </div>

@@ -111,17 +111,17 @@ export default function EnhancedStatsOverview({ stats, onNavigate }: EnhancedSta
           >
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
-                <p className="truncate text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground sm:text-[11px]">
+                <p className="truncate text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground sm:text-[13px]">
                   {stat.title}
                 </p>
-                <p className="mt-2 text-xl font-semibold tracking-tight tabular-nums sm:text-2xl">{stat.value}</p>
+                <p className="mt-2 text-2xl font-semibold tracking-tight tabular-nums sm:text-3xl">{stat.value}</p>
               </div>
               <span className={cn('grid h-8 w-8 shrink-0 place-items-center rounded-lg sm:h-9 sm:w-9 sm:rounded-xl', tone.icon)}>
                 <Icon className="h-4 w-4" />
               </span>
             </div>
 
-            <p className="mt-2 truncate text-[10px] text-muted-foreground sm:text-[11px]">{stat.description}</p>
+            <p className="mt-2 truncate text-xs text-muted-foreground sm:text-[13px]">{stat.description}</p>
 
             {stat.progress !== undefined && (
               <div className="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-muted">

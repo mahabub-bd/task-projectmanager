@@ -1,14 +1,11 @@
-import DashboardPage from '@/pages/DashboardPage';
 import ForgotPasswordPage from '@/pages/ForgotPasswordPage';
 import LoginPage from '@/pages/LoginPage';
 import RegisterPage from '@/pages/RegisterPage';
 import ResetPasswordPage from '@/pages/ResetPasswordPage';
 import React, { lazy } from 'react';
 
-
-
-
-// Lazy pages
+// Lazy pages (dashboard is the heaviest page — keep it out of the entry bundle)
+const DashboardPage = lazy(() => import('@/pages/DashboardPage'));
 const TasksPage = lazy(() => import('@/pages/TasksPage'));
 const TaskDetailsPage = lazy(() => import('@/pages/TaskDetailsPage'));
 const ProjectsPage = lazy(() => import('@/pages/ProjectsPage'));

@@ -30,6 +30,7 @@ export default function SearchBar({
           <Input
             type="text"
             placeholder={placeholder}
+            aria-label={placeholder}
             value={value}
             onChange={(e) => onChange(e.target.value)}
             className="pl-8 sm:pl-10 h-9 sm:h-10 text-xs sm:text-sm"
@@ -37,7 +38,7 @@ export default function SearchBar({
         </div>
         <Button onClick={button.onClick} size="sm" className="sm:size-default shrink-0 h-9 sm:h-10 text-xs sm:text-sm whitespace-nowrap">
           {button.icon && <button.icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
-          <span className="hidden xs:inline">{button.label}</span>
+          <span>{button.label}</span>
         </Button>
       </div>
     );

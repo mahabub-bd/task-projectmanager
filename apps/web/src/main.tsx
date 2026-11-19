@@ -21,8 +21,7 @@ ReactDOM.createRoot(document.getElementById('app')!).render(
         </ThemeProvider>
       </PersistGate>
       <ToastContainer
-        position="top-right"
-      />
+        position="top-right" aria-label={undefined}      />
     </Provider>
   </React.StrictMode>,
 );

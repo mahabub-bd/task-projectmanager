@@ -14,27 +14,11 @@ import { useAppSelector } from '../store/hooks';
 import { hasPermission } from '../utils/permissions';
 import {
   useGetActivityLogQuery,
+  useGetDashboardStatsQuery,
   useGetDepartmentsQuery,
-  useGetMilestonesQuery,
-  useGetOrganizationsQuery,
   useGetProjectsQuery,
   useGetTasksQuery,
 } from '../store/api';
-
-// Helper function to calculate accurate project progress
-const calculateProjectProgress = (project: any, allTasks: any[]) => {
-  const projectTasks = allTasks.filter((t: any) => t.project_id === project.id);
-  const totalTasks = projectTasks.length;
-  const completedTasks = projectTasks.filter((t: any) => t.status === 'completed').length;
-  const progress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
-
-  return {
-    progress,
-    totalTasks,
-    completedTasks,
-    inProgressTasks: projectTasks.filter((t: any) => t.status === 'in_progress').length,
-  };
-};
 
 function DashboardSkeleton() {
   return (
@@ -69,133 +53,94 @@ export default function DashboardPage() {
   const user = useAppSelector((state) => state.auth.user);
   const canViewAuditLogs = hasPermission(user, 'read:audit');
 
-  // Fetch all data without pagination limit for accurate stats
-  const { data: projectsResponse, isLoading: isLoadingProjects } = useGetProjectsQuery({ limit: 1000 });
-  const { data: tasksResponse, isLoading: isLoadingTasks } = useGetTasksQuery({ limit: 1000 });
-  const { data: milestonesResponse, isLoading: isLoadingMilestones } = useGetMilestonesQuery({ limit: 1000 });
-  const { data: departmentsResponse, isLoading: isLoadingDepartments } = useGetDepartmentsQuery({ limit: 1000 });
+  // Aggregate counts come from the dedicated stats endpoint (a handful of
+  // GROUP BY queries) instead of downloading every row with limit: 1000.
+  const { data: statsResponse, isLoading: isLoadingStats } = useGetDashboardStatsQuery(undefined);
+  const stats = statsResponse?.data;
+
+  // Small, bounded list fetches for the sections that need real rows.
+  const { data: tasksResponse, isLoading: isLoadingTasks } = useGetTasksQuery({
+    limit: 50,
+    sort_by: 'created_at',
+    sort_order: 'DESC',
+  });
+  const { data: projectsResponse, isLoading: isLoadingProjects } = useGetProjectsQuery({
+    status: 'active',
+    limit: 25,
+  });
+  const { data: departmentsResponse, isLoading: isLoadingDepartments } = useGetDepartmentsQuery({ limit: 200 });
   const { data: activitiesResponse, isLoading: isLoadingActivities } = useGetActivityLogQuery({ limit: 5 });
-  const { data: organizationsResponse } = useGetOrganizationsQuery({ limit: 1000 });
 
   const isLoading =
-    isLoadingProjects || isLoadingTasks || isLoadingMilestones || isLoadingDepartments || isLoadingActivities;
+    isLoadingStats || isLoadingTasks || isLoadingProjects || isLoadingDepartments || isLoadingActivities;
 
-  const projects = projectsResponse?.items || [];
   const tasks = tasksResponse?.items || [];
-  const milestones = milestonesResponse?.items || [];
+  const projects = projectsResponse?.items || [];
   const departments = departmentsResponse?.items || [];
   const auditLogs = activitiesResponse?.items || [];
-  const organizations = organizationsResponse || [];
 
-  const orgStats = useMemo(() => {
-    let totalDepartments = 0;
-    let totalUsers = 0;
-
-    organizations.forEach((org: any) => {
-      totalDepartments += org.departments?.length || 0;
-      totalUsers += org.users?.length || 0;
-    });
-
-    return {
-      totalOrganizations: organizations.length,
-      totalDepartments,
-      totalUsers,
-    };
-  }, [organizations]);
-
-  const totalProjectsCount = projectsResponse?.total || projects.length;
-  const totalTasksCount = tasksResponse?.total || tasks.length;
-  const totalMilestonesCount = milestonesResponse?.total || milestones.length;
+  const orgStats = stats?.organization ?? { totalOrganizations: 0, totalDepartments: 0, totalUsers: 0 };
+  const totalMilestonesCount = stats?.milestones.total ?? 0;
 
   const taskStats = useMemo(() => {
-    const now = new Date();
-    const total = totalTasksCount;
-    const completed = tasks.filter((t: any) => t.status === 'completed').length;
-    const inProgress = tasks.filter((t: any) => t.status === 'in_progress').length;
-    const overdue = tasks.filter(
-      (t: any) => new Date(t.due_date) < now && t.status !== 'completed'
-    ).length;
-    const completionRate = total > 0 ? Math.round((completed / total) * 100) : 0;
-
-    return { total, completed, inProgress, overdue, completionRate };
-  }, [tasks, totalTasksCount]);
+    const byStatus = stats?.tasks.byStatus ?? {};
+    return {
+      total: stats?.tasks.total ?? 0,
+      completed: stats?.tasks.completed ?? 0,
+      inProgress: byStatus['in_progress'] ?? 0,
+      overdue: stats?.tasks.overdue ?? 0,
+      completionRate: stats?.tasks.completionRate ?? 0,
+    };
+  }, [stats]);
 
   const projectStats = useMemo(() => {
-    const total = totalProjectsCount;
-    const completed = projects.filter((p: any) => p.status === 'completed').length;
-    const active = projects.filter((p: any) => p.status === 'active').length;
-
-    const projectsWithProgress = projects.map((project: any) => ({
-      ...project,
-      ...calculateProjectProgress(project, tasks),
-    }));
-
-    const avgProgress =
-      total > 0
-        ? Math.round(projectsWithProgress.reduce((sum: number, p: any) => sum + (p.progress || 0), 0) / total)
-        : 0;
-
+    const byStatus = stats?.projects.byStatus ?? {};
     return {
-      total,
-      completed,
-      active,
-      avgProgress,
+      total: stats?.projects.total ?? 0,
+      completed: byStatus['completed'] ?? 0,
+      active: byStatus['active'] ?? 0,
       totalMilestones: totalMilestonesCount,
-      completedMilestones: milestones.filter((m: any) => m.status === 'completed').length,
-      completedTasks: tasks.filter((t: any) => t.status === 'completed').length,
-      projectsWithProgress,
+      completedMilestones: stats?.milestones.completed ?? 0,
+      completedTasks: stats?.tasks.completed ?? 0,
     };
-  }, [projects, milestones, tasks, totalProjectsCount, totalMilestonesCount]);
+  }, [stats, totalMilestonesCount]);
 
   // Delivery health uses real workspace data instead of fabricated trend values.
   const healthStats = useMemo(() => {
-    const now = new Date();
-    const activeTasks = tasks.filter((t: any) => t.status !== 'completed');
-    const overdueTasks = activeTasks.filter(
-      (t: any) => t.due_date && new Date(t.due_date) < now
-    ).length;
+    const activeTasks =
+      (stats?.tasks.total ?? 0) - (stats?.tasks.completed ?? 0) - (stats?.tasks.byStatus?.['cancelled'] ?? 0);
+    const overdueTasks = stats?.tasks.overdue ?? 0;
     const onTrackRate =
-      activeTasks.length > 0 ? Math.round(((activeTasks.length - overdueTasks) / activeTasks.length) * 100) : 100;
+      activeTasks > 0 ? Math.round(((activeTasks - overdueTasks) / activeTasks) * 100) : 100;
     const milestoneRate =
       totalMilestonesCount > 0
-        ? Math.round((projectStats.completedMilestones / totalMilestonesCount) * 100)
+        ? Math.round(((stats?.milestones.completed ?? 0) / totalMilestonesCount) * 100)
         : 0;
 
     return {
-      completionRate: taskStats.completionRate,
+      completionRate: stats?.tasks.completionRate ?? 0,
       onTrackRate,
       milestoneRate,
-      activeTasks: activeTasks.length,
+      activeTasks,
       overdueTasks,
-      completedMilestones: projectStats.completedMilestones,
+      completedMilestones: stats?.milestones.completed ?? 0,
       totalMilestones: totalMilestonesCount,
     };
-  }, [tasks, totalMilestonesCount, projectStats.completedMilestones, taskStats.completionRate]);
+  }, [stats, totalMilestonesCount]);
 
-  const recentTasks = useMemo(() => {
-    return [...tasks]
-      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-      .slice(0, 5);
-  }, [tasks]);
+  // Already sorted by created_at DESC server-side.
+  const recentTasks = tasks.slice(0, 5);
 
   const featuredProjects = useMemo(() => {
-    const projectsWithAccurateProgress = projects.map((project: any) => {
-      const progressData = calculateProjectProgress(project, tasks);
-      const projectTasks = tasks.filter((t: any) => t.project_id === project.id);
-
-      return {
-        ...project,
-        ...progressData,
-        task_count: progressData.totalTasks,
-        tasks: projectTasks,
-      };
-    });
-
-    return projectsWithAccurateProgress
-      .filter((p: any) => p.status === 'active')
-      .sort((a: any, b: any) => b.task_count - a.task_count)
-      .slice(0, 5);
-  }, [projects, tasks]);
+    return [...projects]
+      .sort((a: any, b: any) => (b.task_count ?? 0) - (a.task_count ?? 0))
+      .slice(0, 5)
+      .map((p: any) => ({
+        ...p,
+        totalTasks: p.task_count ?? 0,
+        completedTasks: Math.round(((p.task_count ?? 0) * (p.progress ?? 0)) / 100),
+      }));
+  }, [projects]);
 
   const activities = useMemo(() => {
     return auditLogs.map((log: any) => {
@@ -306,19 +251,41 @@ export default function DashboardPage() {
   }, [auditLogs]);
 
   const departmentStats = useMemo(() => {
+    // Single pass: bucket projects by department, tasks by department
+    // (via their project's department), instead of nested filters.
+    const projectById = new Map<string, any>();
+    projects.forEach((p: any) => projectById.set(p.id, p));
+
+    const projectsByDept = new Map<string, any[]>();
+    projects.forEach((p: any) => {
+      if (p.department_id == null) return;
+      const list = projectsByDept.get(p.department_id);
+      if (list) list.push(p);
+      else projectsByDept.set(p.department_id, [p]);
+    });
+
+    const taskCountsByDept = new Map<string, { total: number; completed: number }>();
+    tasks.forEach((t: any) => {
+      const project = t.project_id != null ? projectById.get(t.project_id) : undefined;
+      const deptId = project?.department_id;
+      if (deptId == null) return;
+      const counts = taskCountsByDept.get(deptId) || { total: 0, completed: 0 };
+      counts.total++;
+      if (t.status === 'completed') counts.completed++;
+      taskCountsByDept.set(deptId, counts);
+    });
+
     return departments.map((dept: any) => {
-      const deptProjects = projects.filter((p: any) => p.department_id === dept.id);
-      const deptTasks = tasks.filter((t: any) => deptProjects.some((p: any) => p.id === t.project_id));
-      const completedTasks = deptTasks.filter((t: any) => t.status === 'completed').length;
-      const totalTasks = deptTasks.length;
-      const progress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+      const deptProjects = projectsByDept.get(dept.id) || [];
+      const counts = taskCountsByDept.get(dept.id) || { total: 0, completed: 0 };
+      const progress = counts.total > 0 ? Math.round((counts.completed / counts.total) * 100) : 0;
 
       return {
         department: dept,
         totalProjects: deptProjects.length,
         activeProjects: deptProjects.filter((p: any) => p.status === 'active').length,
-        totalTasks,
-        completedTasks,
+        totalTasks: counts.total,
+        completedTasks: counts.completed,
         teamMembers: dept.users?.length || 0,
         progress,
       };

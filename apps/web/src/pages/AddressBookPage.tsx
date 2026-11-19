@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useGetDepartmentsListQuery, useGetDesignationsListQuery, useGetDivisionsListQuery, useGetOrganizationDirectoryQuery } from '@/store/api';
 import type { RootState } from '@/store/store';
-import { Download, Search, Users } from 'lucide-react';
+import { FileSpreadsheet, FileText, Search, Users } from 'lucide-react';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -177,8 +177,8 @@ export default function AddressBookPage() {
             disabled={isExporting}
             className="gap-1.5 sm:gap-2 px-2 sm:px-3 h-8 sm:h-9"
           >
-            <Download className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            <span className="hidden xs:inline">Excel</span>
+            <FileSpreadsheet className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-emerald-600" />
+            <span>Excel</span>
           </Button>
           <Button
             variant="outline"
@@ -187,8 +187,8 @@ export default function AddressBookPage() {
             disabled={isExporting}
             className="gap-1.5 sm:gap-2 px-2 sm:px-3 h-8 sm:h-9"
           >
-            <Download className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            <span className="hidden xs:inline">PDF</span>
+            <FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-red-600" />
+            <span>PDF</span>
           </Button>
         </div>
       </div>

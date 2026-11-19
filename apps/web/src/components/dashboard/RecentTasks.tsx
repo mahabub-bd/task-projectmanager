@@ -73,15 +73,15 @@ export default function RecentTasks({ tasks, isLoading, onNavigate }: RecentTask
                 />
 
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-medium transition-colors group-hover:text-primary">
+                  <span className="block truncate text-base font-medium transition-colors group-hover:text-primary">
                     {task.title}
                   </span>
                   <span className="mt-1.5 flex flex-wrap items-center gap-1.5">
-                    <Badge variant={`status-${task.status}` as any} className="px-2 py-0.5 text-[10px]">
+                    <Badge variant={`status-${task.status}` as any} className="px-2 py-0.5 text-xs">
                       {String(task.status || 'unknown').replace('_', ' ')}
                     </Badge>
                     {task.project?.name && (
-                      <span className="max-w-[10rem] truncate rounded-md bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
+                      <span className="rounded-md bg-muted px-2 py-0.5 text-xs break-words text-muted-foreground">
                         {task.project.name}
                       </span>
                     )}
@@ -91,7 +91,7 @@ export default function RecentTasks({ tasks, isLoading, onNavigate }: RecentTask
                 <span className="flex shrink-0 flex-col items-end gap-1.5">
                   <span
                     className={cn(
-                      'inline-flex items-center gap-1 text-[11px] text-muted-foreground',
+                      'inline-flex items-center gap-1 text-[13px] text-muted-foreground',
                       isOverdue && 'font-medium text-rose-600 dark:text-rose-400'
                     )}
                   >
@@ -99,8 +99,8 @@ export default function RecentTasks({ tasks, isLoading, onNavigate }: RecentTask
                     {formatDashboardDate(task.due_date)}
                   </span>
                   {task.assigned_to_user && (
-                    <span className="inline-flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                      <span className="grid h-5 w-5 place-items-center rounded-full bg-primary/90 text-[9px] font-semibold text-primary-foreground">
+                    <span className="inline-flex items-center gap-1.5 text-[13px] text-muted-foreground">
+                      <span className="grid h-5 w-5 place-items-center rounded-full bg-primary/90 text-[11px] font-semibold text-primary-foreground">
                         {task.assigned_to_user.name?.charAt(0).toUpperCase() || '?'}
                       </span>
                       <span className="hidden max-w-20 truncate sm:inline">
