@@ -24,66 +24,79 @@ export default function StatsCard({
   icon: Icon,
   iconClassName,
   valueClassName,
-  iconBgColor = 'bg-primary/10',
+  iconBgColor = 'bg-primary/10 text-primary',
   trend,
   className,
 }: StatsCardProps) {
+  const hasFooter = Boolean(subtext || trend);
+
   return (
-    <Card className={cn(
-      'group relative overflow-hidden rounded-2xl transition-all duration-300 hover:shadow-lg hover:border-primary/50',
-      className
-    )}>
-      {/* Background gradient decoration */}
-      <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-br from-primary/5 to-transparent rounded-bl-full -mr-8 -mt-8 transition-all duration-300 group-hover:from-primary/10" />
+    <Card
+      className={cn(
+        'stats-card group relative flex h-full flex-col overflow-hidden rounded-xl border-border/70 bg-card/80 transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md',
+        className
+      )}
+    >
+      {/* Accent line that draws in on hover */}
+      <span
+        aria-hidden="true"
+        className="absolute inset-x-0 top-0 h-0.5 origin-left scale-x-0 bg-linear-to-r from-primary/50 to-primary transition-transform duration-300 group-hover:scale-x-100"
+      />
 
-      <CardContent className="p-3 sm:p-6">
-        <div className="flex items-start justify-between">
-          {/* Left side - Content */}
-          <div className="flex-1 space-y-0.5 sm:space-y-2">
-            <p className="text-xs sm:text-sm font-medium text-muted-foreground">{title}</p>
-            <div className={cn(
-              'text-xl sm:text-3xl font-bold tracking-tight',
-              valueClassName
-            )}>
+      <CardContent className="flex flex-1 flex-col p-4 sm:p-5">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-[11px] font-semibold uppercase tracking-[0.1em] text-muted-foreground sm:text-xs">
+              {title}
+            </p>
+            <p
+              className={cn(
+                'mt-1.5 text-2xl font-semibold tracking-tight tabular-nums sm:text-3xl',
+                valueClassName
+              )}
+            >
               {value}
-            </div>
-
-            {/* Subtext or Trend */}
-            {subtext && !trend && (
-              <p className="text-[10px] sm:text-sm text-muted-foreground">{subtext}</p>
-            )}
-
-            {/* Trend Indicator */}
-            {trend && (
-              <div className="flex items-center gap-0.5 sm:gap-1 text-[10px] sm:text-sm">
-                {trend.isPositive ? (
-                  <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-emerald-600 dark:text-emerald-400" />
-                ) : (
-                  <TrendingDown className="h-3 w-3 sm:h-4 sm:w-4 text-red-600 dark:text-red-400" />
-                )}
-                <span className={cn(
-                  'font-medium',
-                  trend.isPositive ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'
-                )}>
-                  {trend.isPositive ? '+' : ''}{trend.value}%
-                </span>
-                <span className="text-muted-foreground ml-0.5 sm:ml-1 hidden xs:inline">vs last month</span>
-              </div>
-            )}
+            </p>
           </div>
 
-          {/* Right side - Icon */}
-          <div className={cn(
-            'flex h-9 w-9 sm:h-14 sm:w-14 items-center justify-center rounded-full transition-all duration-300',
-            iconBgColor,
-            'group-hover:scale-110 group-hover:shadow-md'
-          )}>
-            <Icon className={cn('h-4 w-4 sm:h-7 sm:w-7', iconClassName)} />
-          </div>
+          <span
+            className={cn(
+              'grid h-9 w-9 shrink-0 place-items-center rounded-xl transition-all duration-300 group-hover:scale-105 group-hover:shadow-sm sm:h-10 sm:w-10',
+              iconBgColor
+            )}
+          >
+            <Icon className={cn('h-4 w-4 sm:h-5 sm:w-5', iconClassName)} aria-hidden="true" />
+          </span>
         </div>
 
-        {/* Bottom highlight bar on hover */}
-        <div className="absolute bottom-0 left-0 h-1 bg-linear-to-r from-primary/50 to-primary scale-x-0 transition-transform duration-300 group-hover:scale-x-100 rounded-b-2xl" />
+        {hasFooter && (
+          <div className="mt-auto flex min-h-[1.375rem] flex-wrap items-center gap-x-2.5 gap-y-1 pt-3 text-[13px]">
+            {trend && (
+              <span
+                className={cn(
+                  'inline-flex items-center gap-1 font-medium',
+                  trend.isPositive
+                    ? 'text-emerald-600 dark:text-emerald-400'
+                    : 'text-red-600 dark:text-red-400'
+                )}
+              >
+                {trend.isPositive ? (
+                  <TrendingUp className="h-3.5 w-3.5" aria-hidden="true" />
+                ) : (
+                  <TrendingDown className="h-3.5 w-3.5" aria-hidden="true" />
+                )}
+                <span className="tabular-nums">
+                  {trend.isPositive ? '+' : ''}
+                  {trend.value}%
+                </span>
+              </span>
+            )}
+
+            {subtext && (
+              <span className="truncate text-muted-foreground">{subtext}</span>
+            )}
+          </div>
+        )}
       </CardContent>
     </Card>
   );

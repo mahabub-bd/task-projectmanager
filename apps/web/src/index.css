@@ -5,6 +5,10 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
+  /* Small-phone breakpoint used by `hidden xs:*` utilities. Tailwind ships no
+     `xs` variant by default, so without this those elements never render. */
+  --breakpoint-xs: 30rem;
+
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
   --color-card: hsl(var(--card));
@@ -370,4 +374,22 @@ body {
   .dashboard-enter {
     animation: none;
   }
+
+  /* Stat surfaces animate on hover (lift, glow, accent draw-in, meter fill).
+     Collapse those transitions for users who opt out of motion. */
+  .dashboard-card,
+  .dashboard-card *,
+  .stats-card,
+  .stats-card * {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Dashboard: all interactive/route elements show pointer cursor */
+.dashboard-page button,
+.dashboard-page [role='button'],
+.dashboard-page a {
+  cursor: pointer;
 }

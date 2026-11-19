@@ -24,14 +24,19 @@ function DashboardSkeleton() {
   return (
     <div className="dashboard-page space-y-5 sm:space-y-6" aria-busy="true" aria-label="Loading dashboard">
       <div className="h-24 animate-pulse rounded-2xl bg-muted/40" />
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
+      {/* Mirrors QuickActions: five pills, horizontally scrollable on mobile */}
+      <div className="flex gap-2 md:grid md:grid-cols-5">
         {[0, 1, 2, 3, 4].map((item) => (
-          <div key={item} className="h-16 animate-pulse rounded-xl bg-muted/40" />
+          <div
+            key={item}
+            className="h-12 w-40 shrink-0 animate-pulse rounded-xl bg-muted/40 md:w-auto"
+          />
         ))}
       </div>
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {[0, 1, 2, 3].map((item) => (
-          <div key={item} className="h-32 animate-pulse rounded-2xl bg-muted/40" />
+      {/* Mirrors EnhancedStatsOverview: six stat cards */}
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4 2xl:grid-cols-6">
+        {[0, 1, 2, 3, 4, 5].map((item) => (
+          <div key={item} className="h-56 animate-pulse rounded-2xl bg-muted/40" />
         ))}
       </div>
       <div className="grid gap-5 xl:grid-cols-12">
@@ -55,8 +60,9 @@ export default function DashboardPage() {
 
   // Aggregate counts come from the dedicated stats endpoint (a handful of
   // GROUP BY queries) instead of downloading every row with limit: 1000.
-  const { data: statsResponse, isLoading: isLoadingStats } = useGetDashboardStatsQuery(undefined);
-  const stats = statsResponse?.data;
+  // baseQueryWithResponseTransform already unwraps the { data } envelope,
+  // so statsResponse IS the stats payload itself.
+  const { data: stats, isLoading: isLoadingStats } = useGetDashboardStatsQuery(undefined);
 
   // Small, bounded list fetches for the sections that need real rows.
   const { data: tasksResponse, isLoading: isLoadingTasks } = useGetTasksQuery({
